@@ -1,0 +1,5 @@
+notifications:
+  email: false
+language: haxe
+haxe:
+  - "3.2.1"
