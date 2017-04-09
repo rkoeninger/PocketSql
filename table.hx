@@ -1,5 +1,0 @@
-package table;
-
-class ClassName {
-	
-}
