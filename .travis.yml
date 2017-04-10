@@ -3,3 +3,7 @@ notifications:
 language: haxe
 haxe:
   - "3.2.1"
+install:
+  - haxelib hxcs
+script:
+  - haxe build.hxml
