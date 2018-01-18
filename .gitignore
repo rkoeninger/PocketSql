@@ -1,1 +1,6 @@
-output/
+.vs/
+bin/
+obj/
+packages/
+*.user
+*.suo

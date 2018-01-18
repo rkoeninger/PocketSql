@@ -1,9 +1,5 @@
 notifications:
   email: false
-language: haxe
-haxe:
-  - "3.2.1"
-install:
-  - haxelib install hxcs
+language: csharp
 script:
-  - haxe build.hxml
+  - echo "Csharp 7 not supported on travis"
