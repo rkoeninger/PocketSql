@@ -7,7 +7,21 @@ namespace PocketSql.Tests
         [Test]
         public void Test()
         {
-            ParseIt.Main(@"
+            ParseIt.LogTokens(@"
+                select *
+                from People
+                where Age > 30");
+        }
+
+        [Test]
+        public void Test2()
+        {
+            ParseIt.LogStatements(@"
+                insert into People
+                (Name, Age)
+                values
+                ('Rob', 30)
+
                 select *
                 from People
                 where Age > 30");
