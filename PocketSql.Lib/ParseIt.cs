@@ -46,20 +46,28 @@ namespace PocketSql
                 if (statement is SelectStatement select)
                 {
                     Console.WriteLine($@"
-                        select {string.Join(", ", select.ComputeClauses)}
+                        select {string.Join(", ",
+                            (select.QueryExpression as QuerySpecification)
+                                .SelectElements.Select(x => x.ToString()))}
                         into {select.Into?.BaseIdentifier}
-                        from {select.On?.Value}
+                        from {((select.QueryExpression as QuerySpecification)
+                            .FromClause.TableReferences[0] as NamedTableReference)
+                                .SchemaObject.BaseIdentifier.Value}
                         where {select.QueryExpression?.ForClause}");
                 }
 
                 if (statement is InsertStatement insert)
                 {
                     Console.WriteLine($@"
-                        insert {insert.InsertSpecification.InsertOption} {(insert.InsertSpecification.Target as NamedTableReference)?.SchemaObject?.BaseIdentifier.Value}
-                        ({string.Join(", ", insert.InsertSpecification.Columns.Select(x => x.MultiPartIdentifier.Identifiers[0].Value))})
+                        insert {insert.InsertSpecification.InsertOption}
+                            {(insert.InsertSpecification.Target as NamedTableReference)
+                                ?.SchemaObject?.BaseIdentifier.Value}
+                        ({string.Join(", ",
+                            insert.InsertSpecification.Columns.Select(x =>
+                                x.MultiPartIdentifier.Identifiers[0].Value))})
                         values {string.Join(", ",
-                            (insert.InsertSpecification.InsertSource as ValuesInsertSource)?.RowValues[0]?
-                                .ColumnValues?
+                            (insert.InsertSpecification.InsertSource as ValuesInsertSource)
+                                ?.RowValues[0]?.ColumnValues?
                                 .Select(ScalarToString) ?? new string[0])}");
                 }
 
@@ -69,16 +77,8 @@ namespace PocketSql
 
         private static string ScalarToString(ScalarExpression expr)
         {
-            if (expr is StringLiteral s)
-            {
-                return $"'{s.Value}'";
-            }
-
-            if (expr is IntegerLiteral i)
-            {
-                return i.Value;
-            }
-
+            if (expr is StringLiteral s) return $"'{s.Value}'";
+            if (expr is IntegerLiteral i) return i.Value;
             return "other-expr";
         }
     }
