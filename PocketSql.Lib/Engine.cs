@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using IsolationLevel = System.Data.IsolationLevel;
@@ -14,7 +15,7 @@ namespace PocketSql
 
         public readonly Dictionary<string, DataTable> tables = new Dictionary<string, DataTable>();
 
-        public DataSet Evalute(StatementList statements)
+        public DataSet Evaluate(StatementList statements)
         {
             var results = new DataSet();
 
@@ -60,7 +61,7 @@ namespace PocketSql
                 this.engine = engine;
             }
 
-            private readonly Engine engine;
+            internal readonly Engine engine;
 
             private bool open;
 
@@ -134,21 +135,129 @@ namespace PocketSql
             // TODO: how to set nullability on parameter?
             public IDbDataParameter CreateParameter() => new EngineParameter(true);
 
-            public int ExecuteNonQuery()
+            private DataSet Execute()
             {
-                throw new NotImplementedException();
+                var parser = new TSql140Parser(false, SqlEngineType.Standalone);
+                var input = new StringReader(CommandText);
+                var statements = parser.ParseStatementList(input, out var errors);
+                // TODO: raise parse errors
+                return connection.engine.Evaluate(statements);
             }
 
             public IDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
 
             public IDataReader ExecuteReader(CommandBehavior behavior)
             {
-                throw new NotImplementedException();
+                return new EngineDataReader(Execute());
+            }
+
+            public int ExecuteNonQuery()
+            {
+                Execute();
+                return -1; // TODO: get lines affected - Evaluate could return broader data type
+                // Defaults to -1 if lines affected is somehow unknown
             }
 
             public object ExecuteScalar()
             {
-                throw new NotImplementedException();
+                Execute();
+                return null; // TODO: how to interpret scalar from dataset?
+                             //       see how ADO does it
+            }
+        }
+
+        private class EngineDataReader : IDataReader
+        {
+            private readonly DataSet data;
+            private int tableIndex = -1;
+            private int rowIndex = -1;
+
+            public EngineDataReader(DataSet data)
+            {
+                this.data = data;
+            }
+
+            public bool IsClosed { get; private set; } = false;
+            public void Close() => IsClosed = true;
+            public void Dispose() => Close();
+            public object this[int i] => GetValue(i);
+            public object this[string name] => this[GetOrdinal(name)];
+
+            public int Depth => throw new NotImplementedException();
+            public int RecordsAffected => throw new NotImplementedException();
+            public int FieldCount => data.Tables[tableIndex].Columns.Count;
+
+            public DataTable GetSchemaTable() => throw new NotImplementedException();
+
+            public string GetName(int i) => data.Tables[tableIndex].Columns[i].ColumnName;
+            public int GetOrdinal(string name) => data.Tables[tableIndex].Columns[name].Ordinal;
+
+            public Type GetFieldType(int i) => data.Tables[tableIndex].Columns[i].DataType;
+            public string GetDataTypeName(int i) => GetFieldType(i).Name;
+
+            public bool IsDBNull(int i) => data.Tables[tableIndex].Rows[rowIndex].IsNull(i);
+
+            public bool GetBoolean(int i) => (bool) GetValue(i);
+            public byte GetByte(int i) => (byte) GetValue(i);
+            public DateTime GetDateTime(int i) => (DateTime) GetValue(i);
+            public decimal GetDecimal(int i) => (decimal) GetValue(i);
+            public double GetDouble(int i) => (double) GetValue(i);
+            public float GetFloat(int i) => (float) GetValue(i);
+            public Guid GetGuid(int i) => (Guid) GetValue(i);
+            public short GetInt16(int i) => (short) GetValue(i);
+            public int GetInt32(int i) => (int) GetValue(i);
+            public long GetInt64(int i) => (long) GetValue(i);
+            public string GetString(int i) => (string) GetValue(i);
+            public char GetChar(int i) => (char)GetValue(i);
+            public object GetValue(int i) => data.Tables[tableIndex].Rows[rowIndex].ItemArray[i];
+
+            public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferOffset, int length)
+            {
+                var bytes = (byte[]) GetValue(i);
+                var amount =
+                    Math.Max(0,
+                        Math.Min(length,
+                            Math.Min(buffer.Length - bufferOffset, bytes.Length - fieldOffset)));
+                Array.Copy(bytes, fieldOffset, buffer, bufferOffset, amount);
+                return amount;
+            }
+
+            public long GetChars(int i, long fieldOffset, char[] buffer, int bufferOffset, int length)
+            {
+                var chars = (char[]) GetValue(i);
+                var amount =
+                    Math.Max(0,
+                        Math.Min(length,
+                            Math.Min(buffer.Length - bufferOffset, chars.Length - fieldOffset)));
+                Array.Copy(chars, fieldOffset, buffer, bufferOffset, amount);
+                return amount;
+            }
+
+            public int GetValues(object[] values)
+            {
+                var i = 0;
+
+                for (; i < values.Length && i < FieldCount; ++i)
+                {
+                    values[i] = GetValue(i);
+                }
+
+                return i;
+            }
+
+            public IDataReader GetData(int i) => throw new NotImplementedException();
+
+            public bool NextResult()
+            {
+                tableIndex++;
+                rowIndex = -1;
+                return tableIndex < data.Tables.Count;
+            }
+
+            public bool Read()
+            {
+                rowIndex++;
+                return rowIndex < data.Tables[tableIndex].Rows.Count;
             }
         }
 
