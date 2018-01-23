@@ -275,6 +275,9 @@ namespace PocketSql
                 case AssignmentKind.Equals:
                     return value;
                 case AssignmentKind.AddEquals:
+                    // TODO: handle numeric conversions properly
+                    if (current is int && value is int)
+                        return (int) current + (int) value;
                     return (decimal)current + (decimal)value;
                 case AssignmentKind.SubtractEquals:
                     return (decimal)current - (decimal)value;
@@ -577,7 +580,7 @@ namespace PocketSql
         private class EngineDataReader : IDataReader
         {
             private readonly List<EngineResult> data;
-            private int tableIndex = 0;
+            private int tableIndex;
             private int rowIndex = -1;
 
             public EngineDataReader(List<EngineResult> data)
