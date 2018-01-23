@@ -155,14 +155,15 @@ namespace PocketSql
 
             foreach (DataRow row in table.Rows)
             {
-                if (Evaluate(update.UpdateSpecification.WhereClause.SearchCondition, row))
+                if (update.UpdateSpecification.WhereClause == null
+                    || Evaluate(update.UpdateSpecification.WhereClause.SearchCondition, row))
                 {
                     foreach (var clause in update.UpdateSpecification.SetClauses)
                     {
                         switch (clause)
                         {
                             case AssignmentSetClause set:
-                                var columnName = ((SchemaObjectName)set.Column.MultiPartIdentifier).BaseIdentifier.Value;
+                                var columnName = set.Column.MultiPartIdentifier.Identifiers.Last().Value;
                                 row[columnName] = Evaluate(
                                     set.AssignmentKind,
                                     row[columnName],
@@ -234,7 +235,8 @@ namespace PocketSql
 
             foreach (DataRow row in table.Rows)
             {
-                if (Evaluate(delete.DeleteSpecification.WhereClause.SearchCondition, row))
+                if (delete.DeleteSpecification.WhereClause == null
+                    || Evaluate(delete.DeleteSpecification.WhereClause.SearchCondition, row))
                 {
                     table.Rows.Remove(row);
                     rowCount++;
