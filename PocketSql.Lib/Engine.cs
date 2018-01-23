@@ -56,6 +56,8 @@ namespace PocketSql
                     return Evaluate(insert, vars);
                 case DeleteStatement delete:
                     return Evaluate(delete, vars);
+                case TruncateTableStatement truncate:
+                    return Evaluate(truncate);
                 case CreateTableStatement createTable:
                     return Evaluate(createTable);
                 case SetVariableStatement set:
@@ -155,6 +157,45 @@ namespace PocketSql
         {
             var tableRef = (NamedTableReference)update.UpdateSpecification.Target;
             var table = tables[tableRef.SchemaObject.BaseIdentifier.Value];
+            DataTable output = null;
+
+            if (update.UpdateSpecification.OutputClause != null)
+            {
+                // TODO: extract and share logic with Evaluate(SelectStatement, ...)
+                // TODO: handle inserted.* vs deleted.* and $action
+                var selections = update.UpdateSpecification.OutputClause.SelectColumns.SelectMany(s =>
+                {
+                    switch (s)
+                    {
+                        case SelectStarExpression star:
+                            return table.Columns.Cast<DataColumn>().Select(c =>
+                                (c.ColumnName,
+                                c.DataType,
+                                (ScalarExpression)CreateColumnReferenceExpression(c.ColumnName)));
+                        case SelectScalarExpression scalar:
+                            return new[]
+                            {
+                                (scalar.ColumnName?.Value ?? InferName(scalar.Expression),
+                                InferType(scalar.Expression, table),
+                                scalar.Expression)
+                            }.AsEnumerable();
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }).ToList();
+
+                output = new DataTable();
+
+                foreach (var (name, type, _) in selections)
+                {
+                    output.Columns.Add(new DataColumn
+                    {
+                        ColumnName = name,
+                        DataType = type
+                    });
+                }
+            }
+
             var rowCount = 0;
 
             foreach (DataRow row in table.Rows)
@@ -164,10 +205,13 @@ namespace PocketSql
                 {
                     foreach (var clause in update.UpdateSpecification.SetClauses)
                     {
+                        var oldValues = output == null ? null : new Dictionary<string, object>();
+
                         switch (clause)
                         {
                             case AssignmentSetClause set:
                                 var columnName = set.Column.MultiPartIdentifier.Identifiers.Last().Value;
+                                if (output != null) oldValues[columnName] = row[columnName];
                                 row[columnName] = Evaluate(
                                     set.AssignmentKind,
                                     row[columnName],
@@ -175,6 +219,11 @@ namespace PocketSql
                                 break;
                             default:
                                 throw new NotImplementedException();
+                        }
+
+                        if (output != null)
+                        {
+                            // TODO: add row to output, differentiating between inserted. and deleted.
                         }
                     }
 
@@ -185,6 +234,7 @@ namespace PocketSql
             return new EngineResult
             {
                 RecordsAffected = rowCount
+                // TODO: ResultSet = output
             };
         }
 
@@ -253,6 +303,19 @@ namespace PocketSql
                     rowCount++;
                 }
             }
+
+            return new EngineResult
+            {
+                RecordsAffected = rowCount
+            };
+        }
+
+        private EngineResult Evaluate(TruncateTableStatement truncate)
+        {
+            // TODO: partition ranges
+            var table = tables[truncate.TableName.BaseIdentifier.Value];
+            var rowCount = table.Rows.Count;
+            table.Rows.Clear();
 
             return new EngineResult
             {
