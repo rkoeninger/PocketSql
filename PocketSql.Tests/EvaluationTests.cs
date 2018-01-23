@@ -10,7 +10,7 @@ namespace PocketSql.Tests
         [Test]
         public void CreateInsertSelect()
         {
-            var engine = new Engine();
+            var engine = new Engine(140);
 
             using (var connection = engine.GetConnection())
             {

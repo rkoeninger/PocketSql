@@ -11,7 +11,33 @@ namespace PocketSql
 {
     public class Engine
     {
-        public IDbConnection GetConnection() => new EngineConnection(this);
+        private readonly SqlVersion sqlVersion;
+
+        public Engine(int version) : this(IntToSqlVersion(version)) { }
+
+        // TODO: make public
+        private Engine(SqlVersion sqlVersion)
+        {
+            this.sqlVersion = sqlVersion;
+        }
+
+        private static SqlVersion IntToSqlVersion(int version)
+        {
+            switch (version)
+            {
+                case 80:  return SqlVersion.Sql80;
+                case 90:  return SqlVersion.Sql90;
+                case 100: return SqlVersion.Sql100;
+                case 110: return SqlVersion.Sql110;
+                case 120: return SqlVersion.Sql120;
+                case 130: return SqlVersion.Sql130;
+                case 140: return SqlVersion.Sql140;
+            }
+
+            throw new NotSupportedException($"SQL Server version {version} not supported");
+        }
+
+        public IDbConnection GetConnection() => new EngineConnection(this, sqlVersion);
 
         private readonly Dictionary<string, DataTable> tables = new Dictionary<string, DataTable>();
 
@@ -431,12 +457,14 @@ namespace PocketSql
 
         private class EngineConnection : IDbConnection
         {
-            public EngineConnection(Engine engine)
+            public EngineConnection(Engine engine, SqlVersion sqlVersion)
             {
                 this.engine = engine;
+                this.sqlVersion = sqlVersion;
             }
 
             internal readonly Engine engine;
+            private readonly SqlVersion sqlVersion;
 
             private bool open;
 
@@ -458,7 +486,7 @@ namespace PocketSql
 
             public IDbTransaction BeginTransaction() => BeginTransaction(IsolationLevel.ReadCommitted);
             public IDbTransaction BeginTransaction(IsolationLevel il) => new EngineTransaction(this, il);
-            public IDbCommand CreateCommand() => new EngineCommand(this);
+            public IDbCommand CreateCommand() => new EngineCommand(this, sqlVersion);
         }
 
         private class EngineTransaction : IDbTransaction
@@ -482,12 +510,14 @@ namespace PocketSql
 
         private class EngineCommand : IDbCommand
         {
-            public EngineCommand(EngineConnection connection)
+            public EngineCommand(EngineConnection connection, SqlVersion sqlVersion)
             {
                 this.connection = connection;
+                this.sqlVersion = sqlVersion;
             }
 
             private readonly EngineConnection connection;
+            private readonly SqlVersion sqlVersion;
 
             public IDbConnection Connection
             {
@@ -512,7 +542,9 @@ namespace PocketSql
 
             private List<EngineResult> Execute()
             {
-                var parser = new TSql140Parser(false, SqlEngineType.Standalone);
+                // TODO: you have to create an instance to call the helper?
+                // TODO: specify SqlEngineType: Azure vs SqlServer?
+                var parser = new TSql140Parser(false).Create(sqlVersion, false);
                 var input = new StringReader(CommandText);
                 var statements = parser.ParseStatementList(input, out var errors);
                 // TODO: raise parse errors
