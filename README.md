@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/rkoeninger/pocketsql.svg?branch=master)](https://travis-ci.org/rkoeninger/pocketsql)
+[![Build Status](https://travis-ci.org/rkoeninger/PocketSql.svg?branch=master)](https://travis-ci.org/rkoeninger/PocketSql)
 
-# PocketSQL
+# PocketSql
 
 An embedable database for testing integration code against multiple popular databases on multiple platforms.
