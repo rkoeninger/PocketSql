@@ -58,6 +58,8 @@ namespace PocketSql
                     return Evaluate(delete, vars);
                 case CreateTableStatement createTable:
                     return Evaluate(createTable);
+                case SetVariableStatement set:
+                    return Evaluate(set, vars);
                 default:
                     throw new NotImplementedException();
             }
@@ -207,6 +209,8 @@ namespace PocketSql
             {
                 case ColumnReferenceExpression colRefExpr:
                     return colRefExpr.MultiPartIdentifier.Identifiers.Last().Value;
+                case VariableReference varRef:
+                    return varRef.Name;
             }
 
             return null;
@@ -214,7 +218,10 @@ namespace PocketSql
 
         private Type InferType(ScalarExpression expr, DataTable table)
         {
-            // TODO: a lot of work to do here
+            // TODO: a lot of work to do here for type inference
+            //       how does sql server do it?
+            //       is it just the lowest common type between all values in a column?
+            //       do the columns not have type?
 
             switch (expr)
             {
@@ -265,6 +272,12 @@ namespace PocketSql
             }
 
             tables.Add(createTable.SchemaObjectName.BaseIdentifier.Value, table);
+            return new EngineResult();
+        }
+
+        private EngineResult Evaluate(SetVariableStatement set, IDictionary<string, object> vars)
+        {
+            vars[set.Variable.Name] = Evaluate(set.Expression, null, vars);
             return new EngineResult();
         }
 
@@ -396,6 +409,7 @@ namespace PocketSql
 
         private bool Evaluate(BooleanBinaryExpressionType op, bool left, bool right)
         {
+            // TODO: emulate sql server short-circuit behavior (may be version specific)
             switch (op)
             {
                 case BooleanBinaryExpressionType.And:
