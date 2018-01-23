@@ -521,22 +521,16 @@ namespace PocketSql
 
             public IDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
 
-            public IDataReader ExecuteReader(CommandBehavior behavior)
-            {
-                return new EngineDataReader(Execute());
-            }
+            public IDataReader ExecuteReader(CommandBehavior behavior) => new EngineDataReader(Execute());
+
+            public object ExecuteScalar() => Execute()[0].ResultSet.Rows[0].ItemArray[0];
 
             public int ExecuteNonQuery()
             {
-                // Handle mix of -1 and positive RecordsAffected
-                return Execute().Sum(x => x.RecordsAffected);
-            }
-
-            public object ExecuteScalar()
-            {
-                Execute();
-                return null; // TODO: how to interpret scalar from dataset?
-                             //       see how ADO does it
+                var results = Execute();
+                return results.Any(x => x.RecordsAffected >= 0)
+                    ? results.Sum(x => Math.Max(0, x.RecordsAffected))
+                    : -1;
             }
         }
 
@@ -563,7 +557,7 @@ namespace PocketSql
             public object this[int i] => GetValue(i);
             public object this[string name] => this[GetOrdinal(name)];
 
-            public int Depth => throw new NotImplementedException();
+            public int Depth => 0;
             public int RecordsAffected => data[tableIndex].RecordsAffected;
             public int FieldCount => data[tableIndex].ResultSet.Columns.Count;
 
