@@ -56,8 +56,8 @@ namespace PocketSql
                     case SelectScalarExpression scalar:
                         return new []
                         {
-                            (scalar.ColumnName.Value,
-                                InferType(scalar.Expression),
+                            (scalar.ColumnName?.Value ?? InferName(scalar.Expression),
+                                InferType(scalar.Expression, table),
                                 scalar.Expression)
                         }.AsEnumerable();
                     default:
@@ -174,10 +174,30 @@ namespace PocketSql
             };
         }
 
-        private Type InferType(ScalarExpression expr)
+        private string InferName(ScalarExpression expr)
+        {
+            switch (expr)
+            {
+                case ColumnReferenceExpression colRefExpr:
+                    return colRefExpr.MultiPartIdentifier.Identifiers.Last().Value;
+            }
+
+            return null;
+        }
+
+        private Type InferType(ScalarExpression expr, DataTable table)
         {
             // TODO: a lot of work to do here
-            return typeof(int);
+
+            switch (expr)
+            {
+                // TODO: need to handle multi-table disambiguation
+                case ColumnReferenceExpression colRefExpr:
+                    var name = colRefExpr.MultiPartIdentifier.Identifiers.Last().Value;
+                    return table.Columns[name].DataType;
+            }
+
+            throw new NotImplementedException();
         }
 
         private EngineResult Evaluate(DeleteStatement delete)
@@ -293,7 +313,7 @@ namespace PocketSql
                         Evaluate(binaryExpr.FirstExpression, row),
                         Evaluate(binaryExpr.SecondExpression, row));
                 case ColumnReferenceExpression colExpr:
-                    return row[((SchemaObjectName)colExpr.MultiPartIdentifier).BaseIdentifier.Value];
+                    return row[colExpr.MultiPartIdentifier.Identifiers.Last().Value];
             }
 
             throw new NotImplementedException();
@@ -529,7 +549,7 @@ namespace PocketSql
         private class EngineDataReader : IDataReader
         {
             private readonly List<EngineResult> data;
-            private int tableIndex = -1;
+            private int tableIndex = 0;
             private int rowIndex = -1;
 
             public EngineDataReader(List<EngineResult> data)
