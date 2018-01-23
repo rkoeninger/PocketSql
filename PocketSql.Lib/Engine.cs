@@ -41,21 +41,21 @@ namespace PocketSql
 
         private readonly Dictionary<string, DataTable> tables = new Dictionary<string, DataTable>();
 
-        private List<EngineResult> Evaluate(StatementList statements) =>
-            statements.Statements.Select(Evaluate).ToList();
+        private List<EngineResult> Evaluate(StatementList statements, IDictionary<string, object> vars) =>
+            statements.Statements.Select(s => Evaluate(s, vars)).ToList();
 
-        private EngineResult Evaluate(TSqlStatement statement)
+        private EngineResult Evaluate(TSqlStatement statement, IDictionary<string, object> vars)
         {
             switch (statement)
             {
                 case SelectStatement select:
-                    return Evaluate(select);
+                    return Evaluate(select, vars);
                 case UpdateStatement update:
-                    return Evaluate(update);
+                    return Evaluate(update, vars);
                 case InsertStatement insert:
-                    return Evaluate(insert);
+                    return Evaluate(insert, vars);
                 case DeleteStatement delete:
-                    return Evaluate(delete);
+                    return Evaluate(delete, vars);
                 case CreateTableStatement createTable:
                     return Evaluate(createTable);
                 default:
@@ -63,7 +63,7 @@ namespace PocketSql
             }
         }
 
-        private EngineResult Evaluate(SelectStatement select)
+        private EngineResult Evaluate(SelectStatement select, IDictionary<string, object> vars)
         {
             var querySpec = (QuerySpecification) select.QueryExpression;
             var tableRef = (NamedTableReference) querySpec.FromClause.TableReferences.Single();
@@ -102,13 +102,13 @@ namespace PocketSql
 
             foreach (DataRow row in table.Rows)
             {
-                if (querySpec.WhereClause == null || Evaluate(querySpec.WhereClause.SearchCondition, row))
+                if (querySpec.WhereClause == null || Evaluate(querySpec.WhereClause.SearchCondition, row, vars))
                 {
                     var resultRow = projection.NewRow();
 
                     for (var i = 0; i < selections.Count; ++i)
                     {
-                        resultRow[i] = Evaluate(selections[i].Item3, row);
+                        resultRow[i] = Evaluate(selections[i].Item3, row, vars);
                     }
 
                     projection.Rows.Add(resultRow);
@@ -121,7 +121,7 @@ namespace PocketSql
             };
         }
 
-        private EngineResult Evaluate(InsertStatement insert)
+        private EngineResult Evaluate(InsertStatement insert, IDictionary<string, object> vars)
         {
             var tableRef = (NamedTableReference) insert.InsertSpecification.Target;
             var table = tables[tableRef.SchemaObject.BaseIdentifier.Value];
@@ -135,7 +135,7 @@ namespace PocketSql
                 for (var i = 0; i < columnOrder.Count; ++i)
                 {
                     row[columnOrder[i].MultiPartIdentifier.Identifiers[0].Value] =
-                        Evaluate(valuesExpr.ColumnValues[i], null);
+                        Evaluate(valuesExpr.ColumnValues[i], null, vars);
                 }
 
                 table.Rows.Add(row);
@@ -147,7 +147,7 @@ namespace PocketSql
             };
         }
 
-        private EngineResult Evaluate(UpdateStatement update)
+        private EngineResult Evaluate(UpdateStatement update, IDictionary<string, object> vars)
         {
             var tableRef = (NamedTableReference)update.UpdateSpecification.Target;
             var table = tables[tableRef.SchemaObject.BaseIdentifier.Value];
@@ -156,7 +156,7 @@ namespace PocketSql
             foreach (DataRow row in table.Rows)
             {
                 if (update.UpdateSpecification.WhereClause == null
-                    || Evaluate(update.UpdateSpecification.WhereClause.SearchCondition, row))
+                    || Evaluate(update.UpdateSpecification.WhereClause.SearchCondition, row, vars))
                 {
                     foreach (var clause in update.UpdateSpecification.SetClauses)
                     {
@@ -167,7 +167,7 @@ namespace PocketSql
                                 row[columnName] = Evaluate(
                                     set.AssignmentKind,
                                     row[columnName],
-                                    Evaluate(set.NewValue, row));
+                                    Evaluate(set.NewValue, row, vars));
                                 break;
                             default:
                                 throw new NotImplementedException();
@@ -227,7 +227,7 @@ namespace PocketSql
             throw new NotImplementedException();
         }
 
-        private EngineResult Evaluate(DeleteStatement delete)
+        private EngineResult Evaluate(DeleteStatement delete, IDictionary<string, object> vars)
         {
             var tableRef = (NamedTableReference) delete.DeleteSpecification.Target;
             var table = tables[tableRef.SchemaObject.BaseIdentifier.Value];
@@ -236,7 +236,7 @@ namespace PocketSql
             foreach (DataRow row in table.Rows)
             {
                 if (delete.DeleteSpecification.WhereClause == null
-                    || Evaluate(delete.DeleteSpecification.WhereClause.SearchCondition, row))
+                    || Evaluate(delete.DeleteSpecification.WhereClause.SearchCondition, row, vars))
                 {
                     table.Rows.Remove(row);
                     rowCount++;
@@ -298,33 +298,33 @@ namespace PocketSql
             throw new NotImplementedException();
         }
 
-        private bool Evaluate(BooleanExpression expr, DataRow row)
+        private bool Evaluate(BooleanExpression expr, DataRow row, IDictionary<string, object> vars)
         {
             switch (expr)
             {
                 case BooleanBinaryExpression binaryExpr:
                     return Evaluate(
                         binaryExpr.BinaryExpressionType,
-                        Evaluate(binaryExpr.FirstExpression, row),
-                        Evaluate(binaryExpr.SecondExpression, row));
+                        Evaluate(binaryExpr.FirstExpression, row, vars),
+                        Evaluate(binaryExpr.SecondExpression, row, vars));
                 case BooleanComparisonExpression compareExpr:
                     return Evaluate(
                         compareExpr.ComparisonType,
-                        Evaluate(compareExpr.FirstExpression, row),
-                        Evaluate(compareExpr.SecondExpression, row));
+                        Evaluate(compareExpr.FirstExpression, row, vars),
+                        Evaluate(compareExpr.SecondExpression, row, vars));
                 case BooleanNotExpression notExpr:
-                    return !Evaluate(notExpr.Expression, row);
+                    return !Evaluate(notExpr.Expression, row, vars);
                 case BooleanIsNullExpression isNullExpr:
-                    return Evaluate(isNullExpr.Expression, row) == null;
+                    return Evaluate(isNullExpr.Expression, row, vars) == null;
                 case InPredicate inExpr:
-                    var value = Evaluate(inExpr.Expression, row);
-                    return value != null && inExpr.Values.Any(x => value.Equals(Evaluate(x, row)));
+                    var value = Evaluate(inExpr.Expression, row, vars);
+                    return value != null && inExpr.Values.Any(x => value.Equals(Evaluate(x, row, vars)));
             }
 
             throw new NotImplementedException();
         }
 
-        private object Evaluate(ScalarExpression expr, DataRow row)
+        private object Evaluate(ScalarExpression expr, DataRow row, IDictionary<string, object> vars)
         {
             switch (expr)
             {
@@ -337,14 +337,16 @@ namespace PocketSql
                 case UnaryExpression unaryExpr:
                     return Evaluate(
                         unaryExpr.UnaryExpressionType,
-                        Evaluate(unaryExpr.Expression, row));
+                        Evaluate(unaryExpr.Expression, row, vars));
                 case BinaryExpression binaryExpr:
                     return Evaluate(
                         binaryExpr.BinaryExpressionType,
-                        Evaluate(binaryExpr.FirstExpression, row),
-                        Evaluate(binaryExpr.SecondExpression, row));
+                        Evaluate(binaryExpr.FirstExpression, row, vars),
+                        Evaluate(binaryExpr.SecondExpression, row, vars));
                 case ColumnReferenceExpression colExpr:
                     return row[colExpr.MultiPartIdentifier.Identifiers.Last().Value];
+                case VariableReference varRef:
+                    return vars[varRef.Name.TrimStart('@')];
             }
 
             throw new NotImplementedException();
@@ -553,7 +555,9 @@ namespace PocketSql
                 var input = new StringReader(CommandText);
                 var statements = parser.ParseStatementList(input, out var errors);
                 // TODO: raise parse errors
-                return connection.engine.Evaluate(statements);
+                return connection.engine.Evaluate(
+                    statements,
+                    Parameters.Cast<IDbDataParameter>().ToDictionary(x => x.ParameterName, x => x.Value));
             }
 
             public IDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);

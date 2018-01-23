@@ -23,7 +23,7 @@ namespace PocketSql.Tests
                 Assert.AreEqual("Rob", people[0].Name);
                 Assert.AreEqual(30, people[0].Age);
 
-                Assert.AreEqual(1, connection.Execute("update People set Age += 1 where Name = 'Rob'"));
+                Assert.AreEqual(1, connection.Execute("update People set Age += 1 where Name = @Name", new { Name = "Rob" }));
 
                 people = connection.Query<Person>("select Name, Age from People where Name = 'Rob'").ToList();
                 Assert.AreEqual(1, people.Count);
