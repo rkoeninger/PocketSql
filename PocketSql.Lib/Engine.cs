@@ -42,7 +42,7 @@ namespace PocketSql
         private readonly Dictionary<string, DataTable> tables = new Dictionary<string, DataTable>();
 
         private List<EngineResult> Evaluate(StatementList statements, IDictionary<string, object> vars) =>
-            statements.Statements.Select(s => Evaluate(s, vars)).ToList();
+            statements.Statements.Select(s => Evaluate(s, vars)).Where(r => r != null).ToList();
 
         private EngineResult Evaluate(TSqlStatement statement, IDictionary<string, object> vars)
         {
@@ -60,6 +60,8 @@ namespace PocketSql
                     return Evaluate(createTable);
                 case SetVariableStatement set:
                     return Evaluate(set, vars);
+                case DeclareVariableStatement declare:
+                    return Evaluate(declare, vars);
                 default:
                     throw new NotImplementedException();
             }
@@ -68,8 +70,8 @@ namespace PocketSql
         private EngineResult Evaluate(SelectStatement select, IDictionary<string, object> vars)
         {
             var querySpec = (QuerySpecification) select.QueryExpression;
-            var tableRef = (NamedTableReference) querySpec.FromClause.TableReferences.Single();
-            var table = tables[tableRef.SchemaObject.BaseIdentifier.Value];
+            var tableRef = (NamedTableReference) querySpec.FromClause?.TableReferences?.Single();
+            var table = tableRef == null ? null : tables[tableRef.SchemaObject.BaseIdentifier.Value];
             var projection = new DataTable();
             
             var selections = querySpec.SelectElements.SelectMany(s =>
@@ -102,7 +104,7 @@ namespace PocketSql
                 });
             }
 
-            foreach (DataRow row in table.Rows)
+            foreach (var row in table?.Rows.Cast<DataRow>() ?? new DataRow[]{null})
             {
                 if (querySpec.WhereClause == null || Evaluate(querySpec.WhereClause.SearchCondition, row, vars))
                 {
@@ -229,6 +231,8 @@ namespace PocketSql
                 case ColumnReferenceExpression colRefExpr:
                     var name = colRefExpr.MultiPartIdentifier.Identifiers.Last().Value;
                     return table.Columns[name].DataType;
+                case VariableReference varRef:
+                    return typeof(object); // TODO: retain variable type information
             }
 
             throw new NotImplementedException();
@@ -272,13 +276,31 @@ namespace PocketSql
             }
 
             tables.Add(createTable.SchemaObjectName.BaseIdentifier.Value, table);
-            return new EngineResult();
+            return null;
         }
 
         private EngineResult Evaluate(SetVariableStatement set, IDictionary<string, object> vars)
         {
-            vars[set.Variable.Name] = Evaluate(set.Expression, null, vars);
-            return new EngineResult();
+            var name = set.Variable.Name.TrimStart('@');
+
+            if (!vars.ContainsKey(name))
+            {
+                throw new Exception($"Variable not declared: {name}");
+            }
+
+            vars[name] = Evaluate(set.Expression, null, vars);
+            return null;
+        }
+
+        private EngineResult Evaluate(DeclareVariableStatement declare, IDictionary<string, object> vars)
+        {
+            foreach (var declaration in declare.Declarations)
+            {
+                vars[declaration.VariableName.Value.TrimStart('@')] =
+                    declaration.Value == null ? null : Evaluate(declaration.Value, null, vars);
+            }
+
+            return null;
         }
 
         private object Evaluate(AssignmentKind kind, object current, object value)
@@ -470,6 +492,8 @@ namespace PocketSql
                     case SqlDataTypeOption.Text:
                     case SqlDataTypeOption.VarChar:
                         return typeof(string);
+                    case SqlDataTypeOption.Sql_Variant:
+                        return typeof(object);
                 }
             }
 

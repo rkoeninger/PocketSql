@@ -32,6 +32,20 @@ namespace PocketSql.Tests
             }
         }
 
+        [Test]
+        public void DeclareSetSelect()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                Assert.AreEqual("Rob", connection.ExecuteScalar<string>(@"
+                    declare @Name varchar(16)
+                    set @Name = 'Rob'
+                    select @Name"));
+            }
+        }
+
         public class Person
         {
             public string Name { get; set; }
