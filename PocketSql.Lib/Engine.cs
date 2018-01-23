@@ -389,14 +389,14 @@ namespace PocketSql
             throw new NotImplementedException();
         }
 
-        private bool Evaluate(BooleanBinaryExpressionType op, object left, object right)
+        private bool Evaluate(BooleanBinaryExpressionType op, bool left, bool right)
         {
             switch (op)
             {
                 case BooleanBinaryExpressionType.And:
-                    return (bool)left && (bool)right;
+                    return left && right;
                 case BooleanBinaryExpressionType.Or:
-                    return (bool)left || (bool)right;
+                    return left || right;
             }
 
             throw new NotImplementedException();
