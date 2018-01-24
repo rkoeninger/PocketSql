@@ -21,21 +21,10 @@ namespace PocketSql
             this.sqlVersion = sqlVersion;
         }
 
-        private static SqlVersion IntToSqlVersion(int version)
-        {
-            switch (version)
-            {
-                case 80:  return SqlVersion.Sql80;
-                case 90:  return SqlVersion.Sql90;
-                case 100: return SqlVersion.Sql100;
-                case 110: return SqlVersion.Sql110;
-                case 120: return SqlVersion.Sql120;
-                case 130: return SqlVersion.Sql130;
-                case 140: return SqlVersion.Sql140;
-            }
-
-            throw new NotSupportedException($"SQL Server version {version} not supported");
-        }
+        private static SqlVersion IntToSqlVersion(int version) =>
+            Enum.TryParse("Sql" + version, out SqlVersion sqlVersion)
+                ? sqlVersion
+                : throw new NotSupportedException($"SQL Server version {version} not supported");
 
         public IDbConnection GetConnection() => new EngineConnection(this, sqlVersion);
 
@@ -73,6 +62,9 @@ namespace PocketSql
 
         private EngineResult Evaluate(SelectStatement select, IDictionary<string, object> vars)
         {
+            // TODO: select into
+            // TODO: group by, having
+
             var querySpec = (QuerySpecification) select.QueryExpression;
             var tableRef = (NamedTableReference) querySpec.FromClause?.TableReferences?.Single();
             var table = tableRef == null ? null : tables[tableRef.SchemaObject.BaseIdentifier.Value];
@@ -82,6 +74,7 @@ namespace PocketSql
             {
                 switch (s)
                 {
+                    // TODO: respect table alias in star expression
                     case SelectStarExpression star:
                         return table.Columns.Cast<DataColumn>().Select(c =>
                             (c.ColumnName,
@@ -123,10 +116,63 @@ namespace PocketSql
                 }
             }
 
+            if (querySpec.OrderByClause != null)
+            {
+                var elements = querySpec.OrderByClause.OrderByElements;
+                var firstElement = elements.First();
+                var restElements = elements.Skip(1);
+                var rows = projection.Rows.Cast<DataRow>().ToList();
+                while (projection.Rows.Count > 0) projection.Rows.RemoveAt(0);
+                foreach (var row in rows) row.BeginEdit();
+
+                // TODO: deep clone all rows, clear table, sort, add to table
+
+                foreach (var row in restElements.Aggregate(
+                    Order(rows, firstElement, vars),
+                    (orderedRows, element) => Order(orderedRows, element, vars)))
+                {
+                    projection.Rows.Add(row);
+                }
+            }
+
+            if (querySpec.OffsetClause != null)
+            {
+                var offset = (int) Evaluate(querySpec.OffsetClause.OffsetExpression, null, vars);
+                var fetch = (int) Evaluate(querySpec.OffsetClause.FetchExpression, null, vars);
+
+                for (var i = 0; i < offset; ++i)
+                {
+                    projection.Rows.RemoveAt(0);
+                }
+
+                while (projection.Rows.Count > fetch)
+                {
+                    projection.Rows.RemoveAt(projection.Rows.Count - 1);
+                }
+            }
+
             return new EngineResult
             {
                 ResultSet = projection
             };
+        }
+
+        private IOrderedEnumerable<DataRow> Order(
+            IEnumerable<DataRow> seq,
+            ExpressionWithSortOrder element,
+            IDictionary<string, object> vars)
+        {
+            object Func(DataRow x) => Evaluate(element.Expression, x, vars);
+            return element.SortOrder == SortOrder.Descending ? seq.OrderByDescending(Func) : seq.OrderBy(Func);
+        }
+
+        private IOrderedEnumerable<DataRow> Order(
+            IOrderedEnumerable<DataRow> seq,
+            ExpressionWithSortOrder element,
+            IDictionary<string, object> vars)
+        {
+            object Func(DataRow x) => Evaluate(element.Expression, x, vars);
+            return element.SortOrder == SortOrder.Descending ? seq.ThenByDescending(Func) : seq.ThenBy(Func);
         }
 
         private EngineResult Evaluate(InsertStatement insert, IDictionary<string, object> vars)
@@ -762,7 +808,12 @@ namespace PocketSql
                 var parser = new TSql140Parser(false).Create(sqlVersion, false);
                 var input = new StringReader(CommandText);
                 var statements = parser.ParseStatementList(input, out var errors);
-                // TODO: raise parse errors
+
+                if (errors != null && errors.Count > 0)
+                {
+                    throw new Exception(string.Join("\r\n", errors.Select(e => e.Message)));
+                }
+
                 return connection.engine.Evaluate(
                     statements,
                     Parameters.Cast<IDbDataParameter>().ToDictionary(x => x.ParameterName, x => x.Value));
