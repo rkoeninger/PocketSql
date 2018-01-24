@@ -56,6 +56,8 @@ namespace PocketSql
                     return Evaluate(insert, vars);
                 case DeleteStatement delete:
                     return Evaluate(delete, vars);
+                case MergeStatement merge:
+                    return Evaluate(merge, vars);
                 case TruncateTableStatement truncate:
                     return Evaluate(truncate);
                 case CreateTableStatement createTable:
@@ -308,6 +310,111 @@ namespace PocketSql
             {
                 RecordsAffected = rowCount
             };
+        }
+
+        private EngineResult Evaluate(MergeStatement merge, IDictionary<string, object> vars)
+        {
+            var targetTableRef = (NamedTableReference) merge.MergeSpecification.Target;
+            var targetTable = tables[targetTableRef.SchemaObject.BaseIdentifier.Value];
+            var sourceTableRef = (NamedTableReference) merge.MergeSpecification.TableReference;
+            var sourceTable = tables[sourceTableRef.SchemaObject.BaseIdentifier.Value];
+            var rowCount = 0;
+            var matched = new List<DataRow>();
+            var notMatchedByTarget = new List<DataRow>();
+            var notMatchedBySource = new List<DataRow>();
+
+            // TODO: only search for and build up collections that will be required by match clauses
+
+            // find matched and not matched (by target)
+            foreach (DataRow row in sourceTable.Rows)
+            {
+                // TODO: need to respect table aliases and combine rows
+                // TODO: need to define new row classes that aggregate rows via aliases
+                var targetRow = targetTable.Rows.Cast<DataRow>().FirstOrDefault(x =>
+                    Evaluate(merge.MergeSpecification.SearchCondition, row, vars));
+
+                if (targetRow == null)
+                {
+                    notMatchedByTarget.Add(row);
+                }
+                else
+                {
+                    matched.Add(row);
+                }
+            }
+
+            // find not matched by source
+            foreach (DataRow row in targetTable.Rows)
+            {
+                var sourceRow = sourceTable.Rows.Cast<DataRow>().FirstOrDefault(x =>
+                    Evaluate(merge.MergeSpecification.SearchCondition, row, vars));
+
+                if (sourceRow == null)
+                {
+                    notMatchedBySource.Add(row);
+                }
+            }
+
+            // apply matched
+            foreach (var clause in merge.MergeSpecification.ActionClauses.Where(x =>
+                x.Condition == MergeCondition.Matched))
+            {
+                foreach (var row in matched)
+                {
+                    if (Evaluate(clause.SearchCondition, row, vars))
+                    {
+                        rowCount++;
+                        Evaluate(clause.Action, targetTable, row);
+                    }
+                }
+            }
+
+            // apply not matched (by target)
+            foreach (var clause in merge.MergeSpecification.ActionClauses.Where(x =>
+                x.Condition == MergeCondition.NotMatched || x.Condition == MergeCondition.NotMatchedByTarget))
+            {
+                foreach (var row in notMatchedByTarget)
+                {
+                    if (Evaluate(clause.SearchCondition, row, vars))
+                    {
+                        rowCount++;
+                        Evaluate(clause.Action, targetTable, row);
+                    }
+                }
+            }
+
+            // apply not matched by source
+            foreach (var clause in merge.MergeSpecification.ActionClauses.Where(x =>
+                x.Condition == MergeCondition.NotMatchedBySource))
+            {
+                foreach (var row in notMatchedBySource)
+                {
+                    if (Evaluate(clause.SearchCondition, row, vars))
+                    {
+                        rowCount++;
+                        Evaluate(clause.Action, targetTable, row);
+                    }
+                }
+            }
+
+            return new EngineResult
+            {
+                RecordsAffected = rowCount
+            };
+        }
+
+        private void Evaluate(MergeAction action, DataTable targetTable, DataRow row)
+        {
+            // TODO: abstract the logic from insert/update/delete Evaluate methods and re-use here
+            switch (action)
+            {
+                case InsertMergeAction insert:
+                    break;
+                case UpdateMergeAction update:
+                    break;
+                case DeleteMergeAction delete:
+                    break;
+            }
         }
 
         private EngineResult Evaluate(TruncateTableStatement truncate)
