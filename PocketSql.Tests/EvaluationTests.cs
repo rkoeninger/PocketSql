@@ -63,11 +63,50 @@ namespace PocketSql.Tests
                     (95, 'jkl'),
                     (92, 'zxc')"));
 
-                foreach (var row in connection.Query("select X, Y from Things order by X, Y desc"))
+                Assert.IsTrue(new []
                 {
-                    Console.WriteLine($"{row.X}, {row.Y}");
+                    new Thing(17, "yui"),
+                    new Thing(17, "hjk"),
+                    new Thing(23, "wer"),
+                    new Thing(23, "fgh"),
+                    new Thing(34, "qwe"),
+                    new Thing(36, "sdf"),
+                    new Thing(47, "iop"),
+                    new Thing(50, "ghj"),
+                    new Thing(63, "rty"),
+                    new Thing(67, "ert"),
+                    new Thing(67, "dfg"),
+                    new Thing(75, "tyu"),
+                    new Thing(83, "uio"),
+                    new Thing(92, "zxc"),
+                    new Thing(95, "jkl"),
+                    new Thing(95, "asd")
+                }.SequenceEqual(connection.Query<Thing>("select X, Y from Things order by X, Y desc")));
+            }
+        }
+
+        private class Thing : IEquatable<Thing>
+        {
+            public Thing(int x, string y)
+            {
+                X = x;
+                Y = y;
+            }
+
+            public int X { get; set; }
+            public string Y { get; set; }
+
+            public override bool Equals(object that) => that is Thing && Equals((Thing) that);
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (X * 397) ^ (Y != null ? Y.GetHashCode() : 0);
                 }
             }
+
+            public bool Equals(Thing that) => X == that.X && Y == that.Y;
         }
 
         [Test]
@@ -83,15 +122,12 @@ namespace PocketSql.Tests
                     insert into Numbers (X)
                     values (1), (2), (3), (4), (5), (6), (7), (8)"));
 
-                foreach (var x in connection.Query<int?>(@"
+                Assert.IsTrue(new int?[] {3, 4, 5, 6}.SequenceEqual(connection.Query<int?>(@"
                     select X
                     from Numbers
                     order by X
-                    offset 4 rows
-                    fetch next 4 rows only"))
-                {
-                    Console.WriteLine(x);
-                }
+                    offset 2 rows
+                    fetch next 4 rows only")));
             }
         }
 

@@ -45,11 +45,8 @@
   <ItemGroup>
     <Compile Include="CaseInsensitivity.cs" />
     <Compile Include="Engine.cs" />
-    <Compile Include="IDataRow.cs" />
-    <Compile Include="JoinedRow.cs" />
+    <Compile Include="DataModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlValue.cs" />
-    <Compile Include="TableRow.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

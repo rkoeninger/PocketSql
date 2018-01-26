@@ -122,17 +122,17 @@ namespace PocketSql
                 var firstElement = elements.First();
                 var restElements = elements.Skip(1);
                 var rows = projection.Rows.Cast<DataRow>().ToList();
-                while (projection.Rows.Count > 0) projection.Rows.RemoveAt(0);
-                foreach (var row in rows) row.BeginEdit();
-
-                // TODO: deep clone all rows, clear table, sort, add to table
+                var temp = projection.Clone();
 
                 foreach (var row in restElements.Aggregate(
                     Order(rows, firstElement, vars),
                     (orderedRows, element) => Order(orderedRows, element, vars)))
                 {
-                    projection.Rows.Add(row);
+                    CopyOnto(row, temp);
                 }
+
+                projection.Rows.Clear();
+                CopyOnto(temp, projection);
             }
 
             if (querySpec.OffsetClause != null)
@@ -155,6 +155,26 @@ namespace PocketSql
             {
                 ResultSet = projection
             };
+        }
+        
+        private static void CopyOnto(DataTable source, DataTable target)
+        {
+            foreach (DataRow row in source.Rows)
+            {
+                CopyOnto(row, target);
+            }
+        }
+
+        private static void CopyOnto(DataRow row, DataTable target)
+        {
+            var copy = target.NewRow();
+
+            foreach (DataColumn col in target.Columns)
+            {
+                copy[col.Ordinal] = row[col.Ordinal];
+            }
+
+            target.Rows.Add(copy);
         }
 
         private IOrderedEnumerable<DataRow> Order(
