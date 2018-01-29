@@ -64,7 +64,24 @@ namespace PocketSql
 
         private EngineResult Evaluate(SelectStatement select, IDictionary<string, object> vars)
         {
-            var querySpec = (QuerySpecification) select.QueryExpression;
+            var results = Evaluate(select.QueryExpression, vars);
+
+            if (select.Into != null)
+            {
+                tables.Add(select.Into.Identifiers.Last().Value, results.ResultSet);
+
+                return new EngineResult
+                {
+                    RecordsAffected = results.ResultSet.Rows.Count
+                };
+            }
+
+            return results;
+        }
+
+        private EngineResult Evaluate(QueryExpression queryExpr, IDictionary<string, object> vars)
+        {
+            var querySpec = (QuerySpecification) queryExpr;
             var tableRef = (NamedTableReference) querySpec.FromClause?.TableReferences?.Single();
             var table = tableRef == null ? null : tables[tableRef.SchemaObject.BaseIdentifier.Value];
             var projection = new DataTable();
@@ -210,16 +227,6 @@ namespace PocketSql
                 }
             }
 
-            if (select.Into != null)
-            {
-                tables.Add(select.Into.Identifiers.Last().Value, projection);
-
-                return new EngineResult
-                {
-                    RecordsAffected = projection.Rows.Count
-                };
-            }
-
             return new EngineResult
             {
                 ResultSet = projection
@@ -266,18 +273,28 @@ namespace PocketSql
 
         private EngineResult Evaluate(InsertStatement insert, IDictionary<string, object> vars)
         {
-            var tableRef = (NamedTableReference) insert.InsertSpecification.Target;
-            var table = tables[tableRef.SchemaObject.BaseIdentifier.Value];
-            var columnOrder = insert.InsertSpecification.Columns;
-            var valuesExprs = ((ValuesInsertSource) insert.InsertSpecification.InsertSource).RowValues;
+            var namedTableRef = (NamedTableReference)insert.InsertSpecification.Target;
+            var table = tables[namedTableRef.SchemaObject.BaseIdentifier.Value];
+            return Evaluate(
+                table,
+                insert.InsertSpecification.Columns,
+                (ValuesInsertSource) insert.InsertSpecification.InsertSource,
+                vars);
+        }
 
-            foreach (var valuesExpr in valuesExprs)
+        private EngineResult Evaluate(
+            DataTable table,
+            IList<ColumnReferenceExpression> cols,
+            ValuesInsertSource values,
+            IDictionary<string, object> vars)
+        {
+            foreach (var valuesExpr in values.RowValues)
             {
                 var row = table.NewRow();
 
-                for (var i = 0; i < columnOrder.Count; ++i)
+                for (var i = 0; i < cols.Count; ++i)
                 {
-                    row[columnOrder[i].MultiPartIdentifier.Identifiers[0].Value] =
+                    row[cols[i].MultiPartIdentifier.Identifiers[0].Value] =
                         Evaluate(valuesExpr.ColumnValues[i], null, vars);
                 }
 
@@ -286,7 +303,7 @@ namespace PocketSql
 
             return new EngineResult
             {
-                RecordsAffected = valuesExprs.Count
+                RecordsAffected = values.RowValues.Count
             };
         }
 
@@ -499,7 +516,7 @@ namespace PocketSql
                     if (Evaluate(clause.SearchCondition, row, vars))
                     {
                         rowCount++;
-                        Evaluate(clause.Action, targetTable, row);
+                        Evaluate(clause.Action, targetTable, row, vars);
                     }
                 }
             }
@@ -513,7 +530,7 @@ namespace PocketSql
                     if (Evaluate(clause.SearchCondition, row, vars))
                     {
                         rowCount++;
-                        Evaluate(clause.Action, targetTable, row);
+                        Evaluate(clause.Action, targetTable, row, vars);
                     }
                 }
             }
@@ -527,7 +544,7 @@ namespace PocketSql
                     if (Evaluate(clause.SearchCondition, row, vars))
                     {
                         rowCount++;
-                        Evaluate(clause.Action, targetTable, row);
+                        Evaluate(clause.Action, targetTable, row, vars);
                     }
                 }
             }
@@ -538,14 +555,21 @@ namespace PocketSql
             };
         }
 
-        private void Evaluate(MergeAction action, DataTable targetTable, DataRow row)
+        // TODO: return rows affected/output
+        private void Evaluate(
+            MergeAction action,
+            DataTable targetTable,
+            DataRow row,
+            IDictionary<string, object> vars)
         {
             // TODO: abstract the logic from insert/update/delete Evaluate methods and re-use here
             switch (action)
             {
                 case InsertMergeAction insert:
+                    Evaluate(targetTable, insert.Columns, insert.Source, vars);
                     break;
                 case UpdateMergeAction update:
+                    //Evaluate();
                     break;
                 case DeleteMergeAction delete:
                     break;
@@ -676,6 +700,8 @@ namespace PocketSql
                 case InPredicate inExpr:
                     var value = Evaluate(inExpr.Expression, row, vars);
                     return value != null && inExpr.Values.Any(x => value.Equals(Evaluate(x, row, vars)));
+                case ExistsPredicate existsExpr:
+                    return Evaluate(existsExpr.Subquery.QueryExpression, vars).ResultSet.Rows.Count > 0;
             }
 
             throw new NotImplementedException();
