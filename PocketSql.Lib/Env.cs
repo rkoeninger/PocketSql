@@ -4,6 +4,8 @@ using System.Data;
 
 namespace PocketSql
 {
+    // TODO: have a base env that is just tables
+    //       and a eval context env that has vars - Locals and Globals
     public class Env
     {
         public static Env Of(Engine engine, IDataParameterCollection parameters)
