@@ -59,6 +59,8 @@ namespace PocketSql
                     return Evaluate(declare, vars);
                 case IfStatement conditional:
                     return Evaluate(conditional, vars);
+                case WhileStatement loop:
+                    return Evaluate(loop, vars);
                 default:
                     throw new NotImplementedException();
             }
@@ -663,6 +665,16 @@ namespace PocketSql
             Evaluate(Evaluate(conditional.Predicate, null, vars)
                 ? conditional.ThenStatement
                 : conditional.ElseStatement, vars);
+
+        private EngineResult Evaluate(WhileStatement loop, IDictionary<string, object> vars)
+        {
+            while (Evaluate(loop.Predicate, null, vars))
+            {
+                Evaluate(loop.Statement, vars);
+            }
+
+            return null;
+        }
 
         private object Evaluate(AssignmentKind kind, object current, object value)
         {
