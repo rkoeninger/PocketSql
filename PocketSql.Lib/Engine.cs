@@ -30,10 +30,10 @@ namespace PocketSql
 
         private readonly Dictionary<string, DataTable> tables = new Dictionary<string, DataTable>();
 
-        private List<EngineResult> Evaluate(StatementList statements, IDictionary<string, object> vars) =>
+        private List<EngineResult> Evaluate(StatementList statements, Vars vars) =>
             statements.Statements.Select(s => Evaluate(s, vars)).Where(r => r != null).ToList();
 
-        private EngineResult Evaluate(TSqlStatement statement, IDictionary<string, object> vars)
+        private EngineResult Evaluate(TSqlStatement statement, Vars vars)
         {
             switch (statement)
             {
@@ -66,7 +66,7 @@ namespace PocketSql
             }
         }
 
-        private EngineResult Evaluate(SelectStatement select, IDictionary<string, object> vars)
+        private EngineResult Evaluate(SelectStatement select, Vars vars)
         {
             var results = Evaluate(select.QueryExpression, vars);
 
@@ -83,7 +83,7 @@ namespace PocketSql
             return results;
         }
 
-        private EngineResult Evaluate(QueryExpression queryExpr, IDictionary<string, object> vars)
+        private EngineResult Evaluate(QueryExpression queryExpr, Vars vars)
         {
             var querySpec = (QuerySpecification) queryExpr;
             var tableRef = (NamedTableReference) querySpec.FromClause?.TableReferences?.Single();
@@ -260,7 +260,7 @@ namespace PocketSql
         private IOrderedEnumerable<DataRow> Order(
             IEnumerable<DataRow> seq,
             ExpressionWithSortOrder element,
-            IDictionary<string, object> vars)
+            Vars vars)
         {
             object Func(DataRow x) => Evaluate(element.Expression, x, vars);
             return element.SortOrder == SortOrder.Descending ? seq.OrderByDescending(Func) : seq.OrderBy(Func);
@@ -269,13 +269,13 @@ namespace PocketSql
         private IOrderedEnumerable<DataRow> Order(
             IOrderedEnumerable<DataRow> seq,
             ExpressionWithSortOrder element,
-            IDictionary<string, object> vars)
+            Vars vars)
         {
             object Func(DataRow x) => Evaluate(element.Expression, x, vars);
             return element.SortOrder == SortOrder.Descending ? seq.ThenByDescending(Func) : seq.ThenBy(Func);
         }
 
-        private EngineResult Evaluate(InsertStatement insert, IDictionary<string, object> vars)
+        private EngineResult Evaluate(InsertStatement insert, Vars vars)
         {
             var namedTableRef = (NamedTableReference)insert.InsertSpecification.Target;
             var table = tables[namedTableRef.SchemaObject.BaseIdentifier.Value];
@@ -290,7 +290,7 @@ namespace PocketSql
             DataTable table,
             IList<ColumnReferenceExpression> cols,
             ValuesInsertSource values,
-            IDictionary<string, object> vars)
+            Vars vars)
         {
             foreach (var valuesExpr in values.RowValues)
             {
@@ -311,7 +311,7 @@ namespace PocketSql
             };
         }
 
-        private EngineResult Evaluate(UpdateStatement update, IDictionary<string, object> vars)
+        private EngineResult Evaluate(UpdateStatement update, Vars vars)
         {
             var tableRef = (NamedTableReference)update.UpdateSpecification.Target;
             var table = tables[tableRef.SchemaObject.BaseIdentifier.Value];
@@ -373,7 +373,7 @@ namespace PocketSql
             };
         }
 
-        private void Evaluate(IList<SetClause> clauses, DataRow row, DataTable output, IDictionary<string, object> vars)
+        private void Evaluate(IList<SetClause> clauses, DataRow row, DataTable output, Vars vars)
         {
             foreach (var clause in clauses)
             {
@@ -450,7 +450,7 @@ namespace PocketSql
             throw new NotImplementedException();
         }
 
-        private EngineResult Evaluate(DeleteStatement delete, IDictionary<string, object> vars)
+        private EngineResult Evaluate(DeleteStatement delete, Vars vars)
         {
             var tableRef = (NamedTableReference) delete.DeleteSpecification.Target;
             var table = tables[tableRef.SchemaObject.BaseIdentifier.Value];
@@ -472,7 +472,7 @@ namespace PocketSql
             };
         }
 
-        private EngineResult Evaluate(MergeStatement merge, IDictionary<string, object> vars)
+        private EngineResult Evaluate(MergeStatement merge, Vars vars)
         {
             var targetTableRef = (NamedTableReference) merge.MergeSpecification.Target;
             var targetTable = tables[targetTableRef.SchemaObject.BaseIdentifier.Value];
@@ -568,11 +568,7 @@ namespace PocketSql
         }
 
         // TODO: return output if output clause is present
-        private void Evaluate(
-            MergeAction action,
-            DataTable targetTable,
-            DataRow row,
-            IDictionary<string, object> vars)
+        private void Evaluate(MergeAction action, DataTable targetTable, DataRow row, Vars vars)
         {
             switch (action)
             {
@@ -637,36 +633,30 @@ namespace PocketSql
             return null;
         }
 
-        private EngineResult Evaluate(SetVariableStatement set, IDictionary<string, object> vars)
+        private EngineResult Evaluate(SetVariableStatement set, Vars vars)
         {
-            var name = set.Variable.Name.TrimStart('@');
-
-            if (!vars.ContainsKey(name))
-            {
-                throw new Exception($"Variable not declared: {name}");
-            }
-
-            vars[name] = Evaluate(set.Expression, null, vars);
+            vars[set.Variable.Name] = Evaluate(set.Expression, null, vars);
             return null;
         }
 
-        private EngineResult Evaluate(DeclareVariableStatement declare, IDictionary<string, object> vars)
+        private EngineResult Evaluate(DeclareVariableStatement declare, Vars vars)
         {
             foreach (var declaration in declare.Declarations)
             {
-                vars[declaration.VariableName.Value.TrimStart('@')] =
-                    declaration.Value == null ? null : Evaluate(declaration.Value, null, vars);
+                vars.Declare(
+                    declaration.VariableName.Value,
+                    declaration.Value == null ? null : Evaluate(declaration.Value, null, vars));
             }
 
             return null;
         }
 
-        private EngineResult Evaluate(IfStatement conditional, IDictionary<string, object> vars) =>
+        private EngineResult Evaluate(IfStatement conditional, Vars vars) =>
             Evaluate(Evaluate(conditional.Predicate, null, vars)
                 ? conditional.ThenStatement
                 : conditional.ElseStatement, vars);
 
-        private EngineResult Evaluate(WhileStatement loop, IDictionary<string, object> vars)
+        private EngineResult Evaluate(WhileStatement loop, Vars vars)
         {
             while (Evaluate(loop.Predicate, null, vars))
             {
@@ -706,7 +696,7 @@ namespace PocketSql
             throw new NotImplementedException();
         }
 
-        private bool Evaluate(BooleanExpression expr, DataRow row, IDictionary<string, object> vars)
+        private bool Evaluate(BooleanExpression expr, DataRow row, Vars vars)
         {
             switch (expr)
             {
@@ -734,7 +724,7 @@ namespace PocketSql
             throw new NotImplementedException();
         }
 
-        private object Evaluate(ScalarExpression expr, DataRow row, IDictionary<string, object> vars)
+        private object Evaluate(ScalarExpression expr, DataRow row, Vars vars)
         {
             switch (expr)
             {
@@ -764,7 +754,7 @@ namespace PocketSql
             throw new NotImplementedException();
         }
 
-        private object Evaluate(CaseExpression caseExpr, DataRow row, IDictionary<string, object> vars)
+        private object Evaluate(CaseExpression caseExpr, DataRow row, Vars vars)
         {
             switch (caseExpr)
             {
@@ -1008,9 +998,7 @@ namespace PocketSql
                     throw new Exception(string.Join("\r\n", errors.Select(e => e.Message)));
                 }
 
-                return connection.engine.Evaluate(
-                    statements,
-                    Parameters.Cast<IDbDataParameter>().ToDictionary(x => x.ParameterName, x => x.Value));
+                return connection.engine.Evaluate(statements, Vars.Of(Parameters));
             }
 
             public IDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
