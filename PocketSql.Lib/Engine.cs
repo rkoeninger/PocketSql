@@ -757,9 +757,44 @@ namespace PocketSql
                     return row[colExpr.MultiPartIdentifier.Identifiers.Last().Value];
                 case VariableReference varRef:
                     return vars[varRef.Name.TrimStart('@')];
+                case CaseExpression caseExpr:
+                    return Evaluate(caseExpr, row, vars);
             }
 
             throw new NotImplementedException();
+        }
+
+        private object Evaluate(CaseExpression caseExpr, DataRow row, IDictionary<string, object> vars)
+        {
+            switch (caseExpr)
+            {
+                case SimpleCaseExpression simple:
+                    var input = Evaluate(simple.InputExpression, row, vars);
+
+                    foreach (var clause in simple.WhenClauses)
+                    {
+                        if (input != null && input.Equals(Evaluate(clause.WhenExpression, row, vars)))
+                        {
+                            return Evaluate(clause.ThenExpression, row, vars);
+                        }
+                    }
+
+                    break;
+                case SearchedCaseExpression searched:
+                    foreach (var clause in searched.WhenClauses)
+                    {
+                        if (Evaluate(clause.WhenExpression, row, null))
+                        {
+                            return Evaluate(clause.ThenExpression, row, vars);
+                        }
+                    }
+
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            return Evaluate(caseExpr.ElseExpression, row, vars);
         }
 
         private object Evaluate(UnaryExpressionType op, object value)
