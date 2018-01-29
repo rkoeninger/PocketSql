@@ -357,30 +357,7 @@ namespace PocketSql
                 if (update.UpdateSpecification.WhereClause == null
                     || Evaluate(update.UpdateSpecification.WhereClause.SearchCondition, row, vars))
                 {
-                    foreach (var clause in update.UpdateSpecification.SetClauses)
-                    {
-                        var oldValues = output == null ? null : new Dictionary<string, object>();
-
-                        switch (clause)
-                        {
-                            case AssignmentSetClause set:
-                                var columnName = set.Column.MultiPartIdentifier.Identifiers.Last().Value;
-                                if (output != null) oldValues[columnName] = row[columnName];
-                                row[columnName] = Evaluate(
-                                    set.AssignmentKind,
-                                    row[columnName],
-                                    Evaluate(set.NewValue, row, vars));
-                                break;
-                            default:
-                                throw new NotImplementedException();
-                        }
-
-                        if (output != null)
-                        {
-                            // TODO: add row to output, differentiating between inserted. and deleted.
-                        }
-                    }
-
+                    Evaluate(update.UpdateSpecification.SetClauses, row, output, vars);
                     rowCount++;
                 }
             }
@@ -390,6 +367,33 @@ namespace PocketSql
                 RecordsAffected = rowCount
                 // TODO: ResultSet = output
             };
+        }
+
+        private void Evaluate(IList<SetClause> clauses, DataRow row, DataTable output, IDictionary<string, object> vars)
+        {
+            foreach (var clause in clauses)
+            {
+                var oldValues = output == null ? null : new Dictionary<string, object>();
+
+                switch (clause)
+                {
+                    case AssignmentSetClause set:
+                        var columnName = set.Column.MultiPartIdentifier.Identifiers.Last().Value;
+                        if (output != null) oldValues[columnName] = row[columnName];
+                        row[columnName] = Evaluate(
+                            set.AssignmentKind,
+                            row[columnName],
+                            Evaluate(set.NewValue, row, vars));
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                if (output != null)
+                {
+                    // TODO: add row to output, differentiating between inserted. and deleted.
+                }
+            }
         }
 
         private ColumnReferenceExpression CreateColumnReferenceExpression(string name)
@@ -549,29 +553,31 @@ namespace PocketSql
                 }
             }
 
+            // TODO: output into
+
             return new EngineResult
             {
                 RecordsAffected = rowCount
             };
         }
 
-        // TODO: return rows affected/output
+        // TODO: return output if output clause is present
         private void Evaluate(
             MergeAction action,
             DataTable targetTable,
             DataRow row,
             IDictionary<string, object> vars)
         {
-            // TODO: abstract the logic from insert/update/delete Evaluate methods and re-use here
             switch (action)
             {
                 case InsertMergeAction insert:
                     Evaluate(targetTable, insert.Columns, insert.Source, vars);
                     break;
                 case UpdateMergeAction update:
-                    //Evaluate();
+                    Evaluate(update.SetClauses, row, null, vars);
                     break;
-                case DeleteMergeAction delete:
+                case DeleteMergeAction _:
+                    targetTable.Rows.Remove(row);
                     break;
             }
         }
