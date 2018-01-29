@@ -25,7 +25,7 @@ namespace PocketSql.Evaluation
                 case SearchedCaseExpression searched:
                     foreach (var clause in searched.WhenClauses)
                     {
-                        if (Evaluate(clause.WhenExpression, row, null))
+                        if (Evaluate(clause.WhenExpression, row, env))
                         {
                             return Evaluate(clause.ThenExpression, row, env);
                         }
