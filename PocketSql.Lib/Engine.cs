@@ -51,6 +51,8 @@ namespace PocketSql
                     return Evaluate(truncate);
                 case CreateTableStatement createTable:
                     return Evaluate(createTable);
+                case DropObjectsStatement drop:
+                    return Evaluate(drop);
                 case SetVariableStatement set:
                     return Evaluate(set, vars);
                 case DeclareVariableStatement declare:
@@ -217,13 +219,11 @@ namespace PocketSql
                     RecordsAffected = projection.Rows.Count
                 };
             }
-            else
+
+            return new EngineResult
             {
-                return new EngineResult
-                {
-                    ResultSet = projection
-                };
-            }
+                ResultSet = projection
+            };
         }
 
         private static void CopyOnto(DataTable source, DataTable target)
@@ -581,6 +581,23 @@ namespace PocketSql
             }
 
             tables.Add(createTable.SchemaObjectName.BaseIdentifier.Value, table);
+            return null;
+        }
+
+        private EngineResult Evaluate(DropObjectsStatement drop)
+        {
+            foreach (var table in drop.Objects)
+            {
+                var tableName = table.BaseIdentifier.Value;
+
+                if (!drop.IsIfExists && !tables.ContainsKey(tableName))
+                {
+                    throw new Exception();
+                }
+
+                tables.Remove(tableName);
+            }
+
             return null;
         }
 
