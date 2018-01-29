@@ -46,9 +46,36 @@
     <Compile Include="CaseInsensitivity.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="DataModel.cs" />
+    <Compile Include="EngineResult.cs" />
     <Compile Include="EquatableList.cs" />
+    <Compile Include="Evaluation\Eval.AssignmentKind.cs" />
+    <Compile Include="Evaluation\Eval.BinaryExpressionType.cs" />
+    <Compile Include="Evaluation\Eval.BooleanBinaryExpressionType.cs" />
+    <Compile Include="Evaluation\Eval.BooleanComparisonType.cs" />
+    <Compile Include="Evaluation\Eval.BooleanExpression.cs" />
+    <Compile Include="Evaluation\Eval.CaseExpression.cs" />
+    <Compile Include="Evaluation\Eval.CreateTableStatement.cs" />
+    <Compile Include="Evaluation\Eval.DeclareVariable.cs" />
+    <Compile Include="Evaluation\Eval.DeleteStatement.cs" />
+    <Compile Include="Evaluation\Eval.DropObectsStatement.cs" />
+    <Compile Include="Evaluation\Eval.IfStatement.cs" />
+    <Compile Include="Evaluation\Eval.InsertStatement.cs" />
+    <Compile Include="Evaluation\Eval.MergeAction.cs" />
+    <Compile Include="Evaluation\Eval.MergeStatement.cs" />
+    <Compile Include="Evaluation\Eval.QueryExpression.cs" />
+    <Compile Include="Evaluation\Eval.ScalarExpression.cs" />
+    <Compile Include="Evaluation\Eval.SelectStatement.cs" />
+    <Compile Include="Evaluation\Eval.SetClauses.cs" />
+    <Compile Include="Evaluation\Eval.SetVariable.cs" />
+    <Compile Include="Evaluation\Eval.StatementList.cs" />
+    <Compile Include="Evaluation\Eval.TSqlStatement.cs" />
+    <Compile Include="Evaluation\Eval.UnaryExpression.cs" />
+    <Compile Include="Evaluation\Eval.UpdateStatement.cs" />
+    <Compile Include="Evaluation\Eval.ValuesInsertSource.cs" />
+    <Compile Include="Evaluation\Eval.WhileStatement.cs" />
+    <Compile Include="Evaluation\Eval.TruncateTableStatement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Vars.cs" />
+    <Compile Include="Env.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -4,11 +4,19 @@ using System.Data;
 
 namespace PocketSql
 {
-    public class Vars
+    public class Env
     {
-        public static Vars Of(IDataParameterCollection parameters) => new Vars().AddAll(parameters);
+        public static Env Of(Engine engine, IDataParameterCollection parameters)
+        {
+            var env = new Env();
+            env.AddAll(parameters);
+            env.Engine = engine;
+            return env;
+        }
 
         private readonly IDictionary<string, object> vars = new Dictionary<string, object>();
+
+        public Engine Engine { get; private set; }
 
         public object this[string name]
         {
@@ -24,7 +32,7 @@ namespace PocketSql
             }
         }
 
-        public Vars Declare(string name, object value)
+        public Env Declare(string name, object value)
         {
             vars.Add(name.TrimStart('@'), value);
             return this;
@@ -32,7 +40,7 @@ namespace PocketSql
 
         public bool IsDeclared(string name) => vars.ContainsKey(name.TrimStart('@'));
 
-        public Vars AddAll(IDataParameterCollection parameters)
+        public Env AddAll(IDataParameterCollection parameters)
         {
             foreach (IDbDataParameter parameter in parameters)
             {
