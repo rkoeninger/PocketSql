@@ -57,6 +57,8 @@ namespace PocketSql
                     return Evaluate(set, vars);
                 case DeclareVariableStatement declare:
                     return Evaluate(declare, vars);
+                case IfStatement conditional:
+                    return Evaluate(conditional, vars);
                 default:
                     throw new NotImplementedException();
             }
@@ -525,6 +527,8 @@ namespace PocketSql
                 }
             }
 
+            // TODO: what order should merge actions be applied?
+
             // apply not matched (by target)
             foreach (var clause in merge.MergeSpecification.ActionClauses.Where(x =>
                 x.Condition == MergeCondition.NotMatched || x.Condition == MergeCondition.NotMatchedByTarget))
@@ -654,6 +658,11 @@ namespace PocketSql
 
             return null;
         }
+
+        private EngineResult Evaluate(IfStatement conditional, IDictionary<string, object> vars) =>
+            Evaluate(Evaluate(conditional.Predicate, null, vars)
+                ? conditional.ThenStatement
+                : conditional.ElseStatement, vars);
 
         private object Evaluate(AssignmentKind kind, object current, object value)
         {
