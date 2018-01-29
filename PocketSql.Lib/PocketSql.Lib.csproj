@@ -46,6 +46,7 @@
     <Compile Include="CaseInsensitivity.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="DataModel.cs" />
+    <Compile Include="EquatableList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

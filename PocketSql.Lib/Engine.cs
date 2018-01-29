@@ -62,14 +62,11 @@ namespace PocketSql
 
         private EngineResult Evaluate(SelectStatement select, IDictionary<string, object> vars)
         {
-            // TODO: select into
-            // TODO: group by, having
-
             var querySpec = (QuerySpecification) select.QueryExpression;
             var tableRef = (NamedTableReference) querySpec.FromClause?.TableReferences?.Single();
             var table = tableRef == null ? null : tables[tableRef.SchemaObject.BaseIdentifier.Value];
             var projection = new DataTable();
-            
+
             var selections = querySpec.SelectElements.SelectMany(s =>
             {
                 switch (s)
@@ -91,7 +88,7 @@ namespace PocketSql
                         throw new NotImplementedException();
                 }
             }).ToList();
-            
+
             foreach (var (name, type, _) in selections)
             {
                 projection.Columns.Add(new DataColumn
@@ -113,6 +110,66 @@ namespace PocketSql
                     }
 
                     projection.Rows.Add(resultRow);
+                }
+            }
+
+            // TODO: need to perform group by before evaluating select expressions
+
+            if (querySpec.GroupByClause != null)
+            {
+                var rows = projection.Rows.Cast<DataRow>().ToList();
+                var temp = projection.Clone();
+
+                // TODO: rollup, cube, grouping sets
+
+                EquatableList KeyBuilder(DataRow row)
+                {
+                    var keys = new EquatableList();
+
+                    foreach (ExpressionGroupingSpecification g in
+                        querySpec.GroupByClause.GroupingSpecifications)
+                    {
+                        keys.Elements.Add(Evaluate(g.Expression, row, vars));
+                    }
+
+                    return keys;
+                }
+
+                // rows.GroupBy(KeyBuilder)
+
+                if (querySpec.HavingClause != null)
+                {
+                    foreach (DataRow row in temp.Rows)
+                    {
+                        if (!Evaluate(querySpec.HavingClause.SearchCondition, row, vars))
+                        {
+                            temp.Rows.Remove(row);
+                        }
+                    }
+                }
+
+                projection.Rows.Clear();
+                CopyOnto(temp, projection);
+            }
+
+            if (querySpec.UniqueRowFilter == UniqueRowFilter.Distinct)
+            {
+                var temp = projection.Clone();
+                CopyOnto(projection, temp);
+                projection.Rows.Clear();
+
+                foreach (var item in temp.Rows.Cast<DataRow>()
+                    .Select(r => EquatableList.Of(r.ItemArray))
+                    .Distinct())
+                {
+                    var row = projection.NewRow();
+
+                    foreach (DataColumn col in temp.Columns)
+                    {
+                        row[col.Ordinal] = item.Elements[col.Ordinal];
+                    }
+
+                    projection.Rows.Add(row);
                 }
             }
 
@@ -151,12 +208,24 @@ namespace PocketSql
                 }
             }
 
-            return new EngineResult
+            if (select.Into != null)
             {
-                ResultSet = projection
-            };
+                tables.Add(select.Into.Identifiers.Last().Value, projection);
+
+                return new EngineResult
+                {
+                    RecordsAffected = projection.Rows.Count
+                };
+            }
+            else
+            {
+                return new EngineResult
+                {
+                    ResultSet = projection
+                };
+            }
         }
-        
+
         private static void CopyOnto(DataTable source, DataTable target)
         {
             foreach (DataRow row in source.Rows)
