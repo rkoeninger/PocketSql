@@ -3,4 +3,4 @@
 
 # PocketSql
 
-An embedable database for testing integration code against multiple popular databases on multiple platforms.
+A virtualized implementation of Microsoft SQL Server, packaged as a library, suitable for testing data acess code and queries.
