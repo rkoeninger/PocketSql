@@ -3,4 +3,4 @@
 
 # PocketSql
 
-A virtualized implementation of Microsoft SQL Server, packaged as a library, suitable for testing data acess code and queries.
+An in-process implementation of T-SQL, packaged as a library, suitable for testing data acess code and queries.
