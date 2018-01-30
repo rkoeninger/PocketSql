@@ -64,6 +64,7 @@
     <Compile Include="Evaluation\Eval.MergeAction.cs" />
     <Compile Include="Evaluation\Eval.MergeStatement.cs" />
     <Compile Include="Evaluation\Eval.QueryExpression.cs" />
+    <Compile Include="Evaluation\Eval.QuerySpecification.cs" />
     <Compile Include="Evaluation\Eval.ScalarExpression.cs" />
     <Compile Include="Evaluation\Eval.SelectInsertSource.cs" />
     <Compile Include="Evaluation\Eval.SelectStatement.cs" />

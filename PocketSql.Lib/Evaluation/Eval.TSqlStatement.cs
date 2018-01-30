@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
@@ -33,6 +34,10 @@ namespace PocketSql.Evaluation
                     return Evaluate(conditional, env);
                 case WhileStatement loop:
                     return Evaluate(loop, env);
+                case BeginEndBlockStatement block:
+                    // TODO: maybe everything should return a list of results?
+                    //       or at least all Evaluate(____Statement) methods
+                    return Evaluate(block.StatementList, env).LastOrDefault();
                 default:
                     throw new NotImplementedException();
             }
