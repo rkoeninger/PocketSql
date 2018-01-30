@@ -11,6 +11,8 @@ namespace PocketSql.Evaluation
         {
             switch (expr)
             {
+                case BooleanParenthesisExpression paren:
+                    return Evaluate(paren.Expression, row, env);
                 case BooleanBinaryExpression binaryExpr:
                     return Evaluate(
                         binaryExpr.BinaryExpressionType,
