@@ -50,6 +50,7 @@
     <Compile Include="EquatableList.cs" />
     <Compile Include="Evaluation\Eval.AssignmentKind.cs" />
     <Compile Include="Evaluation\Eval.BinaryExpressionType.cs" />
+    <Compile Include="Evaluation\Eval.BinaryQueryExpressionType.cs" />
     <Compile Include="Evaluation\Eval.BooleanBinaryExpressionType.cs" />
     <Compile Include="Evaluation\Eval.BooleanComparisonType.cs" />
     <Compile Include="Evaluation\Eval.BooleanExpression.cs" />

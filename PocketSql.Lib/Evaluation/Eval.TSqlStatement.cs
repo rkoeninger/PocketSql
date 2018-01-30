@@ -6,6 +6,9 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
+        // TODO: change result types of various Evaluate to only return what
+        //       they will be able to return: rowCount, resultSet, void, etc.
+
         public static EngineResult Evaluate(TSqlStatement statement, Env env)
         {
             switch (statement)
