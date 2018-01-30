@@ -195,9 +195,46 @@ namespace PocketSql.Tests
                     (23, 'wer'),
                     (92, 'zxc')"));
 
-                Assert.AreEqual(16, connection.Execute("select * into Things2 from Things"));
+                Assert.AreEqual(16, connection.Execute("select * into Others from Things"));
 
-                Assert.AreEqual(16, connection.Query("select * from Things2").Count());
+                Assert.AreEqual(16, connection.Query("select * from Others").Count());
+            }
+        }
+
+        [Test]
+        public void InsertSelect()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute("create table Things (X int, Y varchar(8))");
+                connection.Execute("create table Others (X int)");
+
+                Assert.AreEqual(16, connection.Execute(@"
+                    insert into Things
+                    (X, Y)
+                    values
+                    (34, 'qwe'),
+                    (23, 'wer'),
+                    (67, 'ert'),
+                    (63, 'rty'),
+                    (75, 'tyu'),
+                    (17, 'yui'),
+                    (47, 'uio'),
+                    (47, 'zxc'),
+                    (95, 'asd'),
+                    (67, 'ert'),
+                    (63, 'rty'),
+                    (75, 'tyu'),
+                    (95, 'asd'),
+                    (17, 'yui'),
+                    (23, 'wer'),
+                    (92, 'zxc')"));
+
+                Assert.AreEqual(16, connection.Execute("insert into Others select X from Things"));
+
+                Assert.AreEqual(16, connection.Query("select * from Others").Count());
             }
         }
 

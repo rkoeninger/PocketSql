@@ -1,4 +1,5 @@
-﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using System;
+using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -8,11 +9,24 @@ namespace PocketSql.Evaluation
         {
             var namedTableRef = (NamedTableReference)insert.InsertSpecification.Target;
             var table = env.Engine.tables[namedTableRef.SchemaObject.BaseIdentifier.Value];
-            return Evaluate(
-                table,
-                insert.InsertSpecification.Columns,
-                (ValuesInsertSource)insert.InsertSpecification.InsertSource,
-                env);
+
+            switch (insert.InsertSpecification.InsertSource)
+            {
+                case ValuesInsertSource values:
+                    return Evaluate(
+                        table,
+                        insert.InsertSpecification.Columns,
+                        values,
+                        env);
+                case SelectInsertSource select:
+                    return Evaluate(
+                        table,
+                        insert.InsertSpecification.Columns,
+                        Evaluate(select.Select, env).ResultSet,
+                        env);
+            }
+
+            throw new NotImplementedException();
         }
     }
 }
