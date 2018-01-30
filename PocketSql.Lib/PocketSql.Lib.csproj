@@ -53,6 +53,7 @@
     <Compile Include="Evaluation\Eval.BooleanBinaryExpressionType.cs" />
     <Compile Include="Evaluation\Eval.BooleanComparisonType.cs" />
     <Compile Include="Evaluation\Eval.BooleanExpression.cs" />
+    <Compile Include="Evaluation\Eval.BooleanTernaryExpressionType.cs" />
     <Compile Include="Evaluation\Eval.CaseExpression.cs" />
     <Compile Include="Evaluation\Eval.CreateTableStatement.cs" />
     <Compile Include="Evaluation\Eval.DeclareVariable.cs" />

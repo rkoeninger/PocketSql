@@ -16,6 +16,12 @@ namespace PocketSql.Evaluation
                         binaryExpr.BinaryExpressionType,
                         Evaluate(binaryExpr.FirstExpression, row, env),
                         Evaluate(binaryExpr.SecondExpression, row, env));
+                case BooleanTernaryExpression ternaryExpr:
+                    return Evaluate(
+                        ternaryExpr.TernaryExpressionType,
+                        Evaluate(ternaryExpr.FirstExpression, row, env),
+                        Evaluate(ternaryExpr.SecondExpression, row, env),
+                        Evaluate(ternaryExpr.ThirdExpression, row, env));
                 case BooleanComparisonExpression compareExpr:
                     return Evaluate(
                         compareExpr.ComparisonType,
