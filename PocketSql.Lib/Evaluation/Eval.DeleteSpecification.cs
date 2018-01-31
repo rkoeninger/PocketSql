@@ -5,16 +5,15 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(DeleteStatement delete, Env env)
+        public static EngineResult Evaluate(DeleteSpecification delete, Env env)
         {
-            var tableRef = (NamedTableReference)delete.DeleteSpecification.Target;
+            var tableRef = (NamedTableReference)delete.Target;
             var table = env.Engine.tables[tableRef.SchemaObject.BaseIdentifier.Value];
             var rowCount = 0;
 
             foreach (DataRow row in table.Rows)
             {
-                if (delete.DeleteSpecification.WhereClause == null
-                    || Evaluate(delete.DeleteSpecification.WhereClause.SearchCondition, row, env))
+                if (delete.WhereClause == null || Evaluate(delete.WhereClause.SearchCondition, row, env))
                 {
                     table.Rows.Remove(row);
                     rowCount++;

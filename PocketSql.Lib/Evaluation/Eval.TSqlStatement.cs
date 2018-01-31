@@ -16,13 +16,13 @@ namespace PocketSql.Evaluation
                 case SelectStatement select:
                     return Evaluate(select, env);
                 case UpdateStatement update:
-                    return Evaluate(update, env);
+                    return Evaluate(update.UpdateSpecification, env);
                 case InsertStatement insert:
-                    return Evaluate(insert, env);
+                    return Evaluate(insert.InsertSpecification, env);
                 case DeleteStatement delete:
-                    return Evaluate(delete, env);
+                    return Evaluate(delete.DeleteSpecification, env);
                 case MergeStatement merge:
-                    return Evaluate(merge, env);
+                    return Evaluate(merge.MergeSpecification, env);
                 case TruncateTableStatement truncate:
                     return Evaluate(truncate, env);
                 case CreateTableStatement createTable:

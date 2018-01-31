@@ -19,8 +19,8 @@ namespace PocketSql.Evaluation
             // The union is taken after each sub-select is evaluated.
             // Finally, the resulting rows are sorted according to the columns specified in the order by clause.
 
-            var tableRef = (NamedTableReference)querySpec.FromClause?.TableReferences?.Single();
-            var table = tableRef == null ? null : env.Engine.tables[tableRef.SchemaObject.BaseIdentifier.Value];
+            var table = querySpec.FromClause?.TableReferences?
+                .Aggregate((DataTable)null, (ts, tr) => Evaluate(tr, ts, env));
             var projection = new DataTable();
 
             var selections = querySpec.SelectElements.SelectMany(s =>

@@ -7,11 +7,11 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(MergeStatement merge, Env env)
+        public static EngineResult Evaluate(MergeSpecification merge, Env env)
         {
-            var targetTableRef = (NamedTableReference)merge.MergeSpecification.Target;
+            var targetTableRef = (NamedTableReference)merge.Target;
             var targetTable = env.Engine.tables[targetTableRef.SchemaObject.BaseIdentifier.Value];
-            var sourceTableRef = (NamedTableReference)merge.MergeSpecification.TableReference;
+            var sourceTableRef = (NamedTableReference)merge.TableReference;
             var sourceTable = env.Engine.tables[sourceTableRef.SchemaObject.BaseIdentifier.Value];
             var rowCount = 0;
             var matched = new List<DataRow>();
@@ -26,7 +26,7 @@ namespace PocketSql.Evaluation
                 // TODO: need to respect table aliases and combine rows
                 // TODO: need to define new row classes that aggregate rows via aliases
                 var targetRow = targetTable.Rows.Cast<DataRow>().FirstOrDefault(x =>
-                    Evaluate(merge.MergeSpecification.SearchCondition, row, env));
+                    Evaluate(merge.SearchCondition, row, env));
 
                 if (targetRow == null)
                 {
@@ -42,7 +42,7 @@ namespace PocketSql.Evaluation
             foreach (DataRow row in targetTable.Rows)
             {
                 var sourceRow = sourceTable.Rows.Cast<DataRow>().FirstOrDefault(x =>
-                    Evaluate(merge.MergeSpecification.SearchCondition, row, env));
+                    Evaluate(merge.SearchCondition, row, env));
 
                 if (sourceRow == null)
                 {
@@ -51,7 +51,7 @@ namespace PocketSql.Evaluation
             }
 
             // apply matched
-            foreach (var clause in merge.MergeSpecification.ActionClauses.Where(x =>
+            foreach (var clause in merge.ActionClauses.Where(x =>
                 x.Condition == MergeCondition.Matched))
             {
                 foreach (var row in matched)
@@ -67,7 +67,7 @@ namespace PocketSql.Evaluation
             // TODO: what order should merge actions be applied?
 
             // apply not matched (by target)
-            foreach (var clause in merge.MergeSpecification.ActionClauses.Where(x =>
+            foreach (var clause in merge.ActionClauses.Where(x =>
                 x.Condition == MergeCondition.NotMatched || x.Condition == MergeCondition.NotMatchedByTarget))
             {
                 foreach (var row in notMatchedByTarget)
@@ -81,7 +81,7 @@ namespace PocketSql.Evaluation
             }
 
             // apply not matched by source
-            foreach (var clause in merge.MergeSpecification.ActionClauses.Where(x =>
+            foreach (var clause in merge.ActionClauses.Where(x =>
                 x.Condition == MergeCondition.NotMatchedBySource))
             {
                 foreach (var row in notMatchedBySource)
