@@ -41,6 +41,9 @@ namespace PocketSql.Evaluation
                     // TODO: maybe everything should return a list of results?
                     //       or at least all Evaluate(____Statement) methods
                     return Evaluate(block.StatementList, env).LastOrDefault();
+                case UseStatement use:
+                    env.DefaultDatabase = use.DatabaseName.Value;
+                    return new EngineResult();
                 default:
                     throw new NotImplementedException();
             }

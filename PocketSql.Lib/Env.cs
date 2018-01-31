@@ -19,6 +19,8 @@ namespace PocketSql
         private readonly IDictionary<string, object> vars = new Dictionary<string, object>();
 
         public Engine Engine { get; private set; }
+        public string DefaultDatabase { get; set; }
+        public string DefaultSchema { get; set; }
 
         public object this[string name]
         {
