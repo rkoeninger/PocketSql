@@ -18,11 +18,10 @@ namespace PocketSql.Evaluation
             // If the distinct keyword in present in the select clause, duplicate rows are now eliminated.
             // The union is taken after each sub-select is evaluated.
             // Finally, the resulting rows are sorted according to the columns specified in the order by clause.
+            // And then the offset/fetch is evaluated
 
             var table = querySpec.FromClause?.TableReferences?
                 .Aggregate((DataTable)null, (ts, tr) => Evaluate(tr, ts, env));
-            var projection = new DataTable();
-
             var selections = querySpec.SelectElements.SelectMany(s =>
             {
                 switch (s)
@@ -45,27 +44,40 @@ namespace PocketSql.Evaluation
                 }
             }).ToList();
 
-            foreach (var (name, type, _) in selections)
+            if (table == null)
             {
-                projection.Columns.Add(new DataColumn
+                var projection1 = new DataTable();
+
+                foreach (var (name, type, _) in selections)
                 {
-                    ColumnName = name,
-                    DataType = type
-                });
+                    projection1.Columns.Add(new DataColumn
+                    {
+                        ColumnName = name,
+                        DataType = type
+                    });
+                }
+
+                var resultRow = projection1.NewRow();
+
+                for (var i = 0; i < selections.Count; ++i)
+                {
+                    resultRow[i] = Evaluate(selections[i].Item3, null, env);
+                }
+
+                projection1.Rows.Add(resultRow);
+                return new EngineResult
+                {
+                    ResultSet = projection1
+                };
             }
 
-            foreach (var row in table?.Rows.Cast<DataRow>() ?? new DataRow[] { null })
+            var tableCopy = table.Clone();
+
+            foreach (DataRow row in table.Rows)
             {
                 if (querySpec.WhereClause == null || Evaluate(querySpec.WhereClause.SearchCondition, row, env))
                 {
-                    var resultRow = projection.NewRow();
-
-                    for (var i = 0; i < selections.Count; ++i)
-                    {
-                        resultRow[i] = Evaluate(selections[i].Item3, row, env);
-                    }
-
-                    projection.Rows.Add(resultRow);
+                    CopyOnto(row, tableCopy);
                 }
             }
 
@@ -73,8 +85,8 @@ namespace PocketSql.Evaluation
 
             if (querySpec.GroupByClause != null)
             {
-                var rows = projection.Rows.Cast<DataRow>().ToList();
-                var temp = projection.Clone();
+                var rows = tableCopy.Rows.Cast<DataRow>().ToList();
+                var temp = tableCopy.Clone();
 
                 // TODO: rollup, cube, grouping sets
 
@@ -104,30 +116,59 @@ namespace PocketSql.Evaluation
                     }
                 }
 
-                projection.Rows.Clear();
-                CopyOnto(temp, projection);
+                tableCopy.Rows.Clear();
+                CopyOnto(temp, tableCopy);
             }
 
             if (querySpec.UniqueRowFilter == UniqueRowFilter.Distinct)
             {
-                var temp = projection.Clone();
-                CopyOnto(projection, temp);
-                projection.Rows.Clear();
+                var temp = tableCopy.Clone();
+                CopyOnto(tableCopy, temp);
+                tableCopy.Rows.Clear();
 
                 foreach (var item in temp.Rows.Cast<DataRow>()
                     .Select(r => EquatableList.Of(r.ItemArray))
                     .Distinct())
                 {
-                    var row = projection.NewRow();
+                    var row = tableCopy.NewRow();
 
                     foreach (DataColumn col in temp.Columns)
                     {
                         row[col.Ordinal] = item.Elements[col.Ordinal];
                     }
 
-                    projection.Rows.Add(row);
+                    tableCopy.Rows.Add(row);
                 }
             }
+
+            var projection = new DataTable();
+
+            foreach (var (name, type, _) in selections)
+            {
+                projection.Columns.Add(new DataColumn
+                {
+                    ColumnName = name,
+                    DataType = type
+                });
+            }
+
+            {
+                projection.Rows.Clear();
+
+                foreach (DataRow row in tableCopy.Rows)
+                {
+                    var resultRow = projection.NewRow();
+                    
+                    for (var i = 0; i < selections.Count; ++i)
+                    {
+                        resultRow[i] = Evaluate(selections[i].Item3, row, env);
+                    }
+
+                    projection.Rows.Add(resultRow);
+                }
+            }
+
+
 
             if (querySpec.OrderByClause != null)
             {

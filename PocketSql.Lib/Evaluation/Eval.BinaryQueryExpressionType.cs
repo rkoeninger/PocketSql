@@ -9,6 +9,7 @@ namespace PocketSql.Evaluation
         public static EngineResult Evaluate(BinaryQueryExpressionType type, bool all, DataTable first, DataTable right)
         {
             // TODO: what to do when columns don't match?
+            // TODO: does offset/fetch/top happen before or after?
 
             switch (type)
             {

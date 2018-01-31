@@ -7,6 +7,11 @@ namespace PocketSql.Evaluation
     {
         public static EngineResult Evaluate(QueryExpression queryExpr, Env env)
         {
+            // TODO: offset/fetch should be done here?
+            //       order only gets applied if not already ordered
+            //       QuerySpecification could contain TopRowFilter,
+            //       which gets applied after order by
+
             switch (queryExpr)
             {
                 case QuerySpecification querySpec:

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Policy;
 using Dapper;
 using NUnit.Framework;
 
@@ -235,6 +236,25 @@ namespace PocketSql.Tests
                 Assert.AreEqual(16, connection.Execute("insert into Others select X from Things"));
 
                 Assert.AreEqual(16, connection.Query("select * from Others").Count());
+            }
+        }
+
+        [Test]
+        public void InsertSelectTransform()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute("create table Numbers (X int)");
+
+                Assert.AreEqual(8, connection.Execute(@"
+                    insert into Numbers (X)
+                    values (1), (2), (3), (4), (5), (6), (7), (8)"));
+
+                Assert.IsTrue(
+                    new [] {2, 3, 4, 5, 6, 7, 8, 9}.SequenceEqual(
+                        connection.Query<int>("select X + 1 from Numbers")));
             }
         }
 

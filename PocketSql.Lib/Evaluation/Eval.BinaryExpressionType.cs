@@ -12,6 +12,8 @@ namespace PocketSql.Evaluation
                 case BinaryExpressionType.Add:
                     if (left is string && right is string)
                         return (string)left + (string)right;
+                    if (left is int && right is int)
+                        return (int) left + (int) right;
                     return (decimal)left + (decimal)right;
                 case BinaryExpressionType.Subtract:
                     return (decimal)left - (decimal)right;

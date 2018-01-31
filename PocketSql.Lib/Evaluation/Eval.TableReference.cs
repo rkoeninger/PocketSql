@@ -16,7 +16,7 @@ namespace PocketSql.Evaluation
                     // TODO: how does this work?
                     return Evaluate(dml.DataModificationSpecification, env).ResultSet;
                 case JoinParenthesisTableReference paren:
-                    break;
+                    return Evaluate(paren.Join, joinedTables, env);
                 case JoinTableReference join:
                     break;
                 case OdbcQualifiedJoinTableReference odbc:

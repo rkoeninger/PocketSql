@@ -113,6 +113,9 @@ namespace PocketSql.Evaluation
                     return table.Columns[name].DataType;
                 case VariableReference varRef:
                     return typeof(object); // TODO: retain variable type information
+                case BinaryExpression binExpr:
+                    // TODO: so, so brittle
+                    return InferType(binExpr.FirstExpression, table);
             }
 
             throw new NotImplementedException();
