@@ -81,8 +81,6 @@ namespace PocketSql.Evaluation
                 }
             }
 
-            // TODO: need to perform group by before evaluating select expressions
-
             if (querySpec.GroupByClause != null)
             {
                 var rows = tableCopy.Rows.Cast<DataRow>().ToList();
@@ -120,27 +118,6 @@ namespace PocketSql.Evaluation
                 CopyOnto(temp, tableCopy);
             }
 
-            if (querySpec.UniqueRowFilter == UniqueRowFilter.Distinct)
-            {
-                var temp = tableCopy.Clone();
-                CopyOnto(tableCopy, temp);
-                tableCopy.Rows.Clear();
-
-                foreach (var item in temp.Rows.Cast<DataRow>()
-                    .Select(r => EquatableList.Of(r.ItemArray))
-                    .Distinct())
-                {
-                    var row = tableCopy.NewRow();
-
-                    foreach (DataColumn col in temp.Columns)
-                    {
-                        row[col.Ordinal] = item.Elements[col.Ordinal];
-                    }
-
-                    tableCopy.Rows.Add(row);
-                }
-            }
-
             var projection = new DataTable();
 
             foreach (var (name, type, _) in selections)
@@ -168,7 +145,26 @@ namespace PocketSql.Evaluation
                 }
             }
 
+            if (querySpec.UniqueRowFilter == UniqueRowFilter.Distinct)
+            {
+                var temp = projection.Clone();
+                CopyOnto(projection, temp);
+                projection.Rows.Clear();
 
+                foreach (var item in temp.Rows.Cast<DataRow>()
+                    .Select(r => EquatableList.Of(r.ItemArray))
+                    .Distinct())
+                {
+                    var row = projection.NewRow();
+
+                    foreach (DataColumn col in temp.Columns)
+                    {
+                        row[col.Ordinal] = item.Elements[col.Ordinal];
+                    }
+
+                    projection.Rows.Add(row);
+                }
+            }
 
             if (querySpec.OrderByClause != null)
             {
