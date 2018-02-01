@@ -5,6 +5,8 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
+        // TODO: need to handle different Drop___Statement differently
+
         public static EngineResult Evaluate(DropObjectsStatement drop, Env env)
         {
             foreach (var table in drop.Objects)

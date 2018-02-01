@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Policy;
 using Dapper;
 using NUnit.Framework;
 
@@ -86,8 +85,12 @@ namespace PocketSql.Tests
             }
         }
 
-        private class Thing : IEquatable<Thing>
+        public class Thing : IEquatable<Thing>
         {
+            public Thing()
+            {
+            }
+
             public Thing(int x, string y)
             {
                 X = x;
@@ -107,7 +110,7 @@ namespace PocketSql.Tests
                 }
             }
 
-            public bool Equals(Thing that) => X == that.X && Y == that.Y;
+            public bool Equals(Thing that) => that != null && X == that.X && Y == that.Y;
         }
 
         [Test]
@@ -255,6 +258,41 @@ namespace PocketSql.Tests
                 Assert.IsTrue(
                     new [] {2, 3, 4, 5, 6, 7, 8, 9}.SequenceEqual(
                         connection.Query<int>("select X + 1 from Numbers")));
+            }
+        }
+
+        [Test]
+        public void InsertSelectGroupBy()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute("create table Things (X int, Y varchar(8))");
+
+                Assert.AreEqual(16, connection.Execute(@"
+                    insert into Things
+                    (X, Y)
+                    values
+                    (3, 'a'),
+                    (2, 'b'),
+                    (6, 'c'),
+                    (6, 'a'),
+                    (7, 'b'),
+                    (1, 'a'),
+                    (4, 'c'),
+                    (4, 'd'),
+                    (9, 'b'),
+                    (6, 'a'),
+                    (6, 'b'),
+                    (7, 'd'),
+                    (9, 'c'),
+                    (1, 'a'),
+                    (2, 'b'),
+                    (9, 'd')"));
+
+                var result = connection.Query<Thing>("select Y, sum(X) as X from Things group by Y").ToList();
+                Assert.AreEqual(4, result.Count);
             }
         }
 

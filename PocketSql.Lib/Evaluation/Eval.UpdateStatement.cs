@@ -116,6 +116,13 @@ namespace PocketSql.Evaluation
                 case BinaryExpression binExpr:
                     // TODO: so, so brittle
                     return InferType(binExpr.FirstExpression, table);
+                case FunctionCall fun:
+                    switch (fun.FunctionName.Value.ToLower())
+                    {
+                        case "sum": return InferType(fun.Parameters[0], table);
+                        case "count": return typeof(int);
+                    }
+                    break;
             }
 
             throw new NotImplementedException();

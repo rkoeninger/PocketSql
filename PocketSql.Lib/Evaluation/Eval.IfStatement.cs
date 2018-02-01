@@ -1,4 +1,5 @@
-﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using System.Data;
+using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -6,7 +7,7 @@ namespace PocketSql.Evaluation
     {
         public static EngineResult Evaluate(IfStatement conditional, Env env) =>
             Evaluate(
-                Evaluate(conditional.Predicate, null, env)
+                Evaluate(conditional.Predicate, (DataRow)null, env)
                     ? conditional.ThenStatement
                     : conditional.ElseStatement,
                 env);

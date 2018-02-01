@@ -20,6 +20,8 @@ namespace PocketSql.Evaluation
             // Finally, the resulting rows are sorted according to the columns specified in the order by clause.
             // And then the offset/fetch is evaluated
 
+            // FROM
+
             var table = querySpec.FromClause?.TableReferences?
                 .Aggregate((DataTable)null, (ts, tr) => Evaluate(tr, ts, env));
             var selections = querySpec.SelectElements.SelectMany(s =>
@@ -44,6 +46,19 @@ namespace PocketSql.Evaluation
                 }
             }).ToList();
 
+            var projection = new DataTable();
+
+            foreach (var (name, type, _) in selections)
+            {
+                projection.Columns.Add(new DataColumn
+                {
+                    ColumnName = name,
+                    DataType = type
+                });
+            }
+
+            // SELECT without FROM
+
             if (table == null)
             {
                 var projection1 = new DataTable();
@@ -61,7 +76,7 @@ namespace PocketSql.Evaluation
 
                 for (var i = 0; i < selections.Count; ++i)
                 {
-                    resultRow[i] = Evaluate(selections[i].Item3, null, env);
+                    resultRow[i] = Evaluate(selections[i].Item3, (DataRow)null, env);
                 }
 
                 projection1.Rows.Add(resultRow);
@@ -73,6 +88,8 @@ namespace PocketSql.Evaluation
 
             var tableCopy = table.Clone();
 
+            // WHERE
+
             foreach (DataRow row in table.Rows)
             {
                 if (querySpec.WhereClause == null || Evaluate(querySpec.WhereClause.SearchCondition, row, env))
@@ -81,6 +98,8 @@ namespace PocketSql.Evaluation
                 }
             }
 
+            // GROUP BY
+
             if (querySpec.GroupByClause != null)
             {
                 var rows = tableCopy.Rows.Cast<DataRow>().ToList();
@@ -88,54 +107,49 @@ namespace PocketSql.Evaluation
 
                 // TODO: rollup, cube, grouping sets
 
-                EquatableList KeyBuilder(DataRow row)
-                {
-                    var keys = new EquatableList();
+                var groups = rows.GroupBy(row =>
+                    EquatableList.Of(querySpec.GroupByClause.GroupingSpecifications.Select(g =>
+                        Evaluate(g, row, env)))).ToList();
 
-                    foreach (ExpressionGroupingSpecification g in
-                        querySpec.GroupByClause.GroupingSpecifications)
-                    {
-                        keys.Elements.Add(Evaluate(g.Expression, row, env));
-                    }
-
-                    return keys;
-                }
-
-                // rows.GroupBy(KeyBuilder)
+                // HAVING
 
                 if (querySpec.HavingClause != null)
                 {
-                    foreach (DataRow row in temp.Rows)
-                    {
-                        if (!Evaluate(querySpec.HavingClause.SearchCondition, row, env))
-                        {
-                            temp.Rows.Remove(row);
-                        }
-                    }
+                    groups = groups.Where(x => Evaluate(querySpec.HavingClause.SearchCondition, x, env)).ToList();
+                    //foreach (DataRow row in temp.Rows)
+                    //{
+                    //    if (!Evaluate(querySpec.HavingClause.SearchCondition, row, env))
+                    //    {
+                    //        temp.Rows.Remove(row);
+                    //    }
+                    //}
                 }
 
-                tableCopy.Rows.Clear();
-                CopyOnto(temp, tableCopy);
-            }
+                //tableCopy.Rows.Clear();
+                //CopyOnto(temp, tableCopy);
 
-            var projection = new DataTable();
+                // SELECT
 
-            foreach (var (name, type, _) in selections)
-            {
-                projection.Columns.Add(new DataColumn
+                foreach (var group in groups)
                 {
-                    ColumnName = name,
-                    DataType = type
-                });
-            }
+                    var resultsRow = projection.NewRow();
 
+                    for (var i = 0; i < selections.Count; ++i)
+                    {
+                        resultsRow[i] = Evaluate(selections[i].Item3, group, env);
+                    }
+
+                    projection.Rows.Add(resultsRow);
+                }
+            }
+            else
             {
-                projection.Rows.Clear();
+                // SELECT
 
                 foreach (DataRow row in tableCopy.Rows)
                 {
                     var resultRow = projection.NewRow();
-                    
+
                     for (var i = 0; i < selections.Count; ++i)
                     {
                         resultRow[i] = Evaluate(selections[i].Item3, row, env);
@@ -144,6 +158,8 @@ namespace PocketSql.Evaluation
                     projection.Rows.Add(resultRow);
                 }
             }
+
+            // DISTINCT
 
             if (querySpec.UniqueRowFilter == UniqueRowFilter.Distinct)
             {
@@ -166,6 +182,8 @@ namespace PocketSql.Evaluation
                 }
             }
 
+            // ORDER BY
+
             if (querySpec.OrderByClause != null)
             {
                 var elements = querySpec.OrderByClause.OrderByElements;
@@ -185,10 +203,12 @@ namespace PocketSql.Evaluation
                 CopyOnto(temp, projection);
             }
 
+            // OFFSET
+
             if (querySpec.OffsetClause != null)
             {
-                var offset = (int)Evaluate(querySpec.OffsetClause.OffsetExpression, null, env);
-                var fetch = (int)Evaluate(querySpec.OffsetClause.FetchExpression, null, env);
+                var offset = (int)Evaluate(querySpec.OffsetClause.OffsetExpression, (DataRow)null, env);
+                var fetch = (int)Evaluate(querySpec.OffsetClause.FetchExpression, (DataRow)null, env);
 
                 for (var i = 0; i < offset; ++i)
                 {

@@ -6,11 +6,13 @@ namespace PocketSql
 {
     public class EquatableList : IEquatable<EquatableList>
     {
-        public static EquatableList Of(object[] array)
+        public static EquatableList Of(object[] array) => Of(array.AsEnumerable());
+
+        public static EquatableList Of(IEnumerable<object> seq)
         {
             var list = new EquatableList();
 
-            foreach (var x in array)
+            foreach (var x in seq)
             {
                 list.Elements.Add(x);
             }

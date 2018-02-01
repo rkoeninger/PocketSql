@@ -32,6 +32,23 @@ namespace PocketSql.Evaluation
                     return env[varRef.Name.TrimStart('@')];
                 case CaseExpression caseExpr:
                     return Evaluate(caseExpr, row, env);
+                case FunctionCall funCall:
+                    return Evaluate(funCall, row, env);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public static object Evaluate(ScalarExpression expr, IGrouping<EquatableList, DataRow> group, Env env)
+        {
+            switch (expr)
+            {
+                case ColumnReferenceExpression colExpr:
+                    // TODO: need to know column names for EquatableList
+                    // TODO: this only works when there is only 1 column grouped by
+                    return group.Key.Elements.First();
+                case FunctionCall funCall:
+                    return Evaluate(funCall, group, env);
             }
 
             throw new NotImplementedException();

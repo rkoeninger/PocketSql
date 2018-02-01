@@ -61,6 +61,8 @@
     <Compile Include="Evaluation\Eval.DeclareVariable.cs" />
     <Compile Include="Evaluation\Eval.DeleteSpecification.cs" />
     <Compile Include="Evaluation\Eval.DropObectsStatement.cs" />
+    <Compile Include="Evaluation\Eval.FunctionCall.cs" />
+    <Compile Include="Evaluation\Eval.GroupingSpecification.cs" />
     <Compile Include="Evaluation\Eval.IfStatement.cs" />
     <Compile Include="Evaluation\Eval.InsertSpecification.cs" />
     <Compile Include="Evaluation\Eval.MergeAction.cs" />

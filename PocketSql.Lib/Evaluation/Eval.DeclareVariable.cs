@@ -1,4 +1,5 @@
-﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using System.Data;
+using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -10,7 +11,7 @@ namespace PocketSql.Evaluation
             {
                 env.Declare(
                     declaration.VariableName.Value,
-                    declaration.Value == null ? null : Evaluate(declaration.Value, null, env));
+                    declaration.Value == null ? null : Evaluate(declaration.Value, (DataRow)null, env));
             }
 
             return null;

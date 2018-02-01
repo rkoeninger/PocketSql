@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
@@ -40,6 +41,13 @@ namespace PocketSql.Evaluation
                     return Evaluate(existsExpr.Subquery.QueryExpression, env).ResultSet.Rows.Count > 0;
             }
 
+            throw new NotImplementedException();
+        }
+
+        // TODO: need column names for the values in the EquatableList
+
+        public static bool Evaluate(BooleanExpression expr, IGrouping<EquatableList, DataRow> groups, Env env)
+        {
             throw new NotImplementedException();
         }
     }
