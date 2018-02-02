@@ -12,11 +12,7 @@ namespace PocketSql.Evaluation
             if (select.Into != null)
             {
                 env.Engine.tables.Add(select.Into.Identifiers.Last().Value, results.ResultSet);
-
-                return new EngineResult
-                {
-                    RecordsAffected = results.ResultSet.Rows.Count
-                };
+                return new EngineResult(results.ResultSet.Rows.Count);
             }
 
             return results;

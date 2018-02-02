@@ -40,10 +40,7 @@ namespace PocketSql.Evaluation
                 }
 
                 projection.Rows.Add(resultRow);
-                return new EngineResult
-                {
-                    ResultSet = projection
-                };
+                return new EngineResult(projection);
             }
 
             var tableCopy = table.Clone();
@@ -151,10 +148,7 @@ namespace PocketSql.Evaluation
                 }
             }
 
-            return new EngineResult
-            {
-                ResultSet = projection
-            };
+            return new EngineResult(projection);
         }
 
         private static Func<SelectElement, IEnumerable<(string, Type, ScalarExpression)>> ExtractSelection(DataTable table) => s =>

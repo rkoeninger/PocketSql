@@ -61,11 +61,8 @@ namespace PocketSql.Evaluation
                 }
             }
 
-            return new EngineResult
-            {
-                RecordsAffected = rowCount
-                // TODO: ResultSet = output
-            };
+            return new EngineResult(rowCount);
+            // TODO: ResultSet = output
         }
 
         private static ColumnReferenceExpression CreateColumnReferenceExpression(string name)

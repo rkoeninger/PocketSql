@@ -20,10 +20,7 @@ namespace PocketSql.Evaluation
                 }
             }
 
-            return new EngineResult
-            {
-                RecordsAffected = rowCount
-            };
+            return new EngineResult(rowCount);
         }
     }
 }

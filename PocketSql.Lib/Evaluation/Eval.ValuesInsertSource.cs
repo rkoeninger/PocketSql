@@ -25,10 +25,7 @@ namespace PocketSql.Evaluation
                 table.Rows.Add(row);
             }
 
-            return new EngineResult
-            {
-                RecordsAffected = values.RowValues.Count
-            };
+            return new EngineResult(values.RowValues.Count);
         }
     }
 }
