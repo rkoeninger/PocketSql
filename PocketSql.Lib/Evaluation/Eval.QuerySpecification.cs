@@ -24,65 +24,25 @@ namespace PocketSql.Evaluation
 
             var table = querySpec.FromClause?.TableReferences?
                 .Aggregate((DataTable)null, (ts, tr) => Evaluate(tr, ts, env));
-            var selections = querySpec.SelectElements.SelectMany(s =>
-            {
-                switch (s)
-                {
-                    // TODO: respect table alias in star expression
-                    case SelectStarExpression star:
-                        return table.Columns.Cast<DataColumn>().Select(c =>
-                            (c.ColumnName,
-                                c.DataType,
-                                (ScalarExpression)CreateColumnReferenceExpression(c.ColumnName)));
-                    case SelectScalarExpression scalar:
-                        return new[]
-                        {
-                            (scalar.ColumnName?.Value ?? InferName(scalar.Expression),
-                                InferType(scalar.Expression, table),
-                                scalar.Expression)
-                        }.AsEnumerable();
-                    default:
-                        throw new NotImplementedException();
-                }
-            }).ToList();
-
+            var selections = querySpec.SelectElements.SelectMany(ExtractSelection(table)).ToList();
             var projection = new DataTable();
-
-            foreach (var (name, type, _) in selections)
-            {
-                projection.Columns.Add(new DataColumn
-                {
-                    ColumnName = name,
-                    DataType = type
-                });
-            }
+            projection.Columns.AddRange(selections.Select(s => new DataColumn(s.Item1, s.Item2)).ToArray());
 
             // SELECT without FROM
 
             if (table == null)
             {
-                var projection1 = new DataTable();
-
-                foreach (var (name, type, _) in selections)
-                {
-                    projection1.Columns.Add(new DataColumn
-                    {
-                        ColumnName = name,
-                        DataType = type
-                    });
-                }
-
-                var resultRow = projection1.NewRow();
+                var resultRow = projection.NewRow();
 
                 for (var i = 0; i < selections.Count; ++i)
                 {
                     resultRow[i] = Evaluate(selections[i].Item3, (DataRow)null, env);
                 }
 
-                projection1.Rows.Add(resultRow);
+                projection.Rows.Add(resultRow);
                 return new EngineResult
                 {
-                    ResultSet = projection1
+                    ResultSet = projection
                 };
             }
 
@@ -116,17 +76,7 @@ namespace PocketSql.Evaluation
                 if (querySpec.HavingClause != null)
                 {
                     groups = groups.Where(x => Evaluate(querySpec.HavingClause.SearchCondition, x, env)).ToList();
-                    //foreach (DataRow row in temp.Rows)
-                    //{
-                    //    if (!Evaluate(querySpec.HavingClause.SearchCondition, row, env))
-                    //    {
-                    //        temp.Rows.Remove(row);
-                    //    }
-                    //}
                 }
-
-                //tableCopy.Rows.Clear();
-                //CopyOnto(temp, tableCopy);
 
                 // SELECT
 
@@ -206,6 +156,28 @@ namespace PocketSql.Evaluation
                 ResultSet = projection
             };
         }
+
+        private static Func<SelectElement, IEnumerable<(string, Type, ScalarExpression)>> ExtractSelection(DataTable table) => s =>
+        {
+            switch (s)
+            {
+                // TODO: respect table alias in star expression
+                case SelectStarExpression star:
+                    return table.Columns.Cast<DataColumn>().Select(c =>
+                        (c.ColumnName,
+                            c.DataType,
+                            (ScalarExpression)CreateColumnReferenceExpression(c.ColumnName)));
+                case SelectScalarExpression scalar:
+                    return new[]
+                    {
+                            (scalar.ColumnName?.Value ?? InferName(scalar.Expression),
+                                InferType(scalar.Expression, table),
+                                scalar.Expression)
+                        }.AsEnumerable();
+                default:
+                    throw new NotImplementedException();
+            }
+        };
 
         private static void Select<T>(
             Func<ScalarExpression, T, Env, object> evaluate,
