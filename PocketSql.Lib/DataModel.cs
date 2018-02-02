@@ -101,4 +101,29 @@ namespace PocketSql
             set => GetRow(database, schema, table)[database, schema, table, column] = value;
         }
     }
+
+    public interface IArgument { }
+
+    public class RowArgument : IArgument
+    {
+        public DataRow Value { get; set; }
+    }
+
+    public class GroupArgument : IArgument
+    {
+        public EquatableList Key { get; set; }
+        public List<DataRow> Rows { get; set; }
+    }
+
+    public class ScalarArgument : IArgument
+    {
+        public object Value { get; }
+
+        public ScalarArgument(object value)
+        {
+            Value = value;
+        }
+    }
+
+    public class NullArgument : IArgument { }
 }

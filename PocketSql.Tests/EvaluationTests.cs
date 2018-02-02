@@ -293,6 +293,10 @@ namespace PocketSql.Tests
 
                 var result = connection.Query<Thing>("select Y, sum(X) as X from Things group by Y").ToList();
                 Assert.AreEqual(4, result.Count);
+                Assert.AreEqual(17, result.First(t => t.Y == "a").X);
+                Assert.AreEqual(26, result.First(t => t.Y == "b").X);
+                Assert.AreEqual(19, result.First(t => t.Y == "c").X);
+                Assert.AreEqual(20, result.First(t => t.Y == "d").X);
             }
         }
 
