@@ -130,33 +130,13 @@ namespace PocketSql.Evaluation
 
                 // SELECT
 
-                foreach (var group in groups)
-                {
-                    var resultsRow = projection.NewRow();
-
-                    for (var i = 0; i < selections.Count; ++i)
-                    {
-                        resultsRow[i] = Evaluate(selections[i].Item3, group, env);
-                    }
-
-                    projection.Rows.Add(resultsRow);
-                }
+                Select(Evaluate, groups, projection, selections, env);
             }
             else
             {
                 // SELECT
 
-                foreach (DataRow row in tableCopy.Rows)
-                {
-                    var resultRow = projection.NewRow();
-
-                    for (var i = 0; i < selections.Count; ++i)
-                    {
-                        resultRow[i] = Evaluate(selections[i].Item3, row, env);
-                    }
-
-                    projection.Rows.Add(resultRow);
-                }
+                Select(Evaluate, tableCopy.Rows.Cast<DataRow>(), projection, selections, env);
             }
 
             // DISTINCT
@@ -225,6 +205,26 @@ namespace PocketSql.Evaluation
             {
                 ResultSet = projection
             };
+        }
+
+        private static void Select<T>(
+            Func<ScalarExpression, T, Env, object> evaluate,
+            IEnumerable<T> source,
+            DataTable target,
+            IList<(string, Type, ScalarExpression)> selections,
+            Env env)
+        {
+            foreach (var row in source)
+            {
+                var resultRow = target.NewRow();
+
+                for (var i = 0; i < selections.Count; ++i)
+                {
+                    resultRow[i] = evaluate(selections[i].Item3, row, env);
+                }
+
+                target.Rows.Add(resultRow);
+            }
         }
 
         private static void CopyOnto(DataTable source, DataTable target)
