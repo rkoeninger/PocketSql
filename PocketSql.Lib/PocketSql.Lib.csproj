@@ -66,7 +66,8 @@
     <Compile Include="Evaluation\Eval.IfStatement.cs" />
     <Compile Include="Evaluation\Eval.InsertSpecification.cs" />
     <Compile Include="Evaluation\Eval.MergeAction.cs" />
-    <Compile Include="Evaluation\Eval.MergeStatement.cs" />
+    <Compile Include="Evaluation\Eval.MergeSpecification.cs" />
+    <Compile Include="Evaluation\Eval.ProcedureStatementBodyBase.cs" />
     <Compile Include="Evaluation\Eval.QueryExpression.cs" />
     <Compile Include="Evaluation\Eval.QuerySpecification.cs" />
     <Compile Include="Evaluation\Eval.ScalarExpression.cs" />
@@ -78,10 +79,12 @@
     <Compile Include="Evaluation\Eval.TableReference.cs" />
     <Compile Include="Evaluation\Eval.TSqlStatement.cs" />
     <Compile Include="Evaluation\Eval.UnaryExpression.cs" />
-    <Compile Include="Evaluation\Eval.UpdateStatement.cs" />
+    <Compile Include="Evaluation\Eval.UpdateSpecification.cs" />
     <Compile Include="Evaluation\Eval.ValuesInsertSource.cs" />
     <Compile Include="Evaluation\Eval.WhileStatement.cs" />
     <Compile Include="Evaluation\Eval.TruncateTableStatement.cs" />
+    <Compile Include="Function.cs" />
+    <Compile Include="Procedure.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Env.cs" />
   </ItemGroup>

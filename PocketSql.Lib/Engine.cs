@@ -30,6 +30,8 @@ namespace PocketSql
         public IDbConnection GetConnection() => new EngineConnection(this, sqlVersion);
 
         internal readonly Dictionary<string, DataTable> tables = new Dictionary<string, DataTable>();
+        internal readonly Dictionary<string, Procedure> procedures = new Dictionary<string, Procedure>();
+        internal readonly Dictionary<string, Function> functions = new Dictionary<string, Function>();
 
         private class EngineConnection : IDbConnection
         {

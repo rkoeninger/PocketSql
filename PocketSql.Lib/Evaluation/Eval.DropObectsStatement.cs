@@ -1,27 +1,42 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        // TODO: need to handle different Drop___Statement differently
-
-        public static EngineResult Evaluate(DropObjectsStatement drop, Env env)
+        public static void Evaluate(DropObjectsStatement drop, Env env)
         {
-            foreach (var table in drop.Objects)
+            switch (drop)
             {
-                var tableName = table.BaseIdentifier.Value;
+                case DropFunctionStatement _:
+                    DropAll(drop, env.Engine.functions);
+                    return;
+                case DropProcedureStatement _:
+                    DropAll(drop, env.Engine.procedures);
+                    return;
+                case DropTableStatement _:
+                    DropAll(drop, env.Engine.tables);
+                    return;
+            }
 
-                if (!drop.IsIfExists && !env.Engine.tables.ContainsKey(tableName))
+            throw new NotImplementedException();
+        }
+
+        private static void DropAll<T>(DropObjectsStatement drop, IDictionary<string, T> dict)
+        {
+            foreach (var x in drop.Objects)
+            {
+                var name = x.BaseIdentifier.Value;
+
+                if (!drop.IsIfExists && !dict.ContainsKey(name))
                 {
                     throw new Exception();
                 }
 
-                env.Engine.tables.Remove(tableName);
+                dict.Remove(name);
             }
-
-            return null;
         }
     }
 }

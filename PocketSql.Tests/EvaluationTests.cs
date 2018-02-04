@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using Dapper;
 using NUnit.Framework;
@@ -297,6 +298,69 @@ namespace PocketSql.Tests
                 Assert.AreEqual(26, result.First(t => t.Y == "b").X);
                 Assert.AreEqual(19, result.First(t => t.Y == "c").X);
                 Assert.AreEqual(20, result.First(t => t.Y == "d").X);
+            }
+        }
+
+        [Test, Ignore("Parsing procedures isn't working")]
+        public void StoredProc()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute("create table Things (X int, Y varchar(8))");
+
+                Assert.AreEqual(16, connection.Execute(@"
+                    insert into Things
+                    (X, Y)
+                    values
+                    (34, 'qwe'),
+                    (23, 'wer'),
+                    (67, 'ert'),
+                    (63, 'rty'),
+                    (75, 'tyu'),
+                    (17, 'yui'),
+                    (47, 'uio'),
+                    (47, 'zxc'),
+                    (95, 'asd'),
+                    (67, 'ert'),
+                    (63, 'rty'),
+                    (75, 'tyu'),
+                    (95, 'asd'),
+                    (17, 'yui'),
+                    (23, 'wer'),
+                    (92, 'zxc')"));
+
+                connection.Execute(@"
+                    create procedure DoIt
+                        @Limit int
+                    as
+                    begin
+                        select * from Things where X > @Limit
+                    end
+                    go");
+
+                Assert.AreEqual(
+                    9,
+                    connection.Query(
+                        "DoIt",
+                        new { Limit = 50 },
+                        commandType: CommandType.StoredProcedure).Count());
+
+                connection.Execute(@"
+                    alter procedure DoIt
+                        @Limit int
+                    as
+                    begin
+                        select * from Things where X < @Limit
+                    end");
+
+                Assert.AreEqual(
+                    5,
+                    connection.Query(
+                        "DoIt",
+                        new { Limit = 40 },
+                        commandType: CommandType.StoredProcedure).Count());
             }
         }
 
