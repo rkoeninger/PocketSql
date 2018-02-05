@@ -15,12 +15,20 @@ namespace PocketSql.Evaluation
                 case BooleanComparisonType.NotEqualToExclamation:
                     return left == null || !left.Equals(right);
                 case BooleanComparisonType.GreaterThan:
+                    if (left is int && right is int)
+                        return (int)left > (int)right;
                     return (decimal)left > (decimal)right;
                 case BooleanComparisonType.GreaterThanOrEqualTo:
+                    if (left is int && right is int)
+                        return (int)left >= (int)right;
                     return (decimal)left >= (decimal)right;
                 case BooleanComparisonType.LessThan:
+                    if (left is int && right is int)
+                        return (int)left < (int)right;
                     return (decimal)left < (decimal)right;
                 case BooleanComparisonType.LessThanOrEqualTo:
+                    if (left is int && right is int)
+                        return (int)left <= (int)right;
                     return (decimal)left <= (decimal)right;
             }
 

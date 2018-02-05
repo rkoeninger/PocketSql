@@ -11,13 +11,13 @@ namespace PocketSql.Evaluation
             switch (drop)
             {
                 case DropFunctionStatement _:
-                    DropAll(drop, env.Engine.functions);
+                    DropAll(drop, env.Engine.Functions);
                     return;
                 case DropProcedureStatement _:
-                    DropAll(drop, env.Engine.procedures);
+                    DropAll(drop, env.Engine.Procedures);
                     return;
                 case DropTableStatement _:
-                    DropAll(drop, env.Engine.tables);
+                    DropAll(drop, env.Engine.Tables);
                     return;
             }
 

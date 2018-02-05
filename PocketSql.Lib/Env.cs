@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 namespace PocketSql
 {
@@ -16,15 +17,33 @@ namespace PocketSql
             return env;
         }
 
-        private readonly IDictionary<string, object> vars = new Dictionary<string, object>();
+        public IDictionary<string, object> Vars { get; set; } = new Dictionary<string, object>();
 
         public Engine Engine { get; private set; }
         public string DefaultDatabase { get; set; }
         public string DefaultSchema { get; set; }
 
+        public Env Fork() => new Env
+        {
+            Engine = Engine,
+            DefaultDatabase = DefaultDatabase,
+            DefaultSchema = DefaultSchema,
+            Vars = Vars.ToDictionary(x => x.Key, x => x.Value)
+        };
+
         public object this[string name]
         {
-            get => vars[name.TrimStart('@')];
+            get
+            {
+                var trimmedName = name.TrimStart('@');
+
+                if (!Vars.ContainsKey(trimmedName))
+                {
+                    throw new Exception($"Variable not defined: {name}");
+                }
+
+                return Vars[trimmedName];
+            }
             set
             {
                 if (!IsDeclared(name))
@@ -32,23 +51,23 @@ namespace PocketSql
                     throw new Exception($"Variable not declared: {name}");
                 }
 
-                vars[name.TrimStart('@')] = value;
+                Vars[name.TrimStart('@')] = value;
             }
         }
 
         public Env Declare(string name, object value)
         {
-            vars.Add(name.TrimStart('@'), value);
+            Vars.Add(name.TrimStart('@'), value);
             return this;
         }
 
-        public bool IsDeclared(string name) => vars.ContainsKey(name.TrimStart('@'));
+        public bool IsDeclared(string name) => Vars.ContainsKey(name.TrimStart('@'));
 
         public Env AddAll(IDataParameterCollection parameters)
         {
             foreach (IDbDataParameter parameter in parameters)
             {
-                vars[parameter.ParameterName.TrimStart('@')] = parameter.Value;
+                Vars[parameter.ParameterName.TrimStart('@')] = parameter.Value;
             }
 
             return this;

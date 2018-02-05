@@ -29,9 +29,9 @@ namespace PocketSql
 
         public IDbConnection GetConnection() => new EngineConnection(this, sqlVersion);
 
-        internal readonly Dictionary<string, DataTable> tables = new Dictionary<string, DataTable>();
-        internal readonly Dictionary<string, Procedure> procedures = new Dictionary<string, Procedure>();
-        internal readonly Dictionary<string, Function> functions = new Dictionary<string, Function>();
+        public Dictionary<string, DataTable> Tables { get; } = new Dictionary<string, DataTable>();
+        public Dictionary<string, Procedure> Procedures { get; } = new Dictionary<string, Procedure>();
+        public Dictionary<string, Function> Functions { get; } = new Dictionary<string, Function>();
 
         private class EngineConnection : IDbConnection
         {
@@ -124,14 +124,14 @@ namespace PocketSql
                 // TODO: specify SqlEngineType: Azure vs SqlServer?
                 var parser = new TSql140Parser(false).Create(sqlVersion, false);
                 var input = new StringReader(CommandText);
-                var statements = parser.ParseStatementList(input, out var errors);
+                var fragment = parser.Parse(input, out var errors);
 
                 if (errors != null && errors.Count > 0)
                 {
                     throw new Exception(string.Join("\r\n", errors.Select(e => e.Message)));
                 }
 
-                return Eval.Evaluate(statements, Env.Of(connection.engine, Parameters));
+                return Eval.Evaluate(fragment, Env.Of(connection.engine, Parameters));
             }
 
             public IDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);

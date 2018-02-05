@@ -48,6 +48,8 @@ namespace PocketSql.Evaluation
                 case UseStatement use:
                     env.DefaultDatabase = use.DatabaseName.Value;
                     return null;
+                case ExecuteStatement exec:
+                    return Evaluate(exec.ExecuteSpecification, env);
                 default:
                     throw new NotImplementedException();
             }

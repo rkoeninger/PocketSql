@@ -61,6 +61,7 @@
     <Compile Include="Evaluation\Eval.DeclareVariable.cs" />
     <Compile Include="Evaluation\Eval.DeleteSpecification.cs" />
     <Compile Include="Evaluation\Eval.DropObectsStatement.cs" />
+    <Compile Include="Evaluation\Eval.ExecuteSpecification.cs" />
     <Compile Include="Evaluation\Eval.FunctionCall.cs" />
     <Compile Include="Evaluation\Eval.GroupingSpecification.cs" />
     <Compile Include="Evaluation\Eval.IfStatement.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Evaluation\Eval.SetVariable.cs" />
     <Compile Include="Evaluation\Eval.StatementList.cs" />
     <Compile Include="Evaluation\Eval.TableReference.cs" />
+    <Compile Include="Evaluation\Eval.TSqlFragment.cs" />
     <Compile Include="Evaluation\Eval.TSqlStatement.cs" />
     <Compile Include="Evaluation\Eval.UnaryExpression.cs" />
     <Compile Include="Evaluation\Eval.UpdateSpecification.cs" />

@@ -11,7 +11,7 @@ namespace PocketSql.Evaluation
             switch (tableRef)
             {
                 case NamedTableReference named:
-                    return env.Engine.tables[named.SchemaObject.BaseIdentifier.Value];
+                    return env.Engine.Tables[named.SchemaObject.BaseIdentifier.Value];
                 case DataModificationTableReference dml:
                     // TODO: how does this work?
                     return Evaluate(dml.DataModificationSpecification, env).ResultSet;

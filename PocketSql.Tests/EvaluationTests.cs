@@ -301,7 +301,7 @@ namespace PocketSql.Tests
             }
         }
 
-        [Test, Ignore("Parsing procedures isn't working")]
+        [Test]
         public void StoredProc()
         {
             var engine = new Engine(140);

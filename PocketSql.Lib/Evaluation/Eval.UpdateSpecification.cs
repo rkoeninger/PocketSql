@@ -10,7 +10,7 @@ namespace PocketSql.Evaluation
         public static EngineResult Evaluate(UpdateSpecification update, Env env)
         {
             var tableRef = (NamedTableReference)update.Target;
-            var table = env.Engine.tables[tableRef.SchemaObject.BaseIdentifier.Value];
+            var table = env.Engine.Tables[tableRef.SchemaObject.BaseIdentifier.Value];
             DataTable output = null;
 
             if (update.OutputClause != null)

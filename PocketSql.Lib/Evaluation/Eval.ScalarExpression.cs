@@ -29,7 +29,7 @@ namespace PocketSql.Evaluation
                 case ColumnReferenceExpression colExpr:
                     return row[colExpr.MultiPartIdentifier.Identifiers.Last().Value];
                 case VariableReference varRef:
-                    return env[varRef.Name.TrimStart('@')];
+                    return env[varRef.Name];
                 case CaseExpression caseExpr:
                     return Evaluate(caseExpr, row, env);
                 case FunctionCall funCall:
