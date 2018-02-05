@@ -335,10 +335,7 @@ namespace PocketSql.Tests
                     create procedure DoIt
                         @Limit int
                     as
-                    begin
-                        select * from Things where X > @Limit
-                    end
-                    go");
+                        select * from Things where X > @Limit");
 
                 Assert.AreEqual(
                     9,
@@ -351,9 +348,7 @@ namespace PocketSql.Tests
                     alter procedure DoIt
                         @Limit int
                     as
-                    begin
-                        select * from Things where X < @Limit
-                    end");
+                        select * from Things where X < @Limit");
 
                 Assert.AreEqual(
                     5,
