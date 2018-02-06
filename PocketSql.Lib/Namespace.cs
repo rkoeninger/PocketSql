@@ -37,5 +37,17 @@ namespace PocketSql
             if (!IsDefined(name)) throw new Exception($"{typeof(T).Name} \"name\" not defined");
             members.Remove(name);
         }
+
+        public Namespace<T> Copy()
+        {
+            var ns = new Namespace<T>();
+
+            foreach (var member in members)
+            {
+                ns.members.Add(member.Key, member.Value);
+            }
+
+            return ns;
+        }
     }
 }

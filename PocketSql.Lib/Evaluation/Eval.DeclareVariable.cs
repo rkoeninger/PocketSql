@@ -9,7 +9,7 @@ namespace PocketSql.Evaluation
         {
             foreach (var declaration in declare.Declarations)
             {
-                env.Declare(
+                env.Vars.Declare(
                     declaration.VariableName.Value,
                     declaration.Value == null ? null : Evaluate(declaration.Value, (DataRow)null, env));
             }

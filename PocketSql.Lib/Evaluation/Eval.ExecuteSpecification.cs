@@ -18,7 +18,7 @@ namespace PocketSql.Evaluation
             // TODO: match parameters provided with declared
             foreach (var param in exec.ExecutableEntity.Parameters)
             {
-                env2[param.Variable.Name] = Evaluate(param.ParameterValue, (DataRow)null, env);
+                env2.Vars[param.Variable.Name] = Evaluate(param.ParameterValue, (DataRow)null, env);
             }
 
             return Evaluate(proc.Statements, env2).FirstOrDefault();
