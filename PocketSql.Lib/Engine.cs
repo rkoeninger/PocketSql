@@ -34,7 +34,7 @@ namespace PocketSql
 
         public Namespace<Database> Databases { get; } = new Namespace<Database>();
 
-        private class EngineConnection : IDbConnection
+        public class EngineConnection : IDbConnection
         {
             public EngineConnection(Engine engine, SqlVersion sqlVersion)
             {
@@ -132,7 +132,7 @@ namespace PocketSql
                     throw new Exception(string.Join("\r\n", errors.Select(e => e.Message)));
                 }
 
-                return Eval.Evaluate(fragment, Env.Of(connection.engine, Parameters));
+                return Eval.Evaluate(fragment, Env.Of(connection, Parameters));
             }
 
             public IDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
