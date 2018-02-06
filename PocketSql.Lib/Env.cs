@@ -17,7 +17,8 @@ namespace PocketSql
             return env;
         }
 
-        public IDictionary<string, object> Vars { get; set; } = new Dictionary<string, object>();
+        public IDictionary<string, object> Vars { get; set; } =
+            new Dictionary<string, object>(new CaseInsensitivity.EqualityComparer());
 
         public Engine Engine { get; private set; }
         public string DefaultDatabase { get; set; }
@@ -35,14 +36,12 @@ namespace PocketSql
         {
             get
             {
-                var trimmedName = name.TrimStart('@');
-
-                if (!Vars.ContainsKey(trimmedName))
+                if (!IsDeclared(name))
                 {
-                    throw new Exception($"Variable not defined: {name}");
+                    throw new Exception($"Variable not declared: {name}");
                 }
 
-                return Vars[trimmedName];
+                return Vars[name];
             }
             set
             {
@@ -51,26 +50,33 @@ namespace PocketSql
                     throw new Exception($"Variable not declared: {name}");
                 }
 
-                Vars[name.TrimStart('@')] = value;
+                Vars[name] = value;
             }
         }
 
         public Env Declare(string name, object value)
         {
-            Vars.Add(name.TrimStart('@'), value);
+            if (IsDeclared(name))
+            {
+                throw new Exception($"Variable already declared: {name}");
+            }
+
+            Vars.Add(name, value);
             return this;
         }
 
-        public bool IsDeclared(string name) => Vars.ContainsKey(name.TrimStart('@'));
+        public bool IsDeclared(string name) => Vars.ContainsKey(name);
 
         public Env AddAll(IDataParameterCollection parameters)
         {
             foreach (IDbDataParameter parameter in parameters)
             {
-                Vars[parameter.ParameterName.TrimStart('@')] = parameter.Value;
+                Vars[PrefixAt(parameter.ParameterName)] = parameter.Value;
             }
 
             return this;
         }
+
+        private static string PrefixAt(string name) => name.StartsWith("@") ? name : $"@{name}";
     }
 }
