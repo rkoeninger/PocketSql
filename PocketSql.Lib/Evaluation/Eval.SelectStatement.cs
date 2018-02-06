@@ -11,7 +11,7 @@ namespace PocketSql.Evaluation
 
             if (select.Into != null)
             {
-                env.Engine.Tables.Add(select.Into.Identifiers.Last().Value, results.ResultSet);
+                env.Tables.Declare(select.Into.Identifiers.Last().Value, results.ResultSet);
                 return new EngineResult(results.ResultSet.Rows.Count);
             }
 

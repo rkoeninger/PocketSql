@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
@@ -11,31 +10,31 @@ namespace PocketSql.Evaluation
             switch (drop)
             {
                 case DropFunctionStatement _:
-                    DropAll(drop, env.Engine.Functions);
+                    DropAll(drop, env.Functions);
                     return;
                 case DropProcedureStatement _:
-                    DropAll(drop, env.Engine.Procedures);
+                    DropAll(drop, env.Procedures);
                     return;
                 case DropTableStatement _:
-                    DropAll(drop, env.Engine.Tables);
+                    DropAll(drop, env.Tables);
                     return;
             }
 
             throw new NotImplementedException();
         }
 
-        private static void DropAll<T>(DropObjectsStatement drop, IDictionary<string, T> dict)
+        private static void DropAll<T>(DropObjectsStatement drop, Namespace<T> ns)
         {
             foreach (var x in drop.Objects)
             {
                 var name = x.BaseIdentifier.Value;
 
-                if (!drop.IsIfExists && !dict.ContainsKey(name))
+                if (!drop.IsIfExists && !ns.IsDefined(name))
                 {
                     throw new Exception();
                 }
 
-                dict.Remove(name);
+                ns.Drop(name);
             }
         }
     }

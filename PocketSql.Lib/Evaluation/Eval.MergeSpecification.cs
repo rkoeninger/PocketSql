@@ -10,9 +10,9 @@ namespace PocketSql.Evaluation
         public static EngineResult Evaluate(MergeSpecification merge, Env env)
         {
             var targetTableRef = (NamedTableReference)merge.Target;
-            var targetTable = env.Engine.Tables[targetTableRef.SchemaObject.BaseIdentifier.Value];
+            var targetTable = env.Tables[targetTableRef.SchemaObject.BaseIdentifier.Value];
             var sourceTableRef = (NamedTableReference)merge.TableReference;
-            var sourceTable = env.Engine.Tables[sourceTableRef.SchemaObject.BaseIdentifier.Value];
+            var sourceTable = env.Tables[sourceTableRef.SchemaObject.BaseIdentifier.Value];
             var rowCount = 0;
             var matched = new List<DataRow>();
             var notMatchedByTarget = new List<DataRow>();

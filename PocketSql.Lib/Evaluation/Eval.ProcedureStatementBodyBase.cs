@@ -13,37 +13,25 @@ namespace PocketSql.Evaluation
                 case AlterFunctionStatement alterFunc:
                     {
                         var func = BuildFunc(alterFunc);
-
-                        if (!env.Engine.Procedures.ContainsKey(func.Name))
-                        {
-                            throw new Exception("function does not exist");
-                        }
-
-                        env.Engine.Functions[func.Name] = func;
+                        env.Functions[func.Name] = func;
                     }
                     return;
                 case AlterProcedureStatement alterProc:
                     {
                         var proc = BuildProc(alterProc);
-
-                        if (!env.Engine.Procedures.ContainsKey(proc.Name))
-                        {
-                            throw new Exception("procedure does not exist");
-                        }
-
-                        env.Engine.Procedures[proc.Name] = proc;
+                        env.Procedures[proc.Name] = proc;
                     }
                     return;
                 case CreateFunctionStatement createFunc:
                     {
                         var func = BuildFunc(createFunc);
-                        env.Engine.Functions.Add(func.Name, func);
+                        env.Functions.Declare(func.Name, func);
                     }
                     return;
                 case CreateProcedureStatement createProc:
                     {
                         var proc = BuildProc(createProc);
-                        env.Engine.Procedures.Add(proc.Name, proc);
+                        env.Procedures.Declare(proc.Name, proc);
                     }
                     return;
             }

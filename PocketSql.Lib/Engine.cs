@@ -16,10 +16,13 @@ namespace PocketSql
 
         public Engine(int version) : this(IntToSqlVersion(version)) { }
 
-        // TODO: make public
         private Engine(SqlVersion sqlVersion)
         {
             this.sqlVersion = sqlVersion;
+            var dbo = new Schema("dbo");
+            var master = new Database("master");
+            master.Schemas.Declare(dbo);
+            Databases.Declare(master);
         }
 
         private static SqlVersion IntToSqlVersion(int version) =>
@@ -29,9 +32,7 @@ namespace PocketSql
 
         public IDbConnection GetConnection() => new EngineConnection(this, sqlVersion);
 
-        public Dictionary<string, DataTable> Tables { get; } = new Dictionary<string, DataTable>();
-        public Dictionary<string, Procedure> Procedures { get; } = new Dictionary<string, Procedure>();
-        public Dictionary<string, Function> Functions { get; } = new Dictionary<string, Function>();
+        public Namespace<Database> Databases { get; } = new Namespace<Database>();
 
         private class EngineConnection : IDbConnection
         {

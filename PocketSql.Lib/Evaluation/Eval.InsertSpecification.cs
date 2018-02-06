@@ -8,7 +8,7 @@ namespace PocketSql.Evaluation
         public static EngineResult Evaluate(InsertSpecification insert, Env env)
         {
             var namedTableRef = (NamedTableReference)insert.Target;
-            var table = env.Engine.Tables[namedTableRef.SchemaObject.BaseIdentifier.Value];
+            var table = env.Tables[namedTableRef.SchemaObject.BaseIdentifier.Value];
 
             switch (insert.InsertSource)
             {

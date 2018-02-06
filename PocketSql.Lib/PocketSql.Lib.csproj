@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CaseInsensitivity.cs" />
+    <Compile Include="Database.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="DataModel.cs" />
     <Compile Include="EngineResult.cs" />
@@ -86,9 +87,12 @@
     <Compile Include="Evaluation\Eval.WhileStatement.cs" />
     <Compile Include="Evaluation\Eval.TruncateTableStatement.cs" />
     <Compile Include="Function.cs" />
+    <Compile Include="INamed.cs" />
+    <Compile Include="Namespace.cs" />
     <Compile Include="Procedure.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Env.cs" />
+    <Compile Include="Schema.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

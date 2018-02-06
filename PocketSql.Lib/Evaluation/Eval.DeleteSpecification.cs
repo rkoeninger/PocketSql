@@ -8,7 +8,7 @@ namespace PocketSql.Evaluation
         public static EngineResult Evaluate(DeleteSpecification delete, Env env)
         {
             var tableRef = (NamedTableReference)delete.Target;
-            var table = env.Engine.Tables[tableRef.SchemaObject.BaseIdentifier.Value];
+            var table = env.Tables[tableRef.SchemaObject.BaseIdentifier.Value];
             var rowCount = 0;
 
             foreach (DataRow row in table.Rows)

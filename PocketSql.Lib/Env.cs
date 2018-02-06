@@ -21,8 +21,8 @@ namespace PocketSql
             new Dictionary<string, object>(new CaseInsensitivity.EqualityComparer());
 
         public Engine Engine { get; private set; }
-        public string DefaultDatabase { get; set; }
-        public string DefaultSchema { get; set; }
+        public string DefaultDatabase { get; set; } = "master";
+        public string DefaultSchema { get; set; } = "dbo";
 
         public Env Fork() => new Env
         {
@@ -78,5 +78,9 @@ namespace PocketSql
         }
 
         private static string PrefixAt(string name) => name.StartsWith("@") ? name : $"@{name}";
+
+        public Namespace<Function> Functions => Engine.Databases[DefaultDatabase].Schemas[DefaultSchema].Functions;
+        public Namespace<Procedure> Procedures => Engine.Databases[DefaultDatabase].Schemas[DefaultSchema].Procedures;
+        public Namespace<DataTable> Tables => Engine.Databases[DefaultDatabase].Schemas[DefaultSchema].Tables;
     }
 }

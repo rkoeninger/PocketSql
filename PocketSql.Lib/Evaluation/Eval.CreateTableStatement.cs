@@ -21,7 +21,7 @@ namespace PocketSql.Evaluation
                 });
             }
 
-            env.Engine.Tables.Add(createTable.SchemaObjectName.BaseIdentifier.Value, table);
+            env.Tables.Declare(createTable.SchemaObjectName.BaseIdentifier.Value, table);
             return null;
         }
 

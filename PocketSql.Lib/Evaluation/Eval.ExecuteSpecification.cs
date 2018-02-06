@@ -12,7 +12,7 @@ namespace PocketSql.Evaluation
             // TODO: exec.LinkedServer for DB
             var execRef = (ExecutableProcedureReference)exec.ExecutableEntity;
             var procName = execRef.ProcedureReference.ProcedureReference.Name.Identifiers.Last().Value;
-            var proc = env.Engine.Procedures[procName];
+            var proc = env.Procedures[procName];
             var env2 = env.Fork();
 
             // TODO: match parameters provided with declared
