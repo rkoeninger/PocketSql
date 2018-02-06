@@ -65,14 +65,16 @@ namespace PocketSql.Evaluation
                 // TODO: rollup, cube, grouping sets
 
                 var groups = rows.GroupBy(row =>
-                    EquatableList.Of(querySpec.GroupByClause.GroupingSpecifications.Select(g =>
-                        Evaluate(g, row, env)))).ToList();
+                    EquatableList.Of(querySpec.GroupByClause.GroupingSpecifications
+                        .Select(g => (InferName(g), Evaluate(g, row, env))))).ToList();
 
                 // HAVING
 
                 if (querySpec.HavingClause != null)
                 {
-                    groups = groups.Where(x => Evaluate(querySpec.HavingClause.SearchCondition, x, env)).ToList();
+                    groups = groups
+                        .Where(x => Evaluate(querySpec.HavingClause.SearchCondition, x, env))
+                        .ToList();
                 }
 
                 // SELECT
@@ -95,14 +97,16 @@ namespace PocketSql.Evaluation
                 projection.Rows.Clear();
 
                 foreach (var item in temp.Rows.Cast<DataRow>()
-                    .Select(r => EquatableList.Of(r.ItemArray))
+                    .Select(r => EquatableList.Of(r.Table.Columns
+                        .Cast<DataColumn>()
+                        .Select(c => (c.ColumnName, r[c]))))
                     .Distinct())
                 {
                     var row = projection.NewRow();
 
                     foreach (DataColumn col in temp.Columns)
                     {
-                        row[col.Ordinal] = item.Elements[col.Ordinal];
+                        row[col.Ordinal] = item.Elements[col.Ordinal].Item2;
                     }
 
                     projection.Rows.Add(row);

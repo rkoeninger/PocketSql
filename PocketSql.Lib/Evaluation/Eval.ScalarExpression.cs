@@ -46,7 +46,7 @@ namespace PocketSql.Evaluation
                 case ColumnReferenceExpression colExpr:
                     // TODO: need to know column names for EquatableList
                     // TODO: this only works when there is only 1 column grouped by
-                    return group.Key.Elements.First();
+                    return group.Key.Elements.First().Item2;
                 case FunctionCall funCall:
                     return Evaluate(funCall, group, env);
             }

@@ -82,6 +82,17 @@ namespace PocketSql.Evaluation
             };
         }
 
+        private static string InferName(GroupingSpecification groupSpec)
+        {
+            switch (groupSpec)
+            {
+                case ExpressionGroupingSpecification expr:
+                    return InferName(expr.Expression);
+            }
+
+            return null;
+        }
+
         private static string InferName(ScalarExpression expr)
         {
             switch (expr)

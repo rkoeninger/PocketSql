@@ -6,9 +6,7 @@ namespace PocketSql
 {
     public class EquatableList : IEquatable<EquatableList>
     {
-        public static EquatableList Of(object[] array) => Of(array.AsEnumerable());
-
-        public static EquatableList Of(IEnumerable<object> seq)
+        public static EquatableList Of(IEnumerable<(string, object)> seq)
         {
             var list = new EquatableList();
 
@@ -20,17 +18,14 @@ namespace PocketSql
             return list;
         }
 
-        public IList<object> Elements { get; } = new List<object>();
+        public IList<(string, object)> Elements { get; } = new List<(string, object)>();
 
         public override bool Equals(object obj) =>
             obj is EquatableList && Equals((EquatableList)obj);
 
         public override int GetHashCode() =>
-            Elements.Aggregate(1, (hash, obj) => hash + (obj?.GetHashCode() ?? 1) * 357);
+            Elements.Aggregate(1, (hash, obj) => hash + obj.GetHashCode() * 357);
 
-        public bool Equals(EquatableList other) =>
-            Elements.Count == other.Elements.Count
-            && Enumerable.Range(0, Elements.Count)
-                .All(i => Elements[i]?.Equals(other.Elements[i]) ?? other.Elements[i] == null);
+        public bool Equals(EquatableList other) => Elements.SequenceEqual(other.Elements);
     }
 }
