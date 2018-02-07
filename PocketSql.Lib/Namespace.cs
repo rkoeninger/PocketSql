@@ -26,7 +26,7 @@ namespace PocketSql
 
         public void Declare(string name, T value)
         {
-            if (IsDefined(name)) throw new Exception($"{typeof(T).Name} \"name\" already exists");
+            if (IsDefined(name)) throw new Exception($"{typeof(T).Name} \"{name}\" already exists");
             members.Add(name, value);
         }
 
@@ -34,7 +34,7 @@ namespace PocketSql
 
         public void Drop(string name)
         {
-            if (!IsDefined(name)) throw new Exception($"{typeof(T).Name} \"name\" not defined");
+            if (!IsDefined(name)) throw new Exception($"{typeof(T).Name} \"{name}\" not defined");
             members.Remove(name);
         }
 

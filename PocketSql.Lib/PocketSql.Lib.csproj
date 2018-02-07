@@ -48,7 +48,13 @@
     <Compile Include="Database.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="DataModel.cs" />
+    <Compile Include="EngineCommand.cs" />
+    <Compile Include="EngineConnection.cs" />
+    <Compile Include="EngineDataReader.cs" />
+    <Compile Include="EngineParameter.cs" />
+    <Compile Include="EngineParameterCollection.cs" />
     <Compile Include="EngineResult.cs" />
+    <Compile Include="EngineTransaction.cs" />
     <Compile Include="EquatableList.cs" />
     <Compile Include="Evaluation\Eval.AssignmentKind.cs" />
     <Compile Include="Evaluation\Eval.BinaryExpressionType.cs" />

@@ -4,7 +4,7 @@ namespace PocketSql
 {
     public class Env
     {
-        public static Env Of(Engine.EngineConnection connection, IDataParameterCollection parameters)
+        public static Env Of(EngineConnection connection, IDataParameterCollection parameters)
         {
             var env = new Env();
             env.AddAll(parameters);
