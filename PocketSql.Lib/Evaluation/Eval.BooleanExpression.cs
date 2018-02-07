@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
@@ -44,10 +43,39 @@ namespace PocketSql.Evaluation
             throw new NotImplementedException();
         }
 
-        // TODO: need column names for the values in the EquatableList
-
-        public static bool Evaluate(BooleanExpression expr, IGrouping<EquatableList, DataRow> groups, Env env)
+        public static bool Evaluate(BooleanExpression expr, IGrouping<EquatableList, DataRow> group, Env env)
         {
+            switch (expr)
+            {
+                case BooleanParenthesisExpression paren:
+                    return Evaluate(paren.Expression, group, env);
+                case BooleanBinaryExpression binaryExpr:
+                    return Evaluate(
+                        binaryExpr.BinaryExpressionType,
+                        Evaluate(binaryExpr.FirstExpression, group, env),
+                        Evaluate(binaryExpr.SecondExpression, group, env));
+                case BooleanTernaryExpression ternaryExpr:
+                    return Evaluate(
+                        ternaryExpr.TernaryExpressionType,
+                        Evaluate(ternaryExpr.FirstExpression, group, env),
+                        Evaluate(ternaryExpr.SecondExpression, group, env),
+                        Evaluate(ternaryExpr.ThirdExpression, group, env));
+                case BooleanComparisonExpression compareExpr:
+                    return Evaluate(
+                        compareExpr.ComparisonType,
+                        Evaluate(compareExpr.FirstExpression, group, env),
+                        Evaluate(compareExpr.SecondExpression, group, env));
+                case BooleanNotExpression notExpr:
+                    return !Evaluate(notExpr.Expression, group, env);
+                case BooleanIsNullExpression isNullExpr:
+                    return Evaluate(isNullExpr.Expression, group, env) == null;
+                case InPredicate inExpr:
+                    var value = Evaluate(inExpr.Expression, group, env);
+                    return value != null && inExpr.Values.Any(x => value.Equals(Evaluate(x, group, env)));
+                case ExistsPredicate existsExpr:
+                    return Evaluate(existsExpr.Subquery.QueryExpression, env).ResultSet.Rows.Count > 0;
+            }
+
             throw new NotImplementedException();
         }
     }

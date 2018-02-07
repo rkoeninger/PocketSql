@@ -43,10 +43,27 @@ namespace PocketSql.Evaluation
         {
             switch (expr)
             {
+                case IntegerLiteral intLiteral:
+                    return int.Parse(intLiteral.Value);
+                case NumericLiteral numericExpr:
+                    return decimal.Parse(numericExpr.Value);
+                case StringLiteral stringExpr:
+                    return stringExpr.Value;
+                case UnaryExpression unaryExpr:
+                    return Evaluate(
+                        unaryExpr.UnaryExpressionType,
+                        Evaluate(unaryExpr.Expression, group, env));
+                case BinaryExpression binaryExpr:
+                    return Evaluate(
+                        binaryExpr.BinaryExpressionType,
+                        Evaluate(binaryExpr.FirstExpression, group, env),
+                        Evaluate(binaryExpr.SecondExpression, group, env));
                 case ColumnReferenceExpression colExpr:
-                    // TODO: need to know column names for EquatableList
-                    // TODO: this only works when there is only 1 column grouped by
-                    return group.Key.Elements.First().Item2;
+                    return group.Key.Elements.First(x => x.Item1.Similar(colExpr.MultiPartIdentifier.Identifiers.Last().Value)).Item2;
+                case VariableReference varRef:
+                    return env.Vars[varRef.Name];
+                case CaseExpression caseExpr:
+                    return Evaluate(caseExpr, group, env);
                 case FunctionCall funCall:
                     return Evaluate(funCall, group, env);
             }
