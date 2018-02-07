@@ -302,6 +302,43 @@ namespace PocketSql.Tests
         }
 
         [Test]
+        public void InsertSelectGroupByHaving()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute("create table Things (X int, Y varchar(8))");
+
+                Assert.AreEqual(16, connection.Execute(@"
+                    insert into Things
+                    (X, Y)
+                    values
+                    (3, 'a'),
+                    (2, 'b'),
+                    (6, 'c'),
+                    (6, 'a'),
+                    (7, 'b'),
+                    (1, 'a'),
+                    (4, 'c'),
+                    (4, 'd'),
+                    (9, 'b'),
+                    (6, 'a'),
+                    (6, 'b'),
+                    (7, 'd'),
+                    (9, 'c'),
+                    (1, 'a'),
+                    (2, 'b'),
+                    (9, 'd')"));
+
+                var result = connection.Query<Thing>("select sum(X) as X, Y from Things group by Y having sum(X) >= 20").ToList();
+                Assert.AreEqual(2, result.Count);
+                Assert.AreEqual(26, result.First(t => t.Y == "b").X);
+                Assert.AreEqual(20, result.First(t => t.Y == "d").X);
+            }
+        }
+
+        [Test]
         public void StoredProc()
         {
             var engine = new Engine(140);
