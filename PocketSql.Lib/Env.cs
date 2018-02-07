@@ -8,13 +8,13 @@ namespace PocketSql
         {
             var env = new Env();
             env.AddAll(parameters);
-            env.Engine = connection.engine;
+            env.Engine = connection.Engine;
             env.DefaultDatabase = connection.Database;
             return env;
         }
 
         public Namespace<object> Vars { get; private set; } = new Namespace<object>();
-
+        public object ReturnValue { get; set; }
         public Engine Engine { get; private set; }
         public string DefaultDatabase { get; set; } = "master";
         public string DefaultSchema { get; set; } = "dbo";
@@ -31,11 +31,9 @@ namespace PocketSql
         {
             foreach (IDbDataParameter parameter in parameters)
             {
-                Vars.Declare(PrefixAt(parameter.ParameterName), parameter.Value);
+                Vars.Declare(Naming.Parameter(parameter.ParameterName), parameter.Value);
             }
         }
-
-        private static string PrefixAt(string name) => name.StartsWith("@") ? name : $"@{name}";
 
         public Namespace<Function> Functions => Engine.Databases[DefaultDatabase].Schemas[DefaultSchema].Functions;
         public Namespace<Procedure> Procedures => Engine.Databases[DefaultDatabase].Schemas[DefaultSchema].Procedures;

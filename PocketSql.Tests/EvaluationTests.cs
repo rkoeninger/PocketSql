@@ -107,7 +107,9 @@ namespace PocketSql.Tests
             {
                 unchecked
                 {
+                    // ReSharper disable NonReadonlyMemberInGetHashCode
                     return (X * 397) ^ (Y != null ? Y.GetHashCode() : 0);
+                    // ReSharper enable NonReadonlyMemberInGetHashCode
                 }
             }
 
@@ -407,6 +409,36 @@ namespace PocketSql.Tests
                     declare @Name varchar(16)
                     set @Name = 'Rob'
                     select @Name"));
+            }
+        }
+
+        [Test, Ignore("StoredProcedure command needs to scope parameters directly onto proc called")]
+        public void OutputParameter()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                var p = new DynamicParameters();
+                p.Add("@a", 11);
+                p.Add("@b", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                p.Add("@c", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+                connection.Execute(@"
+                    create proc TestProc
+                        @a int,
+                        @b int output
+                    as
+                    begin
+                        set @b = 999
+                        select 1111
+                        return @a
+                    end");
+                Assert.AreEqual(1111, connection.QueryFirst<int>(
+                    "TestProc",
+                    p,
+                    commandType: CommandType.StoredProcedure));
+                Assert.AreEqual(11, p.Get<int>("@c"));
+                Assert.AreEqual(999, p.Get<int>("@b"));
             }
         }
 

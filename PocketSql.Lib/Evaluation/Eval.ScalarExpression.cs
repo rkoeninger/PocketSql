@@ -7,6 +7,9 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
+        public static object Evaluate(ScalarExpression expr, Env env) =>
+            Evaluate(expr, (DataRow) null, env);
+
         public static object Evaluate(ScalarExpression expr, DataRow row, Env env)
         {
             switch (expr)

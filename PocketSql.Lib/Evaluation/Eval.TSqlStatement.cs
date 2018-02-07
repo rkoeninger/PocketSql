@@ -50,6 +50,9 @@ namespace PocketSql.Evaluation
                     return null;
                 case ExecuteStatement exec:
                     return Evaluate(exec.ExecuteSpecification, env);
+                case ReturnStatement ret:
+                    env.ReturnValue = Evaluate(ret.Expression, env);
+                    return null;
                 default:
                     throw new NotImplementedException();
             }

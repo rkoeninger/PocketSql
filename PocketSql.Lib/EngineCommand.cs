@@ -16,13 +16,14 @@ namespace PocketSql
             this.sqlVersion = sqlVersion;
         }
 
-        private readonly EngineConnection connection;
+        private EngineConnection connection;
         private readonly SqlVersion sqlVersion;
 
         public IDbConnection Connection
         {
             get => connection;
-            set => throw new NotSupportedException("Can't set Connection on PocketSql.EngineCommand");
+            set => connection = value as EngineConnection
+                ?? throw new ArgumentException($"{nameof(EngineCommand)} can only use {nameof(EngineConnection)}");
         }
 
         public IDbTransaction Transaction { get; set; }
@@ -53,13 +54,27 @@ namespace PocketSql
                 throw new Exception(string.Join("\r\n", errors.Select(e => e.Message)));
             }
 
-            return Eval.Evaluate(fragment, Env.Of(connection, Parameters));
+            var env = Env.Of(connection, Parameters);
+            var results = Eval.Evaluate(fragment, env);
+
+            foreach (var param in Parameters.Cast<IDbDataParameter>()
+                .Where(x => x.Direction == ParameterDirection.Output
+                    || x.Direction == ParameterDirection.InputOutput))
+            {
+                param.Value = env.Vars[Naming.Parameter(param.ParameterName)];
+            }
+
+            foreach (var param in Parameters.Cast<IDbDataParameter>()
+                .Where(x => x.Direction == ParameterDirection.ReturnValue))
+            {
+                param.Value = env.ReturnValue;
+            }
+
+            return results;
         }
 
         public IDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
-
         public IDataReader ExecuteReader(CommandBehavior behavior) => new EngineDataReader(Execute());
-
         public object ExecuteScalar() => Execute()[0].ResultSet.Rows[0].ItemArray[0];
 
         public int ExecuteNonQuery()

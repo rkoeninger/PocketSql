@@ -36,7 +36,7 @@ namespace PocketSql.Evaluation
 
                 for (var i = 0; i < selections.Count; ++i)
                 {
-                    resultRow[i] = Evaluate(selections[i].Item3, (DataRow)null, env);
+                    resultRow[i] = Evaluate(selections[i].Item3, env);
                 }
 
                 projection.Rows.Add(resultRow);
@@ -138,8 +138,8 @@ namespace PocketSql.Evaluation
 
             if (querySpec.OffsetClause != null)
             {
-                var offset = (int)Evaluate(querySpec.OffsetClause.OffsetExpression, (DataRow)null, env);
-                var fetch = (int)Evaluate(querySpec.OffsetClause.FetchExpression, (DataRow)null, env);
+                var offset = (int)Evaluate(querySpec.OffsetClause.OffsetExpression, env);
+                var fetch = (int)Evaluate(querySpec.OffsetClause.FetchExpression, env);
 
                 for (var i = 0; i < offset; ++i)
                 {

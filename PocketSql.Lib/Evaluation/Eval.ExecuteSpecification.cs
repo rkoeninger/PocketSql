@@ -1,5 +1,4 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
@@ -18,10 +17,19 @@ namespace PocketSql.Evaluation
             // TODO: match parameters provided with declared
             foreach (var param in exec.ExecutableEntity.Parameters)
             {
-                env2.Vars[param.Variable.Name] = Evaluate(param.ParameterValue, (DataRow)null, env);
+                env2.Vars[param.Variable.Name] = Evaluate(param.ParameterValue, env);
             }
 
-            return Evaluate(proc.Statements, env2).FirstOrDefault();
+            // TODO: what about multiple results?
+            var results = Evaluate(proc.Statements, env2).FirstOrDefault();
+
+            foreach (var param in exec.ExecutableEntity.Parameters.Where(x => x.IsOutput))
+            {
+                env.Vars[Naming.Parameter(param.Variable.Name)] = env.Vars[Naming.Parameter(param.Variable.Name)];
+            }
+
+            env.ReturnValue = env2.ReturnValue;
+            return results;
         }
     }
 }

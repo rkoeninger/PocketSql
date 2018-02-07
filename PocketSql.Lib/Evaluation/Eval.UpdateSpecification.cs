@@ -115,6 +115,10 @@ namespace PocketSql.Evaluation
 
             switch (expr)
             {
+                case IntegerLiteral _:
+                    return typeof(int);
+                case StringLiteral _:
+                    return typeof(string);
                 // TODO: need to handle multi-table disambiguation
                 case ColumnReferenceExpression colRefExpr:
                     var name = colRefExpr.MultiPartIdentifier.Identifiers.Last().Value;

@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -7,7 +6,7 @@ namespace PocketSql.Evaluation
     {
         public static EngineResult Evaluate(SetVariableStatement set, Env env)
         {
-            env.Vars[set.Variable.Name] = Evaluate(set.Expression, (DataRow)null, env);
+            env.Vars[set.Variable.Name] = Evaluate(set.Expression, env);
             return null;
         }
     }

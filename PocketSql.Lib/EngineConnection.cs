@@ -9,11 +9,11 @@ namespace PocketSql
     {
         public EngineConnection(Engine engine, SqlVersion sqlVersion)
         {
-            this.engine = engine;
+            Engine = engine;
             this.sqlVersion = sqlVersion;
         }
 
-        internal readonly Engine engine;
+        public Engine Engine { get; }
         private readonly SqlVersion sqlVersion;
 
         private bool open;
@@ -21,6 +21,7 @@ namespace PocketSql
         public string Database { get; private set; } = "master";
         public int ConnectionTimeout => 30;
 
+        // TODO: have some model of connection string, get username, default database from it
         public string ConnectionString
         {
             get => "";
