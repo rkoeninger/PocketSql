@@ -9,18 +9,33 @@ namespace PocketSql.Evaluation
     {
         public static object Evaluate(FunctionCall funCall, DataRow row, Env env)
         {
-            // TODO: built-in functions
+            var name = funCall.FunctionName.Value;
+            var paramCount = funCall.Parameters.Count;
 
-            var f = env.Functions[funCall.FunctionName.Value];
-            var env2 = env.Fork();
-
-            foreach (var (param, arg) in f.Parameters.Zip(funCall.Parameters, (param, arg) => (param, arg)))
+            switch (name.ToLower())
             {
-                env2.Vars.Declare(param.Key, Evaluate(arg, row, env));
-            }
+                case "lower" when paramCount == 1:
+                    return ((string)Evaluate(funCall.Parameters[0], row, env)).ToLower();
+                case "upper" when paramCount == 1:
+                    return ((string)Evaluate(funCall.Parameters[0], row, env)).ToUpper();
+                case "trim" when paramCount == 1:
+                    return ((string)Evaluate(funCall.Parameters[0], row, env)).Trim();
+                case "ltrim" when paramCount == 1:
+                    return ((string)Evaluate(funCall.Parameters[0], row, env)).TrimStart();
+                case "rtrim" when paramCount == 1:
+                    return ((string)Evaluate(funCall.Parameters[0], row, env)).TrimEnd();
+                default:
+                    var env2 = env.Fork();
+                    var f = env.Functions[name];
 
-            Evaluate(f.Statements, env2);
-            return env2.ReturnValue;
+                    foreach (var (param, arg) in f.Parameters.Zip(funCall.Parameters, (param, arg) => (param, arg)))
+                    {
+                        env2.Vars.Declare(param.Key, Evaluate(arg, row, env));
+                    }
+
+                    Evaluate(f.Statements, env2);
+                    return env2.ReturnValue;
+            }
         }
 
         public static object Evaluate(FunctionCall funCall, IGrouping<EquatableList, DataRow> row, Env env)

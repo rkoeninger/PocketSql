@@ -133,6 +133,12 @@ namespace PocketSql.Evaluation
                     {
                         case "sum": return InferType(fun.Parameters[0], table, env);
                         case "count": return typeof(int);
+                        case "trim":
+                        case "ltrim":
+                        case "rtrim":
+                        case "upper":
+                        case "lower":
+                            return typeof(string);
                         default: return env.Functions[fun.FunctionName.Value].ReturnType;
                     }
             }

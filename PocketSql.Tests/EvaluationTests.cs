@@ -399,6 +399,40 @@ namespace PocketSql.Tests
         }
 
         [Test]
+        public void BuiltInFunction()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute("create table Things (Y varchar(8))");
+
+                Assert.AreEqual(16, connection.Execute(@"
+                    insert into Things
+                    (Y)
+                    values
+                    ('  qwe'),
+                    ('wer '),
+                    ('  ert '),
+                    (' rty  '),
+                    ('tyu  '),
+                    (' yui'),
+                    (' uio '),
+                    ('zxc'),
+                    ('asd'),
+                    (' ert  '),
+                    ('rty '),
+                    (' tyu'),
+                    ('  asd'),
+                    ('yui '),
+                    ('   wer '),
+                    ('  zxc ')"));
+
+                Assert.IsTrue(connection.Query<string>("select trim(Y) from Things").All(x => x.Length == 3));
+            }
+        }
+
+        [Test]
         public void UserDefinedFunction()
         {
             var engine = new Engine(140);
