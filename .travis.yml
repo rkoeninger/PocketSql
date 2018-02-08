@@ -1,5 +1,6 @@
 notifications:
   email: false
 language: csharp
+mono: "5.4.0"
 script:
   - echo "Csharp 7 not supported on travis"
