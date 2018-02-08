@@ -12,24 +12,12 @@ namespace PocketSql.Evaluation
             var execRef = (ExecutableProcedureReference)exec.ExecutableEntity;
             var procName = execRef.ProcedureReference.ProcedureReference.Name.Identifiers.Last().Value;
             var proc = env.Procedures[procName];
-            var env2 = env.Fork();
-
-            // TODO: match parameters provided with declared
-            foreach (var param in exec.ExecutableEntity.Parameters)
-            {
-                env2.Vars[param.Variable.Name] = Evaluate(param.ParameterValue, env);
-            }
-
-            // TODO: what about multiple results?
-            var results = Evaluate(proc.Statements, env2).FirstOrDefault();
-
-            foreach (var param in exec.ExecutableEntity.Parameters.Where(x => x.IsOutput))
-            {
-                env.Vars[Naming.Parameter(param.Variable.Name)] = env.Vars[Naming.Parameter(param.Variable.Name)];
-            }
-
-            env.ReturnValue = env2.ReturnValue;
-            return results;
+            return Evaluate(
+                proc,
+                execRef.Parameters
+                    .Select(p => (p.Variable.Name, !p.IsOutput, p.IsOutput, Evaluate(p.ParameterValue, env)))
+                    .ToList(),
+                env);
         }
     }
 }

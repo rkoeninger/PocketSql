@@ -76,6 +76,7 @@
     <Compile Include="Evaluation\Eval.InsertSpecification.cs" />
     <Compile Include="Evaluation\Eval.MergeAction.cs" />
     <Compile Include="Evaluation\Eval.MergeSpecification.cs" />
+    <Compile Include="Evaluation\Eval.Procedure.cs" />
     <Compile Include="Evaluation\Eval.ProcedureStatementBodyBase.cs" />
     <Compile Include="Evaluation\Eval.QueryExpression.cs" />
     <Compile Include="Evaluation\Eval.QuerySpecification.cs" />

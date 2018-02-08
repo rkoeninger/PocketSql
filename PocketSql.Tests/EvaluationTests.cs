@@ -412,7 +412,7 @@ namespace PocketSql.Tests
             }
         }
 
-        [Test, Ignore("StoredProcedure command needs to scope parameters directly onto proc called")]
+        [Test]
         public void OutputParameter()
         {
             var engine = new Engine(140);

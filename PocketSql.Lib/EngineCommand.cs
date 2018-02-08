@@ -29,7 +29,7 @@ namespace PocketSql
         public IDbTransaction Transaction { get; set; }
         public string CommandText { get; set; }
         public int CommandTimeout { get; set; }
-        public CommandType CommandType { get; set; }
+        public CommandType CommandType { get; set; } = CommandType.Text;
         public IDataParameterCollection Parameters { get; } = new EngineParameterCollection();
         public UpdateRowSource UpdatedRowSource { get; set; }
 
@@ -41,7 +41,47 @@ namespace PocketSql
         // TODO: how to set nullability on parameter?
         public IDbDataParameter CreateParameter() => new EngineParameter(true);
 
-        private List<EngineResult> Execute()
+        private bool IsInput(ParameterDirection d) =>
+            d == ParameterDirection.Input
+            || d == ParameterDirection.InputOutput;
+
+        private bool IsOutput(ParameterDirection d) =>
+            d == ParameterDirection.InputOutput
+            || d == ParameterDirection.Output;
+
+        private List<EngineResult> ExecuteStoredProcedure()
+        {
+            var env = Env.Of(connection, Parameters);
+            var proc = env.Procedures[CommandText];
+            var results = Eval.Evaluate(
+                proc,
+                Parameters
+                    .Cast<IDbDataParameter>()
+                    .Select(p => (
+                        p.ParameterName,
+                        IsInput(p.Direction),
+                        IsOutput(p.Direction),
+                        p.Value))
+                    .ToList(),
+                env);
+
+            foreach (var param in Parameters.Cast<IDbDataParameter>()
+                .Where(x => x.Direction == ParameterDirection.Output
+                    || x.Direction == ParameterDirection.InputOutput))
+            {
+                param.Value = env.Vars[Naming.Parameter(param.ParameterName)];
+            }
+
+            foreach (var param in Parameters.Cast<IDbDataParameter>()
+                .Where(x => x.Direction == ParameterDirection.ReturnValue))
+            {
+                param.Value = env.ReturnValue;
+            }
+
+            return new List<EngineResult> { results };
+        }
+
+        private List<EngineResult> ExecuteText()
         {
             // TODO: you have to create an instance to call the helper?
             // TODO: specify SqlEngineType: Azure vs SqlServer?
@@ -71,6 +111,19 @@ namespace PocketSql
             }
 
             return results;
+        }
+
+        private List<EngineResult> Execute()
+        {
+            switch (CommandType)
+            {
+                case CommandType.Text:
+                    return ExecuteText();
+                case CommandType.StoredProcedure:
+                    return ExecuteStoredProcedure();
+            }
+
+            throw new NotImplementedException();
         }
 
         public IDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
