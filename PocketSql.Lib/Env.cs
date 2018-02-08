@@ -35,8 +35,11 @@ namespace PocketSql
             }
         }
 
-        public Namespace<Function> Functions => Engine.Databases[DefaultDatabase].Schemas[DefaultSchema].Functions;
-        public Namespace<Procedure> Procedures => Engine.Databases[DefaultDatabase].Schemas[DefaultSchema].Procedures;
-        public Namespace<DataTable> Tables => Engine.Databases[DefaultDatabase].Schemas[DefaultSchema].Tables;
+        public Database Database => Engine.Databases[DefaultDatabase];
+        public Schema Schema => Database.Schemas[DefaultSchema];
+        public Namespace<Function> Functions => Schema.Functions;
+        public Namespace<Procedure> Procedures => Schema.Procedures;
+        public Namespace<DataTable> Tables => Schema.Tables;
+        public Namespace<View> Views => Schema.Views;
     }
 }

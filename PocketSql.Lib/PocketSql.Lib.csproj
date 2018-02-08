@@ -65,6 +65,7 @@
     <Compile Include="Evaluation\Eval.BooleanTernaryExpressionType.cs" />
     <Compile Include="Evaluation\Eval.CaseExpression.cs" />
     <Compile Include="Evaluation\Eval.CreateTableStatement.cs" />
+    <Compile Include="Evaluation\Eval.CreateViewStatement.cs" />
     <Compile Include="Evaluation\Eval.DataModificationSpecification.cs" />
     <Compile Include="Evaluation\Eval.DeclareVariable.cs" />
     <Compile Include="Evaluation\Eval.DeleteSpecification.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Env.cs" />
     <Compile Include="Schema.cs" />
+    <Compile Include="View.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

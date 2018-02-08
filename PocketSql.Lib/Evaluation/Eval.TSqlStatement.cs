@@ -27,6 +27,8 @@ namespace PocketSql.Evaluation
                     return Evaluate(truncate, env);
                 case CreateTableStatement createTable:
                     return Evaluate(createTable, env);
+                case CreateViewStatement createView:
+                    return Evaluate(createView, env);
                 case ProcedureStatementBodyBase exec:
                     Evaluate(exec, env);
                     return null;

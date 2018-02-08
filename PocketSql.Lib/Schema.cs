@@ -13,5 +13,6 @@ namespace PocketSql
         public Namespace<Function> Functions { get; } = new Namespace<Function>();
         public Namespace<Procedure> Procedures { get; } = new Namespace<Procedure>();
         public Namespace<DataTable> Tables { get; } = new Namespace<DataTable>();
+        public Namespace<View> Views { get; } = new Namespace<View>();
     }
 }

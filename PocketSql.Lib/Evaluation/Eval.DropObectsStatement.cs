@@ -18,6 +18,9 @@ namespace PocketSql.Evaluation
                 case DropTableStatement _:
                     DropAll(drop, env.Tables);
                     return;
+                case DropViewStatement _:
+                    DropAll(drop, env.Views);
+                    return;
             }
 
             throw new NotImplementedException();
