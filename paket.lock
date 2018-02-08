@@ -1,0 +1,5 @@
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    Dapper (1.50.4) - restriction: >= net47
+    Microsoft.SqlServer.TransactSql.ScriptDom (14.0.3811.1) - restriction: >= net47
+    NUnit (3.9) - restriction: >= net47
