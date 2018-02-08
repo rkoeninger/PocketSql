@@ -2,5 +2,9 @@ notifications:
   email: false
 language: csharp
 mono: "5.4.0"
+install:
+  - nuget restore PocketSql.sln
+  - nuget install NUnit.ConsoleRunner -Version 3.8.0 -OutputDirectory packages
 script:
   - msbuild /p:Configuration=Release PocketSql.sln
+  - mono ./packages/NUnit.ConsoleRunner.3.8.0/tools/nunit3-console.exe ./PocketSql.Tests/bin/Release/PocketSql.Tests.dll
