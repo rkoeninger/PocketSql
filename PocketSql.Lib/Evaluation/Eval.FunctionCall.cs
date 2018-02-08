@@ -9,7 +9,18 @@ namespace PocketSql.Evaluation
     {
         public static object Evaluate(FunctionCall funCall, DataRow row, Env env)
         {
-            throw new NotImplementedException();
+            // TODO: built-in functions
+
+            var f = env.Functions[funCall.FunctionName.Value];
+            var env2 = env.Fork();
+
+            foreach (var (param, arg) in f.Parameters.Zip(funCall.Parameters, (param, arg) => (param, arg)))
+            {
+                env2.Vars.Declare(param.Key, Evaluate(arg, row, env));
+            }
+
+            Evaluate(f.Statements, env2);
+            return env2.ReturnValue;
         }
 
         public static object Evaluate(FunctionCall funCall, IGrouping<EquatableList, DataRow> row, Env env)

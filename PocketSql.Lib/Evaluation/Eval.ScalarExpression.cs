@@ -14,6 +14,8 @@ namespace PocketSql.Evaluation
         {
             switch (expr)
             {
+                case ParenthesisExpression paren:
+                    return Evaluate(paren.Expression, row, env);
                 case IntegerLiteral intLiteral:
                     return int.Parse(intLiteral.Value);
                 case NumericLiteral numericExpr:

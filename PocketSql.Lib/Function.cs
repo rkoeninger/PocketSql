@@ -9,5 +9,6 @@ namespace PocketSql
         public string Name { get; set; }
         public IDictionary<string, Type> Parameters { get; set; }
         public StatementList Statements { get; set; }
+        public Type ReturnType { get; set; }
     }
 }

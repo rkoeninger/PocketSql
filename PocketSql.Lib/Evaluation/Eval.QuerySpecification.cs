@@ -24,7 +24,7 @@ namespace PocketSql.Evaluation
 
             var table = querySpec.FromClause?.TableReferences?
                 .Aggregate((DataTable)null, (ts, tr) => Evaluate(tr, ts, env));
-            var selections = querySpec.SelectElements.SelectMany(ExtractSelection(table)).ToList();
+            var selections = querySpec.SelectElements.SelectMany(ExtractSelection(table, env)).ToList();
             var projection = new DataTable();
             projection.Columns.AddRange(selections.Select(s => new DataColumn(s.Item1, s.Item2)).ToArray());
 
@@ -155,7 +155,7 @@ namespace PocketSql.Evaluation
             return new EngineResult(projection);
         }
 
-        private static Func<SelectElement, IEnumerable<(string, Type, ScalarExpression)>> ExtractSelection(DataTable table) => s =>
+        private static Func<SelectElement, IEnumerable<(string, Type, ScalarExpression)>> ExtractSelection(DataTable table, Env env) => s =>
         {
             switch (s)
             {
@@ -169,7 +169,7 @@ namespace PocketSql.Evaluation
                     return new[]
                     {
                             (scalar.ColumnName?.Value ?? InferName(scalar.Expression),
-                                InferType(scalar.Expression, table),
+                                InferType(scalar.Expression, table, env),
                                 scalar.Expression)
                         }.AsEnumerable();
                 default:

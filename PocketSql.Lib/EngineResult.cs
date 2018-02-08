@@ -18,5 +18,6 @@ namespace PocketSql
 
         public int RecordsAffected { get; set; } = -1;
         public DataTable ResultSet { get; set; }
+        public object Scalar => ResultSet.Rows[0].ItemArray[0];
     }
 }

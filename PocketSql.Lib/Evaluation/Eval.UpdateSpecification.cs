@@ -30,7 +30,7 @@ namespace PocketSql.Evaluation
                             return new[]
                             {
                                 (scalar.ColumnName?.Value ?? InferName(scalar.Expression),
-                                InferType(scalar.Expression, table),
+                                InferType(scalar.Expression, table, env),
                                 scalar.Expression)
                             }.AsEnumerable();
                         default:
@@ -106,7 +106,7 @@ namespace PocketSql.Evaluation
             return null;
         }
 
-        private static Type InferType(ScalarExpression expr, DataTable table)
+        private static Type InferType(ScalarExpression expr, DataTable table, Env env)
         {
             // TODO: a lot of work to do here for type inference
             //       how does sql server do it?
@@ -127,14 +127,14 @@ namespace PocketSql.Evaluation
                     return typeof(object); // TODO: retain variable type information
                 case BinaryExpression binExpr:
                     // TODO: so, so brittle
-                    return InferType(binExpr.FirstExpression, table);
+                    return InferType(binExpr.FirstExpression, table, env);
                 case FunctionCall fun:
                     switch (fun.FunctionName.Value.ToLower())
                     {
-                        case "sum": return InferType(fun.Parameters[0], table);
+                        case "sum": return InferType(fun.Parameters[0], table, env);
                         case "count": return typeof(int);
+                        default: return env.Functions[fun.FunctionName.Value].ReturnType;
                     }
-                    break;
             }
 
             throw new NotImplementedException();

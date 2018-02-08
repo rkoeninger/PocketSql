@@ -399,7 +399,26 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelecView()
+        public void UserDefinedFunction()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute(@"
+                    create function ScalarMax(@X int, @Y int)
+                    returns int
+                    as
+                    begin
+                        return (case when @X > @Y then @X else @Y end);
+                    end;");
+
+                Assert.AreEqual(5, connection.QueryFirst<int>("select ScalarMax(3, 5)"));
+            }
+        }
+
+        [Test]
+        public void SelectView()
         {
             var engine = new Engine(140);
 

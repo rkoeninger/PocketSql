@@ -46,7 +46,8 @@ namespace PocketSql.Evaluation
                 Parameters = funcExpr.Parameters.ToDictionary(
                     x => x.VariableName.Value,
                     x => TranslateType(x.DataType)),
-                Statements = funcExpr.StatementList
+                Statements = funcExpr.StatementList,
+                ReturnType = TranslateType(((ScalarFunctionReturnType)funcExpr.ReturnType).DataType)
             };
 
         private static Procedure BuildProc(ProcedureStatementBody procExpr) =>
