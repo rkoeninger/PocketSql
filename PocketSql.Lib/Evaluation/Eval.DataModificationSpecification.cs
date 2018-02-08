@@ -19,7 +19,7 @@ namespace PocketSql.Evaluation
                     return Evaluate(update, env);
             }
 
-            throw new Exception();
+            throw new NotImplementedException();
         }
     }
 }

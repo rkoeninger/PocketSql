@@ -66,6 +66,7 @@
     <Compile Include="Evaluation\Eval.CaseExpression.cs" />
     <Compile Include="Evaluation\Eval.CreateTableStatement.cs" />
     <Compile Include="Evaluation\Eval.CreateViewStatement.cs" />
+    <Compile Include="Evaluation\Eval.cs" />
     <Compile Include="Evaluation\Eval.DataModificationSpecification.cs" />
     <Compile Include="Evaluation\Eval.DeclareVariable.cs" />
     <Compile Include="Evaluation\Eval.DeleteSpecification.cs" />
