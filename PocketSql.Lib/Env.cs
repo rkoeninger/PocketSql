@@ -17,6 +17,7 @@ namespace PocketSql
         public Namespace<object> Vars { get; private set; } = new Namespace<object>();
         public object ReturnValue { get; set; }
         public int FetchStatus { get; set; } = -1;
+        public int RowCount { get; set; } = -1;
         public Engine Engine { get; private set; }
         public string DefaultDatabase { get; set; } = "master";
         public string DefaultSchema { get; set; } = "dbo";
@@ -46,13 +47,12 @@ namespace PocketSql
 
         public object GetGlobal(string name)
         {
-            switch (name.TrimStart('@').ToLower())
+            switch (name.ToLower())
             {
-                case "fetch_status":
-                    return FetchStatus;
+                case "@@fetch_status": return FetchStatus;
+                case "@@rowcount": return RowCount;
+                default: throw new Exception($"Global \"{name}\" not defined");
             }
-
-            throw new Exception($"Global \"{name}\" not defined");
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
@@ -23,6 +24,31 @@ namespace PocketSql.Evaluation
                 MultiPartIdentifier = schemaObjectName
             };
         }
+
+        private static Func<SelectElement, IEnumerable<(string, Type, ScalarExpression)>>
+            ExtractSelection(DataTable table, Env env) => s =>
+        {
+            switch (s)
+            {
+                // TODO: respect table alias in star expression
+                case SelectStarExpression star:
+                    return table.Columns.Cast<DataColumn>().Select(c => (
+                        c.ColumnName,
+                        c.DataType,
+                        (ScalarExpression)CreateColumnReferenceExpression(c.ColumnName)));
+                case SelectScalarExpression scalar:
+                    return new[]
+                    {(
+                        scalar.ColumnName?.Value ?? InferName(scalar.Expression),
+                        InferType(scalar.Expression, table, env),
+                        scalar.Expression
+                    )}.AsEnumerable();
+                case SelectSetVariable set:
+                    throw new NotImplementedException("SelectSetVariable not implemented");
+                default:
+                    throw new NotImplementedException();
+            }
+        };
 
         private static string InferName(GroupingSpecification groupSpec)
         {
@@ -65,7 +91,8 @@ namespace PocketSql.Evaluation
                 case ColumnReferenceExpression colRefExpr:
                     var name = colRefExpr.MultiPartIdentifier.Identifiers.Last().Value;
                     return table.Columns[name].DataType;
-                case VariableReference varRef:
+                case GlobalVariableExpression _:
+                case VariableReference _:
                     return typeof(object); // TODO: retain variable type information
                 case BinaryExpression binExpr:
                     // TODO: so, so brittle

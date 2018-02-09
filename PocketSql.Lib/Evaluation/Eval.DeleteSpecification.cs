@@ -20,6 +20,7 @@ namespace PocketSql.Evaluation
                 }
             }
 
+            env.RowCount = rowCount;
             return new EngineResult(rowCount);
         }
     }

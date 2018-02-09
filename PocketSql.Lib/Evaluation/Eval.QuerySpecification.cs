@@ -24,7 +24,8 @@ namespace PocketSql.Evaluation
 
             var table = querySpec.FromClause?.TableReferences?
                 .Aggregate((DataTable)null, (ts, tr) => Evaluate(tr, ts, env));
-            var selections = querySpec.SelectElements.SelectMany(ExtractSelection(table, env)).ToList();
+            var selections = querySpec.SelectElements
+                .SelectMany(ExtractSelection(table, env)).ToList();
             var projection = new DataTable();
             projection.Columns.AddRange(selections.Select(s => new DataColumn(s.Item1, s.Item2)).ToArray());
 
@@ -154,28 +155,6 @@ namespace PocketSql.Evaluation
 
             return new EngineResult(projection);
         }
-
-        private static Func<SelectElement, IEnumerable<(string, Type, ScalarExpression)>> ExtractSelection(DataTable table, Env env) => s =>
-        {
-            switch (s)
-            {
-                // TODO: respect table alias in star expression
-                case SelectStarExpression star:
-                    return table.Columns.Cast<DataColumn>().Select(c =>
-                        (c.ColumnName,
-                            c.DataType,
-                            (ScalarExpression)CreateColumnReferenceExpression(c.ColumnName)));
-                case SelectScalarExpression scalar:
-                    return new[]
-                    {
-                            (scalar.ColumnName?.Value ?? InferName(scalar.Expression),
-                                InferType(scalar.Expression, table, env),
-                                scalar.Expression)
-                        }.AsEnumerable();
-                default:
-                    throw new NotImplementedException();
-            }
-        };
 
         private static void Select<T>(
             Func<ScalarExpression, T, Env, object> evaluate,

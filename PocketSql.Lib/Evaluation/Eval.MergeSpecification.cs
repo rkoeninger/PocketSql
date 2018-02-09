@@ -96,6 +96,7 @@ namespace PocketSql.Evaluation
 
             // TODO: output into
 
+            env.RowCount = rowCount;
             return new EngineResult(rowCount);
         }
     }

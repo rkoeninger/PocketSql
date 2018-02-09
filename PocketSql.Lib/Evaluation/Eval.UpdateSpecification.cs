@@ -17,26 +17,8 @@ namespace PocketSql.Evaluation
             {
                 // TODO: extract and share logic with Evaluate(SelectStatement, ...)
                 // TODO: handle inserted.* vs deleted.* and $action
-                var selections = update.OutputClause.SelectColumns.SelectMany(s =>
-                {
-                    switch (s)
-                    {
-                        case SelectStarExpression star:
-                            return table.Columns.Cast<DataColumn>().Select(c =>
-                                (c.ColumnName,
-                                c.DataType,
-                                (ScalarExpression)CreateColumnReferenceExpression(c.ColumnName)));
-                        case SelectScalarExpression scalar:
-                            return new[]
-                            {
-                                (scalar.ColumnName?.Value ?? InferName(scalar.Expression),
-                                InferType(scalar.Expression, table, env),
-                                scalar.Expression)
-                            }.AsEnumerable();
-                        default:
-                            throw new NotImplementedException();
-                    }
-                }).ToList();
+                var selections = update.OutputClause.SelectColumns
+                    .SelectMany(ExtractSelection(table, env)).ToList();
 
                 output = new DataTable();
 
@@ -61,6 +43,7 @@ namespace PocketSql.Evaluation
                 }
             }
 
+            env.RowCount = rowCount;
             return new EngineResult(rowCount);
             // TODO: ResultSet = output
         }

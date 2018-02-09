@@ -128,7 +128,7 @@ namespace PocketSql
 
         public IDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
         public IDataReader ExecuteReader(CommandBehavior behavior) => new EngineDataReader(Execute());
-        public object ExecuteScalar() => Execute()[0].ResultSet.Rows[0].ItemArray[0];
+        public object ExecuteScalar() => Execute().Last().ResultSet.Rows[0].ItemArray[0];
 
         public int ExecuteNonQuery()
         {

@@ -10,6 +10,7 @@ namespace PocketSql.Evaluation
             var table = env.Tables[truncate.TableName.BaseIdentifier.Value];
             var rowCount = table.Rows.Count;
             table.Rows.Clear();
+            env.RowCount = rowCount;
             return new EngineResult(rowCount);
         }
     }

@@ -25,6 +25,7 @@ namespace PocketSql.Evaluation
                 table.Rows.Add(row);
             }
 
+            env.RowCount = values.RowValues.Count;
             return new EngineResult(values.RowValues.Count);
         }
     }
