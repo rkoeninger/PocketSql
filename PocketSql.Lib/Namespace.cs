@@ -32,6 +32,10 @@ namespace PocketSql
 
         public void Declare<U>(U value) where U : T, INamed => Declare(value.Name, value);
 
+        public void DeclareOrSet(string name, T value) => members[name] = value;
+
+        public void DeclareOrSet<U>(U value) where U : T, INamed => DeclareOrSet(value.Name, value);
+
         public void Drop(string name)
         {
             if (!IsDefined(name)) throw new Exception($"{typeof(T).Name} \"{name}\" not defined");

@@ -35,6 +35,8 @@ namespace PocketSql.Evaluation
                     return row[colExpr.MultiPartIdentifier.Identifiers.Last().Value];
                 case VariableReference varRef:
                     return env.Vars[varRef.Name];
+                case GlobalVariableExpression globRef:
+                    return env.GetGlobal(globRef.Name);
                 case CaseExpression caseExpr:
                     return Evaluate(caseExpr, row, env);
                 case FunctionCall funCall:
@@ -67,6 +69,8 @@ namespace PocketSql.Evaluation
                     return group.Key.Elements.First(x => x.Item1.Similar(colExpr.MultiPartIdentifier.Identifiers.Last().Value)).Item2;
                 case VariableReference varRef:
                     return env.Vars[varRef.Name];
+                case GlobalVariableExpression globRef:
+                    return env.GetGlobal(globRef.Name);
                 case CaseExpression caseExpr:
                     return Evaluate(caseExpr, group, env);
                 case FunctionCall funCall:

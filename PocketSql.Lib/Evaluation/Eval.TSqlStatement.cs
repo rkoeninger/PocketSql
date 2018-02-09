@@ -55,6 +55,12 @@ namespace PocketSql.Evaluation
                 case ReturnStatement ret:
                     env.ReturnValue = Evaluate(ret.Expression, env);
                     return null;
+                case DeclareCursorStatement declare:
+                    Evaluate(declare, env);
+                    return null;
+                case CursorStatement cur:
+                    Evaluate(cur, env);
+                    return null;
                 default:
                     throw new NotImplementedException();
             }

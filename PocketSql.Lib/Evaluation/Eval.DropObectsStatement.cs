@@ -32,12 +32,10 @@ namespace PocketSql.Evaluation
             {
                 var name = x.BaseIdentifier.Value;
 
-                if (!drop.IsIfExists && !ns.IsDefined(name))
+                if (!drop.IsIfExists || ns.IsDefined(name))
                 {
-                    throw new Exception();
+                    ns.Drop(name);
                 }
-
-                ns.Drop(name);
             }
         }
     }

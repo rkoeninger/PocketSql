@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 
 namespace PocketSql
 {
@@ -15,6 +16,7 @@ namespace PocketSql
 
         public Namespace<object> Vars { get; private set; } = new Namespace<object>();
         public object ReturnValue { get; set; }
+        public int FetchStatus { get; set; } = -1;
         public Engine Engine { get; private set; }
         public string DefaultDatabase { get; set; } = "master";
         public string DefaultSchema { get; set; } = "dbo";
@@ -41,5 +43,16 @@ namespace PocketSql
         public Namespace<Procedure> Procedures => Schema.Procedures;
         public Namespace<DataTable> Tables => Schema.Tables;
         public Namespace<View> Views => Schema.Views;
+
+        public object GetGlobal(string name)
+        {
+            switch (name.TrimStart('@').ToLower())
+            {
+                case "fetch_status":
+                    return FetchStatus;
+            }
+
+            throw new Exception($"Global \"{name}\" not defined");
+        }
     }
 }
