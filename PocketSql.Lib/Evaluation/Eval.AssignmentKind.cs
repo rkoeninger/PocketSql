@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -30,9 +29,9 @@ namespace PocketSql.Evaluation
                     return (int)current | (int)value;
                 case AssignmentKind.BitwiseXorEquals:
                     return (int)current ^ (int)value;
+                default:
+                    throw FeatureNotSupportedException.Value(kind);
             }
-
-            throw new Exception($"Not a valid assignment kind: {kind}");
         }
     }
 }

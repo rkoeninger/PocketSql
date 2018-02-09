@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
@@ -24,9 +23,9 @@ namespace PocketSql.Evaluation
                         where x != null
                         select x
                     ).ToList();
+                default:
+                    throw FeatureNotSupportedException.Subtype(fragment);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

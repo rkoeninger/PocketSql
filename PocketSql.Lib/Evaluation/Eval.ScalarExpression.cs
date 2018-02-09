@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
@@ -41,15 +40,17 @@ namespace PocketSql.Evaluation
                     return Evaluate(caseExpr, row, env);
                 case FunctionCall funCall:
                     return Evaluate(funCall, row, env);
+                default:
+                    throw FeatureNotSupportedException.Subtype(expr);
             }
-
-            throw new NotImplementedException();
         }
 
         public static object Evaluate(ScalarExpression expr, IGrouping<EquatableList, DataRow> group, Env env)
         {
             switch (expr)
             {
+                case ParenthesisExpression paren:
+                    return Evaluate(paren.Expression, group, env);
                 case IntegerLiteral intLiteral:
                     return int.Parse(intLiteral.Value);
                 case NumericLiteral numericExpr:
@@ -75,9 +76,9 @@ namespace PocketSql.Evaluation
                     return Evaluate(caseExpr, group, env);
                 case FunctionCall funCall:
                     return Evaluate(funCall, group, env);
+                default:
+                    throw FeatureNotSupportedException.Subtype(expr);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

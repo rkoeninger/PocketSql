@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
@@ -38,9 +37,9 @@ namespace PocketSql.Evaluation
                     return value != null && inExpr.Values.Any(x => value.Equals(Evaluate(x, row, env)));
                 case ExistsPredicate existsExpr:
                     return Evaluate(existsExpr.Subquery.QueryExpression, env).ResultSet.Rows.Count > 0;
+                default:
+                    throw FeatureNotSupportedException.Subtype(expr);
             }
-
-            throw new NotImplementedException();
         }
 
         public static bool Evaluate(BooleanExpression expr, IGrouping<EquatableList, DataRow> group, Env env)
@@ -74,9 +73,9 @@ namespace PocketSql.Evaluation
                     return value != null && inExpr.Values.Any(x => value.Equals(Evaluate(x, group, env)));
                 case ExistsPredicate existsExpr:
                     return Evaluate(existsExpr.Subquery.QueryExpression, env).ResultSet.Rows.Count > 0;
+                default:
+                    throw FeatureNotSupportedException.Subtype(expr);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

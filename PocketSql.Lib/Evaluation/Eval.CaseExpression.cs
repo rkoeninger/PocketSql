@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
@@ -7,9 +6,9 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static object Evaluate(CaseExpression caseExpr, DataRow row, Env env)
+        public static object Evaluate(CaseExpression expr, DataRow row, Env env)
         {
-            switch (caseExpr)
+            switch (expr)
             {
                 case SimpleCaseExpression simple:
                     var input = Evaluate(simple.InputExpression, row, env);
@@ -34,15 +33,15 @@ namespace PocketSql.Evaluation
 
                     break;
                 default:
-                    throw new NotImplementedException();
+                    throw FeatureNotSupportedException.Subtype(expr);
             }
 
-            return Evaluate(caseExpr.ElseExpression, row, env);
+            return Evaluate(expr.ElseExpression, row, env);
         }
 
-        public static object Evaluate(CaseExpression caseExpr, IGrouping<EquatableList, DataRow> group, Env env)
+        public static object Evaluate(CaseExpression expr, IGrouping<EquatableList, DataRow> group, Env env)
         {
-            switch (caseExpr)
+            switch (expr)
             {
                 case SimpleCaseExpression simple:
                     var input = Evaluate(simple.InputExpression, group, env);
@@ -67,10 +66,10 @@ namespace PocketSql.Evaluation
 
                     break;
                 default:
-                    throw new NotImplementedException();
+                    throw FeatureNotSupportedException.Subtype(expr);
             }
 
-            return Evaluate(caseExpr.ElseExpression, group, env);
+            return Evaluate(expr.ElseExpression, group, env);
         }
     }
 }

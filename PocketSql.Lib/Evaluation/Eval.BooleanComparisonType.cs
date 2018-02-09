@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -30,9 +29,9 @@ namespace PocketSql.Evaluation
                     if (left is int && right is int)
                         return (int)left <= (int)right;
                     return (decimal)left <= (decimal)right;
+                default:
+                    throw FeatureNotSupportedException.Value(op);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

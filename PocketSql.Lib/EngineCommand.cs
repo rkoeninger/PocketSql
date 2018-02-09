@@ -121,9 +121,9 @@ namespace PocketSql
                     return ExecuteText();
                 case CommandType.StoredProcedure:
                     return ExecuteStoredProcedure();
+                default:
+                    throw FeatureNotSupportedException.Value(CommandType);
             }
-
-            throw new NotImplementedException();
         }
 
         public IDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);

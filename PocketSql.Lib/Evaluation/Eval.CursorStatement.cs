@@ -34,14 +34,16 @@ namespace PocketSql.Evaluation
                     }
 
                     return;
+                default:
+                    throw FeatureNotSupportedException.Subtype(statement);
             }
-
-            throw new System.Exception();
         }
 
         private static DataRow CursorFetch(FetchCursorStatement fetch, Cursor cursor, Env env)
         {
-            switch (fetch.FetchType?.Orientation ?? FetchOrientation.None)
+            var orientation = fetch.FetchType?.Orientation ?? FetchOrientation.None;
+
+            switch (orientation)
             {
                 case FetchOrientation.None:
                 case FetchOrientation.Next:
@@ -56,9 +58,9 @@ namespace PocketSql.Evaluation
                     return cursor.MoveAbsolute((int)Evaluate(fetch.FetchType.RowOffset, env));
                 case FetchOrientation.Relative:
                     return cursor.MoveRelative((int)Evaluate(fetch.FetchType.RowOffset, env));
+                default:
+                    throw FeatureNotSupportedException.Value(orientation);
             }
-
-            throw new System.Exception();
         }
     }
 }

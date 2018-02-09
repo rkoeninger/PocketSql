@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
@@ -62,7 +61,7 @@ namespace PocketSql.Evaluation
                     Evaluate(cur, env);
                     return null;
                 default:
-                    throw new NotImplementedException();
+                    throw FeatureNotSupportedException.Subtype(statement);
             }
         }
     }

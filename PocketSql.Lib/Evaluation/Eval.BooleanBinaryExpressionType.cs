@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -14,9 +13,9 @@ namespace PocketSql.Evaluation
                     return left && right;
                 case BooleanBinaryExpressionType.Or:
                     return left || right;
+                default:
+                    throw FeatureNotSupportedException.Value(op);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

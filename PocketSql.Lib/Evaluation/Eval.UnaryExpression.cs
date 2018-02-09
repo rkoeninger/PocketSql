@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -15,9 +14,9 @@ namespace PocketSql.Evaluation
                     return -1 * (decimal)value;
                 case UnaryExpressionType.BitwiseNot:
                     return ~(int)value;
+                default:
+                    throw FeatureNotSupportedException.Value(op);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

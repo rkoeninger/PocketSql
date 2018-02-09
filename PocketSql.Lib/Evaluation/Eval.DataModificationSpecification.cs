@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -17,9 +16,9 @@ namespace PocketSql.Evaluation
                     return Evaluate(delete, env);
                 case UpdateSpecification update:
                     return Evaluate(update, env);
+                default:
+                    throw FeatureNotSupportedException.Subtype(dml);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

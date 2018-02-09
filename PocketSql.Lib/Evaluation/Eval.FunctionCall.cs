@@ -46,7 +46,7 @@ namespace PocketSql.Evaluation
                 return row.Select(x => Evaluate(expr, x, env)).Cast<int>().Sum();
             }
 
-            throw new NotImplementedException();
+            throw FeatureNotSupportedException.Value(funCall);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -25,9 +24,9 @@ namespace PocketSql.Evaluation
                         binaryExpr.All,
                         Evaluate(binaryExpr.FirstQueryExpression, env).ResultSet,
                         Evaluate(binaryExpr.SecondQueryExpression, env).ResultSet);
+                default:
+                    throw FeatureNotSupportedException.Subtype(queryExpr);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

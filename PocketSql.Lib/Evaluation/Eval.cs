@@ -44,9 +44,8 @@ namespace PocketSql.Evaluation
                         scalar.Expression
                     )}.AsEnumerable();
                 case SelectSetVariable set:
-                    throw new NotImplementedException("SelectSetVariable not implemented");
                 default:
-                    throw new NotImplementedException();
+                    throw FeatureNotSupportedException.Subtype(s);
             }
         };
 
@@ -110,9 +109,9 @@ namespace PocketSql.Evaluation
                             return typeof(string);
                         default: return env.Functions[fun.FunctionName.Value].ReturnType;
                     }
+                default:
+                    throw FeatureNotSupportedException.Value(expr);
             }
-
-            throw new NotImplementedException();
         }
 
         private static Type TranslateType(DataTypeReference typeRef)
@@ -144,10 +143,12 @@ namespace PocketSql.Evaluation
                         return typeof(string);
                     case SqlDataTypeOption.Sql_Variant:
                         return typeof(object);
+                    default:
+                        throw FeatureNotSupportedException.Value(type.SqlDataTypeOption);
                 }
             }
 
-            throw new NotImplementedException();
+            throw FeatureNotSupportedException.Subtype(typeRef);
         }
     }
 }

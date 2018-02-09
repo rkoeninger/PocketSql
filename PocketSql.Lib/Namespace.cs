@@ -12,17 +12,23 @@ namespace PocketSql
 
         public T this[string name]
         {
-            get
-            {
-                if (!IsDefined(name)) throw new Exception($"{typeof(T).Name} \"{name}\" not defined");
-                return members[name];
-            }
-            set
-            {
-                if (!IsDefined(name)) throw new Exception($"{typeof(T).Name} \"{name}\" not defined");
-                members[name] = value;
-            }
+            get => Get(name);
+            set => Set(name, value);
         }
+
+        public T Get(string name)
+        {
+            if (!IsDefined(name)) throw new Exception($"{typeof(T).Name} \"{name}\" not defined");
+            return members[name];
+        }
+
+        public void Set(string name, T value)
+        {
+            if (!IsDefined(name)) throw new Exception($"{typeof(T).Name} \"{name}\" not defined");
+            members[name] = value;
+        }
+
+        public void Set<U>(U value) where U : T, INamed => Set(value.Name, value);
 
         public void Declare(string name, T value)
         {

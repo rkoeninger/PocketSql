@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -16,9 +15,9 @@ namespace PocketSql.Evaluation
                     return Evaluate(table, insert.Columns, values, env);
                 case SelectInsertSource select:
                     return Evaluate(table, insert.Columns, Evaluate(select.Select, env).ResultSet, env);
+                default:
+                    throw FeatureNotSupportedException.Subtype(insert.InsertSource);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

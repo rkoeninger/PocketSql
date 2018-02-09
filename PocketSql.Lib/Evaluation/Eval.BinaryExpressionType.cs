@@ -29,9 +29,9 @@ namespace PocketSql.Evaluation
                     return (int)left & (int)right;
                 case BinaryExpressionType.BitwiseXor:
                     return (int)left ^ (int)right;
+                default:
+                    throw FeatureNotSupportedException.Value(op);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

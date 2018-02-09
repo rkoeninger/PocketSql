@@ -96,6 +96,7 @@
     <Compile Include="Evaluation\Eval.ValuesInsertSource.cs" />
     <Compile Include="Evaluation\Eval.WhileStatement.cs" />
     <Compile Include="Evaluation\Eval.TruncateTableStatement.cs" />
+    <Compile Include="FeatureNotSupportedException.cs" />
     <Compile Include="Function.cs" />
     <Compile Include="INamed.cs" />
     <Compile Include="Namespace.cs" />

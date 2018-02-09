@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
@@ -19,7 +18,6 @@ namespace PocketSql.Evaluation
                     // EXCEPT ALL operator does not remove duplicates. For purposes of
                     // row elimination and duplicate removal, the EXCEPT operator does
                     // not distinguish between NULLs.
-                    break;
                 case BinaryQueryExpressionType.Intersect:
                     // The SQL INTERSECT operator takes the results of two queries and
                     // returns only rows that appear in both result sets.For purposes of
@@ -27,7 +25,6 @@ namespace PocketSql.Evaluation
                     // NULLs.The INTERSECT operator removes duplicate rows from the final
                     // result set. The INTERSECT ALL operator does not remove duplicate rows
                     // from the final result set.
-                    break;
                 case BinaryQueryExpressionType.Union:
                     // In SQL the UNION clause combines the results of two SQL queries into
                     // a single table of all matching rows. The two queries must result in
@@ -46,10 +43,9 @@ namespace PocketSql.Evaluation
                     // must be used.
 
                     // Note that UNION ALL may be much faster than plain UNION.
-                    break;
+                default:
+                    throw FeatureNotSupportedException.Value(type);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

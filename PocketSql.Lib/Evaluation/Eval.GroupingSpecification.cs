@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
@@ -12,9 +11,9 @@ namespace PocketSql.Evaluation
             {
                 case ExpressionGroupingSpecification expr:
                     return Evaluate(expr.Expression, row, env);
+                default:
+                    throw FeatureNotSupportedException.Subtype(groupingSpec);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

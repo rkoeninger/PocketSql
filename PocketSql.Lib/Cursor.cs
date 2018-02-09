@@ -14,10 +14,10 @@ namespace PocketSql
         }
 
         private readonly QueryExpression query;
-        private bool scroll;
+        private readonly bool scroll;
         private DataTable results;
         private int index;
-        private bool open = false;
+        private bool open;
 
         public void Open(Env env)
         {
@@ -38,14 +38,14 @@ namespace PocketSql
             results = null;
         }
 
-        public DataRow MoveFirst() => Access(false, _ => 0);
-        public DataRow MoveLast() => Access(true, _ => results.Rows.Count - 1);
-        public DataRow MoveNext() => Access(false, x => x + 1);
-        public DataRow MovePrior() => Access(true, x => x - 1);
-        public DataRow MoveAbsolute(int offset) => Access(true, _ => offset);
-        public DataRow MoveRelative(int offset) => Access(true, x => x + offset);
-
-        private DataRow Access(bool requiresScroll, Func<int, int> f)
+        public DataRow MoveFirst() => Access(_ => 0, false);
+        public DataRow MoveLast() => Access(_ => results.Rows.Count - 1);
+        public DataRow MoveNext() => Access(x => x + 1, false);
+        public DataRow MovePrior() => Access(x => x - 1);
+        public DataRow MoveAbsolute(int offset) => Access(_ => offset);
+        public DataRow MoveRelative(int offset) => Access(x => x + offset);
+        
+        private DataRow Access(Func<int, int> f, bool requiresScroll = true)
         {
             if (requiresScroll && !scroll) throw new InvalidOperationException("Cusor must be scroll cursor to fetch last, prior, absolute, relative");
             if (!open) throw new InvalidOperationException("Cursor has been closed");

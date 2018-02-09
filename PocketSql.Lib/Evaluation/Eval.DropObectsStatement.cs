@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -21,9 +20,9 @@ namespace PocketSql.Evaluation
                 case DropViewStatement _:
                     DropAll(drop, env.Views);
                     return;
+                default:
+                    throw FeatureNotSupportedException.Subtype(drop);
             }
-
-            throw new NotImplementedException();
         }
 
         private static void DropAll<T>(DropObjectsStatement drop, Namespace<T> ns)

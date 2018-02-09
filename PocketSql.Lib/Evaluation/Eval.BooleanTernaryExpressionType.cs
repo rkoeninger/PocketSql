@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -19,9 +18,9 @@ namespace PocketSql.Evaluation
                     return (int)first >= (int)second && (int)first <= (int)third;
                 case BooleanTernaryExpressionType.NotBetween:
                     return (int)first < (int)second || (int)first > (int)third;
+                default:
+                    throw FeatureNotSupportedException.Value(type);
             }
-
-            throw new Exception();
         }
     }
 }

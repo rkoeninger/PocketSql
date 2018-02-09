@@ -12,13 +12,15 @@ namespace PocketSql.Evaluation
             {
                 case InsertMergeAction insert:
                     Evaluate(targetTable, insert.Columns, insert.Source, env);
-                    break;
+                    return;
                 case UpdateMergeAction update:
                     Evaluate(update.SetClauses, row, null, env);
-                    break;
+                    return;
                 case DeleteMergeAction _:
                     targetTable.Rows.Remove(row);
-                    break;
+                    return;
+                default:
+                    throw FeatureNotSupportedException.Subtype(action);
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
@@ -11,32 +10,20 @@ namespace PocketSql.Evaluation
             switch (exec)
             {
                 case AlterFunctionStatement alterFunc:
-                    {
-                        var func = BuildFunc(alterFunc);
-                        env.Functions[func.Name] = func;
-                    }
+                    env.Functions.Set(BuildFunc(alterFunc));
                     return;
                 case AlterProcedureStatement alterProc:
-                    {
-                        var proc = BuildProc(alterProc);
-                        env.Procedures[proc.Name] = proc;
-                    }
+                    env.Procedures.Set(BuildProc(alterProc));
                     return;
                 case CreateFunctionStatement createFunc:
-                    {
-                        var func = BuildFunc(createFunc);
-                        env.Functions.Declare(func.Name, func);
-                    }
+                    env.Functions.Declare(BuildFunc(createFunc));
                     return;
                 case CreateProcedureStatement createProc:
-                    {
-                        var proc = BuildProc(createProc);
-                        env.Procedures.Declare(proc.Name, proc);
-                    }
+                    env.Procedures.Declare(BuildProc(createProc));
                     return;
+                default:
+                    throw FeatureNotSupportedException.Subtype(exec);
             }
-
-            throw new NotSupportedException();
         }
 
         private static Function BuildFunc(FunctionStatementBody funcExpr) =>

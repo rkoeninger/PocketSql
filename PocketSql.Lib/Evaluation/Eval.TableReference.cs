@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
@@ -20,13 +19,12 @@ namespace PocketSql.Evaluation
                     return Evaluate(dml.DataModificationSpecification, env).ResultSet;
                 case JoinParenthesisTableReference paren:
                     return Evaluate(paren.Join, joinedTables, env);
-                case JoinTableReference join:
-                    break;
                 case OdbcQualifiedJoinTableReference odbc:
                     return Evaluate(odbc.TableReference, joinedTables, env);
+                case JoinTableReference join:
+                default:
+                    throw FeatureNotSupportedException.Subtype(tableRef);
             }
-
-            throw new NotImplementedException();
         }
     }
 }

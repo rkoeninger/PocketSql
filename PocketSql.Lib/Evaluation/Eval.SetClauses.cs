@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
@@ -25,7 +24,7 @@ namespace PocketSql.Evaluation
                             Evaluate(set.NewValue, row, env));
                         break;
                     default:
-                        throw new NotImplementedException();
+                        throw FeatureNotSupportedException.Subtype(clause);
                 }
 
                 if (output != null)
