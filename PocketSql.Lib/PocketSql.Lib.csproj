@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CaseInsensitivity.cs" />
     <Compile Include="Cursor.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Engine.cs" />

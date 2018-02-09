@@ -6,7 +6,7 @@ namespace PocketSql
     public class Namespace<T>
     {
         private readonly IDictionary<string, T> members =
-            new Dictionary<string, T>(new CaseInsensitivity.EqualityComparer());
+            new Dictionary<string, T>(new Naming.EqualityComparer());
 
         public bool IsDefined(string name) => members.ContainsKey(name);
 
