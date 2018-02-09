@@ -5,6 +5,7 @@
         public Database(string name)
         {
             Name = name;
+            Schemas.Declare(new Schema("dbo"));
         }
 
         public string Name { get; }

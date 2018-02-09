@@ -13,10 +13,7 @@ namespace PocketSql
         private Engine(SqlVersion sqlVersion)
         {
             this.sqlVersion = sqlVersion;
-            var dbo = new Schema("dbo");
-            var master = new Database("master");
-            master.Schemas.Declare(dbo);
-            Databases.Declare(master);
+            Databases.Declare(new Database("master"));
         }
 
         private static SqlVersion IntToSqlVersion(int version) =>
