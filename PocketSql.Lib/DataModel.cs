@@ -106,24 +106,28 @@ namespace PocketSql
 
     public class RowArgument : IArgument
     {
+        public RowArgument(DataRow value)
+        {
+            Value = value;
+        }
+
         public DataRow Value { get; set; }
     }
 
     public class GroupArgument : IArgument
     {
+        public GroupArgument(EquatableList key, List<DataRow> rows)
+        {
+            Key = key;
+            Rows = rows;
+        }
+
         public EquatableList Key { get; set; }
         public List<DataRow> Rows { get; set; }
     }
 
-    public class ScalarArgument : IArgument
+    public class NullArgument : IArgument
     {
-        public object Value { get; }
-
-        public ScalarArgument(object value)
-        {
-            Value = value;
-        }
+        public static NullArgument It = new NullArgument();
     }
-
-    public class NullArgument : IArgument { }
 }
