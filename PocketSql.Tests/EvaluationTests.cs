@@ -605,6 +605,18 @@ namespace PocketSql.Tests
             }
         }
 
+        [Test]
+        public void SelectCaseExpression()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                Assert.AreEqual(4, connection.QueryFirst<int>(@"
+                    select (case 'a' when 'a' then 4 else 3 end)"));
+            }
+        }
+
         public class Person
         {
             public string Name { get; set; }

@@ -82,6 +82,8 @@ namespace PocketSql.Evaluation
 
             switch (expr)
             {
+                case ParenthesisExpression paren:
+                    return InferType(paren.Expression, table, env);
                 case IntegerLiteral _:
                     return typeof(int);
                 case StringLiteral _:
@@ -109,6 +111,8 @@ namespace PocketSql.Evaluation
                             return typeof(string);
                         default: return env.Functions[fun.FunctionName.Value].ReturnType;
                     }
+                case CaseExpression c:
+                    return InferType(c.ElseExpression, table, env);
                 default:
                     throw FeatureNotSupportedException.Value(expr);
             }
