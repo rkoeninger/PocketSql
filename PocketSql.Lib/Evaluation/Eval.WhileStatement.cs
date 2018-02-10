@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
@@ -9,7 +8,7 @@ namespace PocketSql.Evaluation
         {
             EngineResult result = null;
 
-            while (Evaluate(loop.Predicate, (DataRow)null, env))
+            while (Evaluate(loop.Predicate, NullArgument.It, env))
             {
                 result = Evaluate(loop.Statement, env);
             }

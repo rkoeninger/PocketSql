@@ -7,7 +7,7 @@ namespace PocketSql.Evaluation
     {
         public static EngineResult Evaluate(IfStatement conditional, Env env) =>
             Evaluate(
-                Evaluate(conditional.Predicate, (DataRow)null, env)
+                Evaluate(conditional.Predicate, NullArgument.It, env)
                     ? conditional.ThenStatement
                     : conditional.ElseStatement,
                 env);

@@ -6,7 +6,7 @@ namespace PocketSql.Evaluation
     {
         public static EngineResult Evaluate(SetVariableStatement set, Env env)
         {
-            env.Vars[set.Variable.Name] = Evaluate(set.Expression, env);
+            env.Vars[set.Variable.Name] = Evaluate(set.Expression, NullArgument.It, env);
             return null;
         }
     }

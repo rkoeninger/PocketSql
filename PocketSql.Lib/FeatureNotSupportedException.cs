@@ -8,7 +8,7 @@ namespace PocketSql
             new FeatureNotSupportedException($"{val} is not a supported value of {typeof(T).Name}");
 
         public static FeatureNotSupportedException Subtype<T>(T obj) =>
-            new FeatureNotSupportedException($"{obj.GetType()} is not a supported type of {typeof(T).Name}");
+            new FeatureNotSupportedException($"{obj.GetType().Name} is not a supported type of {typeof(T).Name}");
 
         public FeatureNotSupportedException(string message)
             : base(message) { }

@@ -52,7 +52,7 @@ namespace PocketSql.Evaluation
                 case ExecuteStatement exec:
                     return Evaluate(exec.ExecuteSpecification, env);
                 case ReturnStatement ret:
-                    env.ReturnValue = Evaluate(ret.Expression, env);
+                    env.ReturnValue = Evaluate(ret.Expression, NullArgument.It, env);
                     return null;
                 case DeclareCursorStatement declare:
                     Evaluate(declare, env);

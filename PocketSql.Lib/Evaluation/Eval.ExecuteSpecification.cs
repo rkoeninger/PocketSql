@@ -15,7 +15,11 @@ namespace PocketSql.Evaluation
             return Evaluate(
                 proc,
                 execRef.Parameters
-                    .Select(p => (p.Variable.Name, !p.IsOutput, p.IsOutput, Evaluate(p.ParameterValue, env)))
+                    .Select(p => (
+                        p.Variable.Name,
+                        !p.IsOutput,
+                        p.IsOutput,
+                        Evaluate(p.ParameterValue, NullArgument.It, env)))
                     .ToList(),
                 env);
         }

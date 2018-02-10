@@ -19,7 +19,7 @@ namespace PocketSql.Evaluation
                 for (var i = 0; i < cols.Count; ++i)
                 {
                     row[cols[i].MultiPartIdentifier.Identifiers[0].Value] =
-                        Evaluate(valuesExpr.ColumnValues[i], env);
+                        Evaluate(valuesExpr.ColumnValues[i], NullArgument.It, env);
                 }
 
                 table.Rows.Add(row);

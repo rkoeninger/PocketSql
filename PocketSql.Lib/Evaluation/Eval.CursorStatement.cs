@@ -55,9 +55,9 @@ namespace PocketSql.Evaluation
                 case FetchOrientation.Last:
                     return cursor.MoveLast();
                 case FetchOrientation.Absolute:
-                    return cursor.MoveAbsolute((int)Evaluate(fetch.FetchType.RowOffset, env));
+                    return cursor.MoveAbsolute((int)Evaluate(fetch.FetchType.RowOffset, NullArgument.It, env));
                 case FetchOrientation.Relative:
-                    return cursor.MoveRelative((int)Evaluate(fetch.FetchType.RowOffset, env));
+                    return cursor.MoveRelative((int)Evaluate(fetch.FetchType.RowOffset, NullArgument.It, env));
                 default:
                     throw FeatureNotSupportedException.Value(orientation);
             }

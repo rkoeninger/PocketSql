@@ -48,6 +48,8 @@ namespace PocketSql
             members.Remove(name);
         }
 
+        public void DropIfExists(string name) => members.Remove(name);
+
         public Namespace<T> Copy()
         {
             var ns = new Namespace<T>();

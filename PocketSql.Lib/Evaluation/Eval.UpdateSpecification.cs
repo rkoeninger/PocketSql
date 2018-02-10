@@ -35,7 +35,7 @@ namespace PocketSql.Evaluation
 
             foreach (DataRow row in table.Rows)
             {
-                if (update.WhereClause == null || Evaluate(update.WhereClause.SearchCondition, row, env))
+                if (update.WhereClause == null || Evaluate(update.WhereClause.SearchCondition, new RowArgument(row), env))
                 {
                     Evaluate(update.SetClauses, row, output, env);
                     rowCount++;

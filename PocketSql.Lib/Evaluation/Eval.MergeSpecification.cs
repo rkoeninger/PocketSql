@@ -26,7 +26,7 @@ namespace PocketSql.Evaluation
                 // TODO: need to respect table aliases and combine rows
                 // TODO: need to define new row classes that aggregate rows via aliases
                 var targetRow = targetTable.Rows.Cast<DataRow>().FirstOrDefault(x =>
-                    Evaluate(merge.SearchCondition, row, env));
+                    Evaluate(merge.SearchCondition, new RowArgument(row), env));
 
                 if (targetRow == null)
                 {
@@ -42,7 +42,7 @@ namespace PocketSql.Evaluation
             foreach (DataRow row in targetTable.Rows)
             {
                 var sourceRow = sourceTable.Rows.Cast<DataRow>().FirstOrDefault(x =>
-                    Evaluate(merge.SearchCondition, row, env));
+                    Evaluate(merge.SearchCondition, new RowArgument(row), env));
 
                 if (sourceRow == null)
                 {
@@ -56,7 +56,7 @@ namespace PocketSql.Evaluation
             {
                 foreach (var row in matched)
                 {
-                    if (Evaluate(clause.SearchCondition, row, env))
+                    if (Evaluate(clause.SearchCondition, new RowArgument(row), env))
                     {
                         rowCount++;
                         Evaluate(clause.Action, targetTable, row, env);
@@ -72,7 +72,7 @@ namespace PocketSql.Evaluation
             {
                 foreach (var row in notMatchedByTarget)
                 {
-                    if (Evaluate(clause.SearchCondition, row, env))
+                    if (Evaluate(clause.SearchCondition, new RowArgument(row), env))
                     {
                         rowCount++;
                         Evaluate(clause.Action, targetTable, row, env);
@@ -86,7 +86,7 @@ namespace PocketSql.Evaluation
             {
                 foreach (var row in notMatchedBySource)
                 {
-                    if (Evaluate(clause.SearchCondition, row, env))
+                    if (Evaluate(clause.SearchCondition, new RowArgument(row), env))
                     {
                         rowCount++;
                         Evaluate(clause.Action, targetTable, row, env);

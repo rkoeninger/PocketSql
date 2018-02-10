@@ -37,7 +37,7 @@ namespace PocketSql.Evaluation
 
                 for (var i = 0; i < selections.Count; ++i)
                 {
-                    resultRow[i] = Evaluate(selections[i].Item3, env);
+                    resultRow[i] = Evaluate(selections[i].Item3, NullArgument.It, env);
                 }
 
                 projection.Rows.Add(resultRow);
@@ -50,7 +50,8 @@ namespace PocketSql.Evaluation
 
             foreach (DataRow row in table.Rows)
             {
-                if (querySpec.WhereClause == null || Evaluate(querySpec.WhereClause.SearchCondition, row, env))
+                if (querySpec.WhereClause == null
+                    || Evaluate(querySpec.WhereClause.SearchCondition, new RowArgument(row), env))
                 {
                     CopyOnto(row, tableCopy);
                 }
@@ -67,26 +68,26 @@ namespace PocketSql.Evaluation
 
                 var groups = rows.GroupBy(row =>
                     EquatableList.Of(querySpec.GroupByClause.GroupingSpecifications
-                        .Select(g => (InferName(g), Evaluate(g, row, env))))).ToList();
+                        .Select(g => (InferName(g), Evaluate(g, new RowArgument(row), env))))).ToList();
 
                 // HAVING
 
                 if (querySpec.HavingClause != null)
                 {
                     groups = groups
-                        .Where(x => Evaluate(querySpec.HavingClause.SearchCondition, x, env))
+                        .Where(x => Evaluate(querySpec.HavingClause.SearchCondition, new GroupArgument(x.Key, x.ToList()), env))
                         .ToList();
                 }
 
                 // SELECT
 
-                Select(Evaluate, groups, projection, selections, env);
+                Select(Evaluate, groups.Select(x => new GroupArgument(x.Key, x.ToList())), projection, selections, env);
             }
             else
             {
                 // SELECT
 
-                Select(Evaluate, tableCopy.Rows.Cast<DataRow>(), projection, selections, env);
+                Select(Evaluate, tableCopy.Rows.Cast<DataRow>().Select(x => new RowArgument(x)), projection, selections, env);
             }
 
             // DISTINCT
@@ -139,8 +140,8 @@ namespace PocketSql.Evaluation
 
             if (querySpec.OffsetClause != null)
             {
-                var offset = (int)Evaluate(querySpec.OffsetClause.OffsetExpression, env);
-                var fetch = (int)Evaluate(querySpec.OffsetClause.FetchExpression, env);
+                var offset = (int)Evaluate(querySpec.OffsetClause.OffsetExpression, NullArgument.It, env);
+                var fetch = (int)Evaluate(querySpec.OffsetClause.FetchExpression, NullArgument.It, env);
 
                 for (var i = 0; i < offset; ++i)
                 {
@@ -201,7 +202,7 @@ namespace PocketSql.Evaluation
             ExpressionWithSortOrder element,
             Env env)
         {
-            object Func(DataRow x) => Evaluate(element.Expression, x, env);
+            object Func(DataRow x) => Evaluate(element.Expression, new RowArgument(x), env);
             return element.SortOrder == SortOrder.Descending ? seq.OrderByDescending(Func) : seq.OrderBy(Func);
         }
 
@@ -210,7 +211,7 @@ namespace PocketSql.Evaluation
             ExpressionWithSortOrder element,
             Env env)
         {
-            object Func(DataRow x) => Evaluate(element.Expression, x, env);
+            object Func(DataRow x) => Evaluate(element.Expression, new RowArgument(x), env);
             return element.SortOrder == SortOrder.Descending ? seq.ThenByDescending(Func) : seq.ThenBy(Func);
         }
     }

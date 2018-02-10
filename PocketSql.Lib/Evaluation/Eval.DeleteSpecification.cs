@@ -13,7 +13,8 @@ namespace PocketSql.Evaluation
 
             foreach (DataRow row in table.Rows)
             {
-                if (delete.WhereClause == null || Evaluate(delete.WhereClause.SearchCondition, row, env))
+                if (delete.WhereClause == null
+                    || Evaluate(delete.WhereClause.SearchCondition, new RowArgument(row), env))
                 {
                     table.Rows.Remove(row);
                     rowCount++;

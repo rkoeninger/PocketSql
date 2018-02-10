@@ -10,7 +10,7 @@ namespace PocketSql.Evaluation
             {
                 env.Vars.Declare(
                     declaration.VariableName.Value,
-                    declaration.Value == null ? null : Evaluate(declaration.Value, env));
+                    declaration.Value == null ? null : Evaluate(declaration.Value, NullArgument.It, env));
             }
 
             return null;

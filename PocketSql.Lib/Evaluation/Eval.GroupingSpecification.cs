@@ -1,11 +1,10 @@
-﻿using System.Data;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static object Evaluate(GroupingSpecification groupingSpec, DataRow row, Env env)
+        public static object Evaluate(GroupingSpecification groupingSpec, RowArgument row, Env env)
         {
             switch (groupingSpec)
             {

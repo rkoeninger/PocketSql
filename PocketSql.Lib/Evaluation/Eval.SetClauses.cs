@@ -21,7 +21,7 @@ namespace PocketSql.Evaluation
                         row[columnName] = Evaluate(
                             set.AssignmentKind,
                             row[columnName],
-                            Evaluate(set.NewValue, row, env));
+                            Evaluate(set.NewValue, new RowArgument(row), env));
                         break;
                     default:
                         throw FeatureNotSupportedException.Subtype(clause);
