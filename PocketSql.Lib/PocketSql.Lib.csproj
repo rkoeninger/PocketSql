@@ -52,6 +52,7 @@
     <Compile Include="EngineParameterCollection.cs" />
     <Compile Include="EngineResult.cs" />
     <Compile Include="EngineTransaction.cs" />
+    <Compile Include="Equality.cs" />
     <Compile Include="EquatableList.cs" />
     <Compile Include="Evaluation\Eval.AssignmentKind.cs" />
     <Compile Include="Evaluation\Eval.BinaryExpressionType.cs" />

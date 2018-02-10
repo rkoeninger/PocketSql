@@ -1,40 +1,27 @@
-﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using System.Linq;
+using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static object Evaluate(CaseExpression expr, IArgument arg, Env env)
+        public static object Evaluate(CaseExpression expr, IArgument arg, Env env) =>
+            Evaluate(MatchingClause(expr, arg, env)?.ThenExpression ?? expr.ElseExpression, arg, env);
+
+        private static WhenClause MatchingClause(CaseExpression expr, IArgument arg, Env env)
         {
             switch (expr)
             {
                 case SimpleCaseExpression simple:
                     var input = Evaluate(simple.InputExpression, arg, env);
-
-                    foreach (var clause in simple.WhenClauses)
-                    {
-                        if (input != null && input.Equals(Evaluate(clause.WhenExpression, arg, env)))
-                        {
-                            return Evaluate(clause.ThenExpression, arg, env);
-                        }
-                    }
-
-                    break;
+                    return simple.WhenClauses
+                        .FirstOrDefault(x => Equality.Equal(input, Evaluate(x.WhenExpression, arg, env)));
                 case SearchedCaseExpression searched:
-                    foreach (var clause in searched.WhenClauses)
-                    {
-                        if (Evaluate(clause.WhenExpression, arg, env))
-                        {
-                            return Evaluate(clause.ThenExpression, arg, env);
-                        }
-                    }
-
-                    break;
+                    return searched.WhenClauses
+                        .FirstOrDefault(x => Evaluate(x.WhenExpression, arg, env));
                 default:
                     throw FeatureNotSupportedException.Subtype(expr);
             }
-
-            return Evaluate(expr.ElseExpression, arg, env);
         }
     }
 }
