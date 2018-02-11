@@ -110,12 +110,6 @@
   <ItemGroup>
     <None Include="paket.references" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\paket-files\rkoeninger\KitchenSink\KitchenSink.Lib\KitchenSink.Lib.csproj">
-      <Project>{e993d487-e0d8-44ef-87d8-d335ecaa6cfa}</Project>
-      <Name>KitchenSink.Lib</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\.paket\paket.targets" />
   <Choose>
