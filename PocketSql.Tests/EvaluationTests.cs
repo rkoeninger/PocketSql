@@ -340,6 +340,58 @@ namespace PocketSql.Tests
             }
         }
 
+        [Test, Ignore("Need to be able to have join rows")]
+        public void MergePermanentTableOntoPermanentTable()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute("create table Source (SourceId int, SourceAmount int)");
+
+                Assert.AreEqual(4, connection.Execute(@"
+                    insert into Source
+                    (SourceId, SourceAmount)
+                    values
+                    (1, 20),
+                    (2, 50),
+                    (3, 30),
+                    (4, 90)"));
+
+                connection.Execute("create table Target (TargetId int, TargetAmount int)");
+
+                Assert.AreEqual(4, connection.Execute(@"
+                    insert into Target
+                    (TargetId, TargetAmount)
+                    values
+                    (1, 30),
+                    (3, 10),
+                    (5, 100),
+                    (6, 80)"));
+
+                connection.Execute(@"
+                    merge Target
+                    using Source
+                    on TargetId = SourceId
+                    when matched then
+                        update set
+                            TargetAmount += SourceAmount
+                    when not matched then
+                        insert (TargetId, TargetAmount)
+                        values (SourceId, SourceAmount);");
+
+                int GetTargetAmount(int id) =>
+                    connection.QueryFirst<int>(@"
+                        select TargetAmount
+                        from Target
+                        where TargetId = @id", new { id });
+
+                Assert.AreEqual(50, GetTargetAmount(1));
+                Assert.AreEqual(90, GetTargetAmount(4));
+                Assert.AreEqual(80, GetTargetAmount(6));
+            }
+        }
+
         [Test]
         public void StoredProc()
         {
@@ -614,6 +666,15 @@ namespace PocketSql.Tests
             {
                 Assert.AreEqual(4, connection.QueryFirst<int>(@"
                     select (case 'a' when 'a' then 4 else 3 end)"));
+
+                Assert.AreEqual(3, connection.QueryFirst<int>(@"
+                    select (case 'a' when 'b' then 4 else 3 end)"));
+
+                Assert.AreEqual(4, connection.QueryFirst<int>(@"
+                    select (case when 1 = 1 then 4 else 3 end)"));
+
+                Assert.AreEqual(3, connection.QueryFirst<int>(@"
+                    select (case when 1 = 0 then 4 else 3 end)"));
             }
         }
 

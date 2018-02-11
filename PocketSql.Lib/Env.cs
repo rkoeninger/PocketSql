@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace PocketSql
 {
@@ -44,6 +45,39 @@ namespace PocketSql
         public Namespace<Procedure> Procedures => Schema.Procedures;
         public Namespace<DataTable> Tables => Schema.Tables;
         public Namespace<View> Views => Schema.Views;
+
+        public Database GetDatabase(Identifier id) =>
+            id?.Value == null ? Engine.Databases[DefaultDatabase] : Engine.Databases[id.Value];
+
+        public Schema GetSchema(Database database, Identifier id) =>
+            id?.Value == null ? database.Schemas[DefaultSchema] : database.Schemas[id.Value];
+
+        public Schema GetSchema(SchemaObjectName id) =>
+            GetSchema(GetDatabase(id.DatabaseIdentifier), id.SchemaIdentifier);
+
+        public Function GetFunction(Schema schema, Identifier id) =>
+            schema.Functions[id.Value];
+
+        public Procedure GetProcedure(Schema schema, Identifier id) =>
+            schema.Procedures[id.Value];
+
+        public DataTable GetTable(Schema schema, Identifier id) =>
+            schema.Tables[id.Value];
+
+        public View GetView(Schema schema, Identifier id) =>
+            schema.Views[id.Value];
+
+        public Function GetFunction(SchemaObjectName id) =>
+            GetFunction(GetSchema(id), id.BaseIdentifier);
+
+        public Procedure GetProcedure(SchemaObjectName id) =>
+            GetProcedure(GetSchema(id), id.BaseIdentifier);
+
+        public DataTable GetTable(SchemaObjectName id) =>
+            GetTable(GetSchema(id), id.BaseIdentifier);
+
+        public View GetView(SchemaObjectName id) =>
+            GetView(GetSchema(id), id.BaseIdentifier);
 
         public object GetGlobal(string name)
         {
