@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Evaluation;
+using PocketSql.Modeling;
 
 namespace PocketSql
 {

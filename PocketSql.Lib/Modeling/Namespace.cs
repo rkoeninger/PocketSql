@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PocketSql
+namespace PocketSql.Modeling
 {
     public class Namespace<T>
     {

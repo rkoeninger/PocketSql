@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
+using PocketSql.Modeling;
 
 namespace PocketSql.Evaluation
 {

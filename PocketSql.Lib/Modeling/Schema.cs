@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace PocketSql
+namespace PocketSql.Modeling
 {
     public class Schema : INamed
     {

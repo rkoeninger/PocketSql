@@ -1,4 +1,4 @@
-﻿namespace PocketSql
+﻿namespace PocketSql.Modeling
 {
     public interface INamed
     {
