@@ -26,6 +26,7 @@ namespace PocketSql.Modeling
         public override int GetHashCode() =>
             Elements.Aggregate(1, (hash, obj) => hash + obj.GetHashCode() * 357);
 
-        public bool Equals(EquatableList other) => Elements.SequenceEqual(other.Elements);
+        public bool Equals(EquatableList other) =>
+            other?.Elements.SequenceEqual(Elements) ?? false;
     }
 }
