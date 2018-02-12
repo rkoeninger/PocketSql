@@ -14,8 +14,66 @@ namespace PocketSql
     {
         public string Name { get; set; }
         public DbType DbType { get; set; }
-        public Type CsType { get; set; }
         public bool Nullable { get; set; }
+        public Maybe<int> Size { get; set; }
+
+        // TODO: need to consider implicit conversions
+        public bool IsValid(object value)
+        {
+            if (value == null || value == DBNull.Value) return Nullable;
+
+            switch (DbType)
+            {
+                case DbType.Single:
+                    return value is float;
+                case DbType.Double:
+                    return value is double;
+                case DbType.Decimal:
+                    return value is decimal;
+                case DbType.Byte:
+                    return value is byte;
+                case DbType.UInt16:
+                    return value is ushort;
+                case DbType.UInt32:
+                    return value is uint;
+                case DbType.UInt64:
+                    return value is ulong;
+                case DbType.SByte:
+                    return value is sbyte;
+                case DbType.Int16:
+                    return value is short;
+                case DbType.Int32:
+                    return value is int;
+                case DbType.Int64:
+                    return value is long;
+                case DbType.Boolean:
+                    return value is bool;
+                case DbType.Date:
+                case DbType.DateTime:
+                case DbType.DateTime2:
+                case DbType.DateTimeOffset:
+                    return value is DateTime;
+                case DbType.Guid:
+                    return value is Guid;
+                case DbType.Time:
+                    return value is TimeSpan;
+                case DbType.AnsiString:
+                case DbType.AnsiStringFixedLength:
+                case DbType.String:
+                case DbType.StringFixedLength:
+                    return Maybe.Some(value)
+                        .OfType<string>()
+                        .Select(v => Size.Select(s => v.Length <= s).OrElse(true))
+                        .OrElse(false);
+                case DbType.Object:
+                    return true;
+                case DbType.Currency:
+                case DbType.VarNumeric:
+                case DbType.Xml:
+                default:
+                    throw FeatureNotSupportedException.Value(DbType);
+            }
+        }
     }
 
     public interface IHeading

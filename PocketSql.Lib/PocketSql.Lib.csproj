@@ -99,6 +99,7 @@
     <Compile Include="FeatureNotSupportedException.cs" />
     <Compile Include="Function.cs" />
     <Compile Include="INamed.cs" />
+    <Compile Include="Maybe.cs" />
     <Compile Include="Namespace.cs" />
     <Compile Include="Naming.cs" />
     <Compile Include="Procedure.cs" />
