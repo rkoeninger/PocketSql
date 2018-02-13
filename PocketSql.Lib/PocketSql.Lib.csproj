@@ -91,6 +91,7 @@
     <Compile Include="Evaluation\Eval.WhileStatement.cs" />
     <Compile Include="Evaluation\Eval.TruncateTableStatement.cs" />
     <Compile Include="FeatureNotSupportedException.cs" />
+    <Compile Include="Modeling\Column.cs" />
     <Compile Include="Modeling\Cursor.cs" />
     <Compile Include="Modeling\Database.cs" />
     <Compile Include="Modeling\DataModel.cs" />
@@ -100,7 +101,9 @@
     <Compile Include="Modeling\Maybe.cs" />
     <Compile Include="Modeling\Namespace.cs" />
     <Compile Include="Modeling\Procedure.cs" />
+    <Compile Include="Modeling\Row.cs" />
     <Compile Include="Modeling\Schema.cs" />
+    <Compile Include="Modeling\Table.cs" />
     <Compile Include="Modeling\View.cs" />
     <Compile Include="Naming.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

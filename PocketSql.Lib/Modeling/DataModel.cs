@@ -10,7 +10,7 @@ namespace PocketSql.Modeling
     // TODO: or they might have no name and only an ordinal
     // TODO: need a class just for a table cell/passable reference?
 
-    public class Column
+    public class BaseColumn
     {
         public string Name { get; set; }
         public DbType DbType { get; set; }
@@ -78,7 +78,7 @@ namespace PocketSql.Modeling
 
     public interface IHeading
     {
-        IList<Column> Columns { get; set; }
+        IList<BaseColumn> Columns { get; set; }
     }
 
     public interface ITable
@@ -97,10 +97,10 @@ namespace PocketSql.Modeling
 
     public class Heading : IHeading
     {
-        public IList<Column> Columns { get; set; }
+        public IList<BaseColumn> Columns { get; set; }
     }
 
-    public class Table : ITable
+    public class BaseTable : ITable
     {
         public string Database { get; set; }
         public string Schema { get; set; }
@@ -109,7 +109,7 @@ namespace PocketSql.Modeling
         public IList<IRow> Rows { get; } = new List<IRow>();
     }
 
-    public class Row : IRow
+    public class BaseRow : IRow
     {
         public IHeading Heading { get; set; }
         public object[] Items { get; set; }
@@ -128,7 +128,7 @@ namespace PocketSql.Modeling
     {
         public IList<IHeading> Headings { get; set; }
 
-        public IList<Column> Columns
+        public IList<BaseColumn> Columns
         {
             get => Headings.SelectMany(x => x.Columns).ToList();
             set => throw new NotSupportedException();
