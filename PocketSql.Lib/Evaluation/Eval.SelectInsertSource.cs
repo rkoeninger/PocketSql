@@ -1,28 +1,26 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
+using PocketSql.Modeling;
 
 namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
         public static EngineResult Evaluate(
-            DataTable table,
+            Table table,
             IList<ColumnReferenceExpression> cols,
-            DataTable selectedRows,
+            Table selectedRows,
             Env env)
         {
-            foreach (DataRow valuesExpr in selectedRows.Rows)
+            foreach (var valuesExpr in selectedRows.Rows)
             {
                 var row = table.NewRow();
 
                 foreach (var col in cols)
                 {
                     var columnName = col.MultiPartIdentifier.Identifiers[0].Value;
-                    row[columnName] = valuesExpr[columnName];
+                    row.SetValue(columnName, valuesExpr.GetValue(columnName));
                 }
-
-                table.Rows.Add(row);
             }
 
             env.RowCount = selectedRows.Rows.Count;

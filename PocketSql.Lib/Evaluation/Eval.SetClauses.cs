@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Modeling;
@@ -8,7 +7,7 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static void Evaluate(IList<SetClause> clauses, DataRow row, DataTable output, Env env)
+        public static void Evaluate(IList<SetClause> clauses, Row row, Table output, Env env)
         {
             foreach (var clause in clauses)
             {
@@ -18,10 +17,10 @@ namespace PocketSql.Evaluation
                 {
                     case AssignmentSetClause set:
                         var columnName = set.Column.MultiPartIdentifier.Identifiers.Last().Value;
-                        if (output != null) oldValues[columnName] = row[columnName];
-                        row[columnName] = Evaluate(
+                        if (output != null) oldValues[columnName] = row.GetColumn(columnName);
+                        row.Values[row.GetColumnOrdinal(columnName)] = Evaluate(
                             set.AssignmentKind,
-                            row[columnName],
+                            row.Values[row.GetColumnOrdinal(columnName)],
                             Evaluate(set.NewValue, new RowArgument(row), env));
                         break;
                     default:

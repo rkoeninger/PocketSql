@@ -1,12 +1,12 @@
-﻿using System.Data;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
+using PocketSql.Modeling;
 
 namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
         // TODO: return output if output clause is present
-        public static void Evaluate(MergeAction action, DataTable targetTable, DataRow row, Env env)
+        public static void Evaluate(MergeAction action, Table targetTable, Row row, Env env)
         {
             switch (action)
             {

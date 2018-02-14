@@ -1,5 +1,4 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Modeling;
 
@@ -29,7 +28,7 @@ namespace PocketSql.Evaluation
                     env.FetchStatus = result == null ? 1 : 0;
                     if (env.FetchStatus != 0) return;
 
-                    foreach (var (v, x) in fetch.IntoVariables.Zip(result.ItemArray, (v, x) => (v, x)))
+                    foreach (var (v, x) in fetch.IntoVariables.Zip(result.Values, (v, x) => (v, x)))
                     {
                         env.Vars.DeclareOrSet(v.Name, x);
                     }
@@ -40,7 +39,7 @@ namespace PocketSql.Evaluation
             }
         }
 
-        private static DataRow CursorFetch(FetchCursorStatement fetch, Cursor cursor, Env env)
+        private static Row CursorFetch(FetchCursorStatement fetch, Cursor cursor, Env env)
         {
             var orientation = fetch.FetchType?.Orientation ?? FetchOrientation.None;
 

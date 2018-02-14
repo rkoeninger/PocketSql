@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Modeling;
 
@@ -8,7 +7,7 @@ namespace PocketSql.Evaluation
     public static partial class Eval
     {
         public static EngineResult Evaluate(
-            DataTable table,
+            Table table,
             IList<ColumnReferenceExpression> cols,
             ValuesInsertSource values,
             Env env)
@@ -19,11 +18,9 @@ namespace PocketSql.Evaluation
 
                 for (var i = 0; i < cols.Count; ++i)
                 {
-                    row[cols[i].MultiPartIdentifier.Identifiers[0].Value] =
-                        Evaluate(valuesExpr.ColumnValues[i], NullArgument.It, env);
+                    var name = cols[i].MultiPartIdentifier.Identifiers[0].Value;
+                    row.SetValue(name, Evaluate(valuesExpr.ColumnValues[i], NullArgument.It, env));
                 }
-
-                table.Rows.Add(row);
             }
 
             env.RowCount = values.RowValues.Count;

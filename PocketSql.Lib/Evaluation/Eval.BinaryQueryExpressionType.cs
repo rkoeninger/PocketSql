@@ -1,11 +1,11 @@
-﻿using System.Data;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
+using PocketSql.Modeling;
 
 namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(BinaryQueryExpressionType type, bool all, DataTable first, DataTable right)
+        public static EngineResult Evaluate(BinaryQueryExpressionType type, bool all, Table first, Table right)
         {
             // TODO: what to do when columns don't match?
             // TODO: does offset/fetch/top happen before or after?

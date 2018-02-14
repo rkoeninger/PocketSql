@@ -1,11 +1,11 @@
-﻿using System.Data;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
+using PocketSql.Modeling;
 
 namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static DataTable Evaluate(TableReference tableRef, DataTable joinedTables, Env env)
+        public static Table Evaluate(TableReference tableRef, Table joinedTables, Env env)
         {
             switch (tableRef)
             {

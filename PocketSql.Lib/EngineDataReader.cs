@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using PocketSql.Evaluation;
 
 namespace PocketSql
 {
@@ -27,10 +28,10 @@ namespace PocketSql
 
         public DataTable GetSchemaTable() => throw new NotImplementedException();
 
-        public string GetName(int i) => data[tableIndex].ResultSet.Columns[i].ColumnName;
-        public int GetOrdinal(string name) => data[tableIndex].ResultSet.Columns[name].Ordinal;
+        public string GetName(int i) => data[tableIndex].ResultSet.Columns[i].Name;
+        public int GetOrdinal(string name) => data[tableIndex].ResultSet.GetColumnOrdinal(name);
 
-        public Type GetFieldType(int i) => data[tableIndex].ResultSet.Columns[i].DataType;
+        public Type GetFieldType(int i) => Eval.TranslateCsType(data[tableIndex].ResultSet.Columns[i].Type);
         public string GetDataTypeName(int i) => GetFieldType(i).Name;
 
         public bool IsDBNull(int i) => data[tableIndex].ResultSet.Rows[rowIndex].IsNull(i);
@@ -47,7 +48,7 @@ namespace PocketSql
         public long GetInt64(int i) => (long)GetValue(i);
         public string GetString(int i) => (string)GetValue(i);
         public char GetChar(int i) => (char)GetValue(i);
-        public object GetValue(int i) => data[tableIndex].ResultSet.Rows[rowIndex].ItemArray[i];
+        public object GetValue(int i) => data[tableIndex].ResultSet.Rows[rowIndex].Values[i];
 
         public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferOffset, int length)
         {

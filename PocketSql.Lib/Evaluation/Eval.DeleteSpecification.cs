@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Modeling;
 
 namespace PocketSql.Evaluation
@@ -12,7 +11,7 @@ namespace PocketSql.Evaluation
             var table = env.Tables[tableRef.SchemaObject.BaseIdentifier.Value];
             var rowCount = 0;
 
-            foreach (DataRow row in table.Rows)
+            foreach (Row row in table.Rows)
             {
                 if (delete.WhereClause == null
                     || Evaluate(delete.WhereClause.SearchCondition, new RowArgument(row), env))

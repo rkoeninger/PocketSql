@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
+using PocketSql.Modeling;
 
 namespace PocketSql.Evaluation
 {
@@ -25,17 +26,17 @@ namespace PocketSql.Evaluation
             };
         }
 
-        private static Func<SelectElement, IEnumerable<(string, Type, ScalarExpression)>>
-            ExtractSelection(DataTable table, Env env) => s =>
+        private static Func<SelectElement, IEnumerable<(string, DbType, ScalarExpression)>>
+            ExtractSelection(Table table, Env env) => s =>
         {
             switch (s)
             {
                 // TODO: respect table alias in star expression
                 case SelectStarExpression star:
-                    return table.Columns.Cast<DataColumn>().Select(c => (
-                        c.ColumnName,
-                        c.DataType,
-                        (ScalarExpression)CreateColumnReferenceExpression(c.ColumnName)));
+                    return table.Columns.Cast<Column>().Select(c => (
+                        c.Name,
+                        c.Type,
+                        (ScalarExpression)CreateColumnReferenceExpression(c.Name)));
                 case SelectScalarExpression scalar:
                     return new[]
                     {(
@@ -73,7 +74,7 @@ namespace PocketSql.Evaluation
             return null;
         }
 
-        private static Type InferType(ScalarExpression expr, DataTable table, Env env)
+        private static DbType InferType(ScalarExpression expr, Table table, Env env)
         {
             // TODO: a lot of work to do here for type inference
             //       how does sql server do it?
@@ -85,16 +86,16 @@ namespace PocketSql.Evaluation
                 case ParenthesisExpression paren:
                     return InferType(paren.Expression, table, env);
                 case IntegerLiteral _:
-                    return typeof(int);
+                    return DbType.Int32;
                 case StringLiteral _:
-                    return typeof(string);
+                    return DbType.String;
                 // TODO: need to handle multi-table disambiguation
                 case ColumnReferenceExpression colRefExpr:
                     var name = colRefExpr.MultiPartIdentifier.Identifiers.Last().Value;
-                    return table.Columns[name].DataType;
+                    return table.GetColumn(name).Type;
                 case GlobalVariableExpression _:
                 case VariableReference _:
-                    return typeof(object); // TODO: retain variable type information
+                    return DbType.Object; // TODO: retain variable type information
                 case BinaryExpression binExpr:
                     // TODO: so, so brittle
                     return InferType(binExpr.FirstExpression, table, env);
@@ -102,13 +103,13 @@ namespace PocketSql.Evaluation
                     switch (fun.FunctionName.Value.ToLower())
                     {
                         case "sum": return InferType(fun.Parameters[0], table, env);
-                        case "count": return typeof(int);
+                        case "count": return DbType.Int32;
                         case "trim":
                         case "ltrim":
                         case "rtrim":
                         case "upper":
                         case "lower":
-                            return typeof(string);
+                            return DbType.String;
                         default: return env.Functions[fun.FunctionName.Value].ReturnType;
                     }
                 case CaseExpression c:
@@ -153,6 +154,67 @@ namespace PocketSql.Evaluation
             }
 
             throw FeatureNotSupportedException.Subtype(typeRef);
+        }
+
+        private static DbType TranslateDbType(DataTypeReference opt)
+        {
+            if (!(opt is SqlDataTypeReference)) throw FeatureNotSupportedException.Subtype(opt);
+
+            var type = ((SqlDataTypeReference)opt).SqlDataTypeOption;
+
+            switch (type)
+            {
+                case SqlDataTypeOption.Int:
+                    return DbType.Int32;
+                case SqlDataTypeOption.BigInt:
+                    return DbType.Int64;
+                case SqlDataTypeOption.Binary:
+                    return DbType.Binary;
+                case SqlDataTypeOption.Bit:
+                    return DbType.Boolean;
+                case SqlDataTypeOption.Char:
+                    return DbType.AnsiString;
+                case SqlDataTypeOption.Date:
+                    return DbType.Date;
+                case SqlDataTypeOption.DateTime:
+                    return DbType.DateTime;
+                case SqlDataTypeOption.DateTime2:
+                    return DbType.DateTime2;
+                case SqlDataTypeOption.DateTimeOffset:
+                    return DbType.DateTimeOffset;
+                case SqlDataTypeOption.Cursor:
+                case SqlDataTypeOption.VarChar:
+                    return DbType.AnsiString;
+                default:
+                    throw FeatureNotSupportedException.Value(type);
+            }
+        }
+
+        public static Type TranslateCsType(DbType type)
+        {
+            switch (type)
+            {
+                case DbType.AnsiString:
+                case DbType.AnsiStringFixedLength:
+                case DbType.String:
+                case DbType.StringFixedLength:
+                    return typeof(string);
+                case DbType.SByte:
+                    return typeof(sbyte);
+                case DbType.Int16:
+                    return typeof(short);
+                case DbType.Int32:
+                    return typeof(int);
+                case DbType.Int64:
+                    return typeof(long);
+                case DbType.Date:
+                case DbType.DateTime:
+                case DbType.DateTime2:
+                case DbType.DateTimeOffset:
+                    return typeof(DateTime);
+                default:
+                    throw FeatureNotSupportedException.Value(type);
+            }
         }
     }
 }

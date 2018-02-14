@@ -44,7 +44,7 @@ namespace PocketSql
         public Schema Schema => Database.Schemas[DefaultSchema];
         public Namespace<Function> Functions => Schema.Functions;
         public Namespace<Procedure> Procedures => Schema.Procedures;
-        public Namespace<DataTable> Tables => Schema.Tables;
+        public Namespace<Table> Tables => Schema.Tables;
         public Namespace<View> Views => Schema.Views;
 
         public Database GetDatabase(Identifier id) =>
@@ -62,7 +62,7 @@ namespace PocketSql
         public Procedure GetProcedure(Schema schema, Identifier id) =>
             schema.Procedures[id.Value];
 
-        public DataTable GetTable(Schema schema, Identifier id) =>
+        public Table GetTable(Schema schema, Identifier id) =>
             schema.Tables[id.Value];
 
         public View GetView(Schema schema, Identifier id) =>
@@ -74,7 +74,7 @@ namespace PocketSql
         public Procedure GetProcedure(SchemaObjectName id) =>
             GetProcedure(GetSchema(id), id.BaseIdentifier);
 
-        public DataTable GetTable(SchemaObjectName id) =>
+        public Table GetTable(SchemaObjectName id) =>
             GetTable(GetSchema(id), id.BaseIdentifier);
 
         public View GetView(SchemaObjectName id) =>

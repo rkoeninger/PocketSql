@@ -1,4 +1,4 @@
-﻿using System.Data;
+﻿using PocketSql.Modeling;
 
 namespace PocketSql
 {
@@ -11,13 +11,13 @@ namespace PocketSql
             RecordsAffected = recordsAffected;
         }
 
-        public EngineResult(DataTable resultSet)
+        public EngineResult(Table resultSet)
         {
             ResultSet = resultSet;
         }
 
         public int RecordsAffected { get; set; } = -1;
-        public DataTable ResultSet { get; set; }
-        public object Scalar => ResultSet.Rows[0].ItemArray[0];
+        public Table ResultSet { get; set; }
+        public object Scalar => ResultSet.Rows[0].Values[0];
     }
 }

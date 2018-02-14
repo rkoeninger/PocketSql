@@ -24,11 +24,19 @@ namespace PocketSql.Evaluation
             // FROM
 
             var table = querySpec.FromClause?.TableReferences?
-                .Aggregate((DataTable)null, (ts, tr) => Evaluate(tr, ts, env));
+                .Aggregate((Table)null, (ts, tr) => Evaluate(tr, ts, env));
             var selections = querySpec.SelectElements
                 .SelectMany(ExtractSelection(table, env)).ToList();
-            var projection = new DataTable();
-            projection.Columns.AddRange(selections.Select(s => new DataColumn(s.Item1, s.Item2)).ToArray());
+            var projection = new Table();
+
+            foreach (var (name, type, _) in selections)
+            {
+                projection.Columns.Add(new Column
+                {
+                    Name = name,
+                    Type = type
+                });
+            }
 
             // SELECT without FROM
 
@@ -38,18 +46,17 @@ namespace PocketSql.Evaluation
 
                 for (var i = 0; i < selections.Count; ++i)
                 {
-                    resultRow[i] = Evaluate(selections[i].Item3, NullArgument.It, env);
+                    resultRow.Values[i] = Evaluate(selections[i].Item3, NullArgument.It, env);
                 }
 
-                projection.Rows.Add(resultRow);
                 return new EngineResult(projection);
             }
 
-            var tableCopy = table.Clone();
+            var tableCopy = table.CopyLayout();
 
             // WHERE
 
-            foreach (DataRow row in table.Rows)
+            foreach (var row in table.Rows)
             {
                 if (querySpec.WhereClause == null
                     || Evaluate(querySpec.WhereClause.SearchCondition, new RowArgument(row), env))
@@ -62,12 +69,9 @@ namespace PocketSql.Evaluation
 
             if (querySpec.GroupByClause != null)
             {
-                var rows = tableCopy.Rows.Cast<DataRow>().ToList();
-                var temp = tableCopy.Clone();
-
                 // TODO: rollup, cube, grouping sets
 
-                var groups = rows.GroupBy(row =>
+                var groups = tableCopy.Rows.GroupBy(row =>
                     EquatableList.Of(querySpec.GroupByClause.GroupingSpecifications
                         .Select(g => (InferName(g), Evaluate(g, new RowArgument(row), env))))).ToList();
 
@@ -82,37 +86,45 @@ namespace PocketSql.Evaluation
 
                 // SELECT
 
-                Select(Evaluate, groups.Select(x => new GroupArgument(x.Key, x.ToList())), projection, selections, env);
+                Select(
+                    Evaluate,
+                    groups.Select(x => new GroupArgument(x.Key, x.ToList())),
+                    projection,
+                    selections,
+                    env);
             }
             else
             {
                 // SELECT
 
-                Select(Evaluate, tableCopy.Rows.Cast<DataRow>().Select(x => new RowArgument(x)), projection, selections, env);
+                Select(
+                    Evaluate,
+                    tableCopy.Rows.Select(x => new RowArgument(x)),
+                    projection,
+                    selections,
+                    env);
             }
 
             // DISTINCT
 
             if (querySpec.UniqueRowFilter == UniqueRowFilter.Distinct)
             {
-                var temp = projection.Clone();
+                var temp = projection.CopyLayout();
                 CopyOnto(projection, temp);
                 projection.Rows.Clear();
 
-                foreach (var item in temp.Rows.Cast<DataRow>()
-                    .Select(r => EquatableList.Of(r.Table.Columns
-                        .Cast<DataColumn>()
-                        .Select(c => (c.ColumnName, r[c]))))
+                foreach (var item in temp.Rows
+                    .Select(r => EquatableList.Of(temp.Columns
+                        .Cast<Column>()
+                        .Select(c => (c.Name, r.GetValue(c.Name)))))
                     .Distinct())
                 {
                     var row = projection.NewRow();
 
-                    foreach (DataColumn col in temp.Columns)
+                    foreach (var i in Enumerable.Range(0, item.Elements.Count))
                     {
-                        row[col.Ordinal] = item.Elements[col.Ordinal].Item2;
+                        row.Values[i] = item.Elements[i].Item2;
                     }
-
-                    projection.Rows.Add(row);
                 }
             }
 
@@ -123,11 +135,10 @@ namespace PocketSql.Evaluation
                 var elements = querySpec.OrderByClause.OrderByElements;
                 var firstElement = elements.First();
                 var restElements = elements.Skip(1);
-                var rows = projection.Rows.Cast<DataRow>().ToList();
-                var temp = projection.Clone();
+                var temp = projection.CopyLayout();
 
                 foreach (var row in restElements.Aggregate(
-                    Order(rows, firstElement, env),
+                    Order(projection.Rows, firstElement, env),
                     (orderedRows, element) => Order(orderedRows, element, env)))
                 {
                     CopyOnto(row, temp);
@@ -161,8 +172,8 @@ namespace PocketSql.Evaluation
         private static void Select<T>(
             Func<ScalarExpression, T, Env, object> evaluate,
             IEnumerable<T> source,
-            DataTable target,
-            IList<(string, Type, ScalarExpression)> selections,
+            Table target,
+            IList<(string, DbType, ScalarExpression)> selections,
             Env env)
         {
             foreach (var row in source)
@@ -171,48 +182,44 @@ namespace PocketSql.Evaluation
 
                 for (var i = 0; i < selections.Count; ++i)
                 {
-                    resultRow[i] = evaluate(selections[i].Item3, row, env);
+                    resultRow.Values[i] = evaluate(selections[i].Item3, row, env);
                 }
-
-                target.Rows.Add(resultRow);
             }
         }
 
-        private static void CopyOnto(DataTable source, DataTable target)
+        private static void CopyOnto(Table source, Table target)
         {
-            foreach (DataRow row in source.Rows)
+            foreach (var row in source.Rows)
             {
                 CopyOnto(row, target);
             }
         }
 
-        private static void CopyOnto(DataRow row, DataTable target)
+        private static void CopyOnto(Row row, Table target)
         {
             var copy = target.NewRow();
 
-            foreach (DataColumn col in target.Columns)
+            foreach (var i in Enumerable.Range(0, target.Columns.Count))
             {
-                copy[col.Ordinal] = row[col.Ordinal];
+                copy.Values[i] = row.Values[i];
             }
-
-            target.Rows.Add(copy);
         }
 
-        private static IOrderedEnumerable<DataRow> Order(
-            IEnumerable<DataRow> seq,
+        private static IOrderedEnumerable<Row> Order(
+            IEnumerable<Row> seq,
             ExpressionWithSortOrder element,
             Env env)
         {
-            object Func(DataRow x) => Evaluate(element.Expression, new RowArgument(x), env);
+            object Func(Row x) => Evaluate(element.Expression, new RowArgument(x), env);
             return element.SortOrder == SortOrder.Descending ? seq.OrderByDescending(Func) : seq.OrderBy(Func);
         }
 
-        private static IOrderedEnumerable<DataRow> Order(
-            IOrderedEnumerable<DataRow> seq,
+        private static IOrderedEnumerable<Row> Order(
+            IOrderedEnumerable<Row> seq,
             ExpressionWithSortOrder element,
             Env env)
         {
-            object Func(DataRow x) => Evaluate(element.Expression, new RowArgument(x), env);
+            object Func(Row x) => Evaluate(element.Expression, new RowArgument(x), env);
             return element.SortOrder == SortOrder.Descending ? seq.ThenByDescending(Func) : seq.ThenBy(Func);
         }
     }

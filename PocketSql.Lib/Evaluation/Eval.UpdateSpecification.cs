@@ -11,7 +11,7 @@ namespace PocketSql.Evaluation
         {
             var tableRef = (NamedTableReference)update.Target;
             var table = env.Tables[tableRef.SchemaObject.BaseIdentifier.Value];
-            DataTable output = null;
+            Table output = null;
 
             if (update.OutputClause != null)
             {
@@ -20,23 +20,24 @@ namespace PocketSql.Evaluation
                 var selections = update.OutputClause.SelectColumns
                     .SelectMany(ExtractSelection(table, env)).ToList();
 
-                output = new DataTable();
+                output = new Table();
 
                 foreach (var (name, type, _) in selections)
                 {
-                    output.Columns.Add(new DataColumn
+                    output.Columns.Add(new Column
                     {
-                        ColumnName = name,
-                        DataType = type
+                        Name = name,
+                        Type = type
                     });
                 }
             }
 
             var rowCount = 0;
 
-            foreach (DataRow row in table.Rows)
+            foreach (Row row in table.Rows)
             {
-                if (update.WhereClause == null || Evaluate(update.WhereClause.SearchCondition, new RowArgument(row), env))
+                if (update.WhereClause == null
+                    || Evaluate(update.WhereClause.SearchCondition, new RowArgument(row), env))
                 {
                     Evaluate(update.SetClauses, row, output, env);
                     rowCount++;

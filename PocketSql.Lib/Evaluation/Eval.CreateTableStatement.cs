@@ -1,5 +1,5 @@
-﻿using System.Data;
-using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
+using PocketSql.Modeling;
 
 namespace PocketSql.Evaluation
 {
@@ -7,16 +7,14 @@ namespace PocketSql.Evaluation
     {
         public static EngineResult Evaluate(CreateTableStatement createTable, Env env)
         {
-            var table = new DataTable();
+            var table = new Table();
 
             foreach (var column in createTable.Definition.ColumnDefinitions)
             {
-                table.Columns.Add(new DataColumn
+                table.Columns.Add(new Column
                 {
-                    ColumnName = column.ColumnIdentifier.Value,
-                    DataType = TranslateType(column.DataType),
-                    //MaxLength = 
-                    //AllowDbNull = 
+                    Name = column.ColumnIdentifier.Value,
+                    Type = TranslateDbType(column.DataType)
                 });
             }
 

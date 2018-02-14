@@ -15,7 +15,7 @@ namespace PocketSql.Modeling
 
         private readonly QueryExpression query;
         private readonly bool scroll;
-        private DataTable results;
+        private Table results;
         private int index;
         private bool open;
 
@@ -38,14 +38,14 @@ namespace PocketSql.Modeling
             results = null;
         }
 
-        public DataRow MoveFirst() => Access(_ => 0, false);
-        public DataRow MoveLast() => Access(_ => results.Rows.Count - 1);
-        public DataRow MoveNext() => Access(x => x + 1, false);
-        public DataRow MovePrior() => Access(x => x - 1);
-        public DataRow MoveAbsolute(int offset) => Access(_ => offset);
-        public DataRow MoveRelative(int offset) => Access(x => x + offset);
+        public Row MoveFirst() => Access(_ => 0, false);
+        public Row MoveLast() => Access(_ => results.Rows.Count - 1);
+        public Row MoveNext() => Access(x => x + 1, false);
+        public Row MovePrior() => Access(x => x - 1);
+        public Row MoveAbsolute(int offset) => Access(_ => offset);
+        public Row MoveRelative(int offset) => Access(x => x + offset);
         
-        private DataRow Access(Func<int, int> f, bool requiresScroll = true)
+        private Row Access(Func<int, int> f, bool requiresScroll = true)
         {
             if (requiresScroll && !scroll) throw new InvalidOperationException("Cusor must be scroll cursor to fetch last, prior, absolute, relative");
             if (!open) throw new InvalidOperationException("Cursor has been closed");

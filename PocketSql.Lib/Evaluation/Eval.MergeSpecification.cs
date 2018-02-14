@@ -15,18 +15,18 @@ namespace PocketSql.Evaluation
             var sourceTableRef = (NamedTableReference)merge.TableReference;
             var sourceTable = env.Tables[sourceTableRef.SchemaObject.BaseIdentifier.Value];
             var rowCount = 0;
-            var matched = new List<DataRow>();
-            var notMatchedByTarget = new List<DataRow>();
-            var notMatchedBySource = new List<DataRow>();
+            var matched = new List<Row>();
+            var notMatchedByTarget = new List<Row>();
+            var notMatchedBySource = new List<Row>();
 
             // TODO: only search for and build up collections that will be required by match clauses
 
             // find matched and not matched (by target)
-            foreach (DataRow row in sourceTable.Rows)
+            foreach (Row row in sourceTable.Rows)
             {
                 // TODO: need to respect table aliases and combine rows
                 // TODO: need to define new row classes that aggregate rows via aliases
-                var targetRow = targetTable.Rows.Cast<DataRow>().FirstOrDefault(x =>
+                var targetRow = targetTable.Rows.Cast<Row>().FirstOrDefault(x =>
                     Evaluate(merge.SearchCondition, new RowArgument(row), env));
 
                 if (targetRow == null)
@@ -40,7 +40,7 @@ namespace PocketSql.Evaluation
             }
 
             // find not matched by source
-            foreach (DataRow row in targetTable.Rows)
+            foreach (Row row in targetTable.Rows)
             {
                 var sourceRow = sourceTable.Rows.Cast<DataRow>().FirstOrDefault(x =>
                     Evaluate(merge.SearchCondition, new RowArgument(row), env));
