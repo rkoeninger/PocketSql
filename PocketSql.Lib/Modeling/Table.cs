@@ -42,5 +42,9 @@ namespace PocketSql.Modeling
                 Name = Name,
                 Columns = Columns.ToList()
             };
+
+        // TODO: public Table Select(Func<Row, Row> selector)
+        // TODO: public Table Where(Func<Row, bool> filter)
+        // TODO: public Table OrderBy(clauses)
     }
 }

@@ -20,7 +20,7 @@ namespace PocketSql.Tests
 
                 Assert.AreEqual(1, connection.Execute("insert into People (Name, Age) values ('Rob', 30)"));
 
-                var people = connection.Query<Person>("select Name, Age from People").ToList();
+                var people = connection.Query<Person>("select p.Name, p.Age from People as p").ToList();
                 Assert.AreEqual(1, people.Count);
                 Assert.AreEqual("Rob", people[0].Name);
                 Assert.AreEqual(30, people[0].Age);

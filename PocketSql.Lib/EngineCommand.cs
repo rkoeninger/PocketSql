@@ -41,13 +41,29 @@ namespace PocketSql
         // TODO: how to set nullability on parameter?
         public IDbDataParameter CreateParameter() => new EngineParameter(true);
 
-        private bool IsInput(ParameterDirection d) =>
-            d == ParameterDirection.Input
-            || d == ParameterDirection.InputOutput;
+        private bool IsInput(IDataParameter d) =>
+            d.Direction == ParameterDirection.Input
+            || d.Direction == ParameterDirection.InputOutput;
 
-        private bool IsOutput(ParameterDirection d) =>
-            d == ParameterDirection.InputOutput
-            || d == ParameterDirection.Output;
+        private bool IsOutput(IDataParameter d) =>
+            d.Direction == ParameterDirection.InputOutput
+            || d.Direction == ParameterDirection.Output;
+
+        private bool IsReturn(IDataParameter d) =>
+            d.Direction == ParameterDirection.ReturnValue;
+
+        private void OnEval(IDataParameterCollection paramz, Env env)
+        {
+            foreach (var param in Parameters.Cast<IDbDataParameter>().Where(IsOutput))
+            {
+                param.Value = env.Vars[Naming.Parameter(param.ParameterName)];
+            }
+
+            foreach (var param in Parameters.Cast<IDbDataParameter>().Where(IsReturn))
+            {
+                param.Value = env.ReturnValue;
+            }
+        }
 
         private List<EngineResult> ExecuteStoredProcedure()
         {
@@ -57,27 +73,10 @@ namespace PocketSql
                 proc,
                 Parameters
                     .Cast<IDbDataParameter>()
-                    .Select(p => (
-                        p.ParameterName,
-                        IsInput(p.Direction),
-                        IsOutput(p.Direction),
-                        p.Value))
+                    .Select(p => (p.ParameterName, IsInput(p), IsOutput(p), p.Value))
                     .ToList(),
                 env);
-
-            foreach (var param in Parameters.Cast<IDbDataParameter>()
-                .Where(x => x.Direction == ParameterDirection.Output
-                    || x.Direction == ParameterDirection.InputOutput))
-            {
-                param.Value = env.Vars[Naming.Parameter(param.ParameterName)];
-            }
-
-            foreach (var param in Parameters.Cast<IDbDataParameter>()
-                .Where(x => x.Direction == ParameterDirection.ReturnValue))
-            {
-                param.Value = env.ReturnValue;
-            }
-
+            OnEval(Parameters, env);
             return new List<EngineResult> { results };
         }
 
@@ -96,20 +95,7 @@ namespace PocketSql
 
             var env = Env.Of(connection, Parameters);
             var results = Eval.Evaluate(fragment, env);
-
-            foreach (var param in Parameters.Cast<IDbDataParameter>()
-                .Where(x => x.Direction == ParameterDirection.Output
-                    || x.Direction == ParameterDirection.InputOutput))
-            {
-                param.Value = env.Vars[Naming.Parameter(param.ParameterName)];
-            }
-
-            foreach (var param in Parameters.Cast<IDbDataParameter>()
-                .Where(x => x.Direction == ParameterDirection.ReturnValue))
-            {
-                param.Value = env.ReturnValue;
-            }
-
+            OnEval(Parameters, env);
             return results;
         }
 
