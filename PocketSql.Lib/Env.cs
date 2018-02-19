@@ -80,6 +80,18 @@ namespace PocketSql
         public View GetView(SchemaObjectName id) =>
             GetView(GetSchema(id), id.BaseIdentifier);
 
+        public Function GetFunction(string[] id) => GetSchema(id).Functions[id[id.Length - 1]];
+
+        public Procedure GetProcedure(string[] id) => GetSchema(id).Procedures[id[id.Length - 1]];
+
+        public Table GetTable(string[] id) => GetSchema(id).Tables[id[id.Length - 1]];
+
+        public View GetView(string[] id) => GetSchema(id).Views[id[id.Length - 1]];
+
+        public Schema GetSchema(string[] id) => Engine
+            .Databases[id.Length >= 3 ? id[id.Length - 3] : DefaultDatabase]
+            .Schemas[id.Length >= 2 ? id[id.Length - 2] : DefaultSchema];
+
         public object GetGlobal(string name)
         {
             switch (name.ToLower())

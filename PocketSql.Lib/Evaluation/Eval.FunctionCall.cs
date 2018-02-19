@@ -89,7 +89,7 @@ namespace PocketSql.Evaluation
             if (funCall.FunctionName.Value.Similar("sum") && funCall.Parameters.Count == 1)
             {
                 var expr = funCall.Parameters[0];
-                return group.Rows.Select(x => Evaluate(expr, new RowArgument(x), env)).Cast<int>().Sum();
+                return group.Rows.Sum(x => Evaluate<int>(expr, new RowArgument(x), env));
             }
 
             throw FeatureNotSupportedException.Value(funCall);

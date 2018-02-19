@@ -1,5 +1,10 @@
 NUGET
   remote: https://api.nuget.org/v3/index.json
     Dapper (1.50.4) - restriction: >= net47
+    Microsoft.NETCore.Platforms (2.0.1) - restriction: || (&& (>= monoandroid) (>= net47)) (&& (>= monotouch) (>= net47)) (&& (< net45) (>= net47) (< netstandard1.5)) (&& (< net45) (>= net47) (< netstandard1.6)) (&& (>= net47) (< netstandard1.0)) (&& (>= net47) (< netstandard1.3)) (&& (>= net47) (< netstandard1.4)) (&& (>= net47) (< netstandard2.0)) (&& (>= net47) (< portable-net45+win8+wpa81)) (&& (>= net47) (< portable-net451+win81+wpa81)) (&& (>= net47) (>= uap10.0)) (&& (>= net47) (>= xamarinios)) (&& (>= net47) (>= xamarinmac)) (&& (>= net47) (>= xamarintvos)) (&& (>= net47) (>= xamarinwatchos))
     Microsoft.SqlServer.TransactSql.ScriptDom (14.0.3811.1) - restriction: >= net47
+    NETStandard.Library (2.0.1) - restriction: && (>= net47) (< netstandard2.0)
+      Microsoft.NETCore.Platforms (>= 1.1) - restriction: || (>= monoandroid) (>= monotouch) (&& (>= net45) (< portable-net451+win81+wpa81)) (&& (< net45) (>= netstandard1.1) (< portable-net451+win81+wpa81)) (&& (< net45) (>= netstandard1.2) (< netstandard1.3) (< wpa81)) (&& (< net45) (>= netstandard1.3) (< netstandard1.4) (< wpa81)) (&& (< net45) (>= netstandard1.4) (< netstandard1.5) (< wpa81)) (&& (< net45) (>= netstandard1.5) (< netstandard1.6)) (&& (< net45) (>= netstandard1.6) (< netstandard2.0)) (&& (< net45) (>= netstandard2.0)) (&& (>= net451) (< netstandard1.3)) (&& (>= net46) (< netstandard1.4)) (>= net461) (>= netcoreapp2.0) (&& (>= netstandard1.0) (< portable-net45+win8+wpa81)) (&& (< netstandard1.0) (>= portable-net45+win8+wp8+wpa81) (< portable-net45+win8+wpa81)) (&& (< netstandard1.0) (>= portable-net45+win8+wpa81) (< portable-net451+win81+wpa81)) (&& (< netstandard1.0) (>= portable-net451+win81+wpa81)) (&& (< netstandard1.3) (>= wpa81)) (>= uap10.0) (>= xamarinios) (>= xamarinmac) (>= xamarintvos) (>= xamarinwatchos)
     NUnit (3.9) - restriction: >= net47
+    System.Collections.Immutable (1.4) - restriction: >= net47
+      NETStandard.Library (>= 1.6.1) - restriction: && (>= netstandard1.0) (< netstandard2.0) (< xamarinmac)

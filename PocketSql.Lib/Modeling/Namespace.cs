@@ -5,8 +5,7 @@ namespace PocketSql.Modeling
 {
     public class Namespace<T>
     {
-        private readonly IDictionary<string, T> members =
-            new Dictionary<string, T>(new Naming.EqualityComparer());
+        private readonly IDictionary<string, T> members = new Dictionary<string, T>(Naming.Comparer);
 
         public bool IsDefined(string name) => members.ContainsKey(name);
 

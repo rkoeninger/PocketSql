@@ -33,7 +33,7 @@ namespace PocketSql.Evaluation
             {
                 // TODO: respect table alias in star expression
                 case SelectStarExpression star:
-                    return table.Columns.Cast<Column>().Select(c => (
+                    return table.Columns.Select(c => (
                         c.Name,
                         c.Type,
                         (ScalarExpression)CreateColumnReferenceExpression(c.Name)));

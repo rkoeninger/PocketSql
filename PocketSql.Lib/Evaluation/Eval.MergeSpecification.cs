@@ -26,7 +26,7 @@ namespace PocketSql.Evaluation
             {
                 // TODO: need to respect table aliases and combine rows
                 // TODO: need to define new row classes that aggregate rows via aliases
-                var targetRow = targetTable.Rows.Cast<Row>().FirstOrDefault(x =>
+                var targetRow = targetTable.Rows.FirstOrDefault(x =>
                     Evaluate(merge.SearchCondition, new RowArgument(row), env));
 
                 if (targetRow == null)
@@ -42,7 +42,7 @@ namespace PocketSql.Evaluation
             // find not matched by source
             foreach (Row row in targetTable.Rows)
             {
-                var sourceRow = sourceTable.Rows.Cast<DataRow>().FirstOrDefault(x =>
+                var sourceRow = sourceTable.Rows.FirstOrDefault(x =>
                     Evaluate(merge.SearchCondition, new RowArgument(row), env));
 
                 if (sourceRow == null)

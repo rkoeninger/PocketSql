@@ -3,3 +3,4 @@ source https://api.nuget.org/v3/index.json
 nuget Dapper restriction: >= net47
 nuget Microsoft.SqlServer.TransactSql.ScriptDom restriction: >= net47
 nuget NUnit restriction: >= net47
+nuget System.Collections.Immutable restriction: >= net47

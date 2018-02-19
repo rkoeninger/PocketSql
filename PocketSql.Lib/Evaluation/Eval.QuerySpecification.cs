@@ -115,7 +115,6 @@ namespace PocketSql.Evaluation
 
                 foreach (var item in temp.Rows
                     .Select(r => EquatableList.Of(temp.Columns
-                        .Cast<Column>()
                         .Select(c => (c.Name, r.GetValue(c.Name)))))
                     .Distinct())
                 {
