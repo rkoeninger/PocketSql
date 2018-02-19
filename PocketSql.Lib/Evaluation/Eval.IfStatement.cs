@@ -5,11 +5,11 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(IfStatement conditional, Env env) =>
+        public static EngineResult Evaluate(IfStatement conditional, Scope scope) =>
             Evaluate(
-                Evaluate(conditional.Predicate, NullArgument.It, env)
+                Evaluate(conditional.Predicate, NullArgument.It, scope)
                     ? conditional.ThenStatement
                     : conditional.ElseStatement,
-                env);
+                scope);
     }
 }

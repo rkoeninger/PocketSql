@@ -6,7 +6,7 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static List<EngineResult> Evaluate(StatementList statements, Env env) =>
-            statements.Statements.Select(s => Evaluate(s, env)).Where(r => r != null).ToList();
+        public static List<EngineResult> Evaluate(StatementList statements, Scope scope) =>
+            statements.Statements.Select(s => Evaluate(s, scope)).Where(r => r != null).ToList();
     }
 }

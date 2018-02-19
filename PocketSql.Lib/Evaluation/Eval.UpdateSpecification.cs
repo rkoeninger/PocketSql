@@ -6,10 +6,10 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(UpdateSpecification update, Env env)
+        public static EngineResult Evaluate(UpdateSpecification update, Scope scope)
         {
             var tableRef = (NamedTableReference)update.Target;
-            var table = env.Tables[tableRef.SchemaObject.BaseIdentifier.Value];
+            var table = scope.Env.Tables[tableRef.SchemaObject.BaseIdentifier.Value];
             Table output = null;
 
             if (update.OutputClause != null)
@@ -17,7 +17,7 @@ namespace PocketSql.Evaluation
                 // TODO: extract and share logic with Evaluate(SelectStatement, ...)
                 // TODO: handle inserted.* vs deleted.* and $action
                 var selections = update.OutputClause.SelectColumns
-                    .SelectMany(ExtractSelection(table, env)).ToList();
+                    .SelectMany(ExtractSelection(table, scope)).ToList();
 
                 output = new Table();
 
@@ -36,14 +36,14 @@ namespace PocketSql.Evaluation
             foreach (Row row in table.Rows)
             {
                 if (update.WhereClause == null
-                    || Evaluate(update.WhereClause.SearchCondition, new RowArgument(row), env))
+                    || Evaluate(update.WhereClause.SearchCondition, new RowArgument(row), scope))
                 {
-                    Evaluate(update.SetClauses, row, output, env);
+                    Evaluate(update.SetClauses, row, output, scope);
                     rowCount++;
                 }
             }
 
-            env.RowCount = rowCount;
+            scope.Env.RowCount = rowCount;
             return new EngineResult(rowCount);
             // TODO: ResultSet = output
         }

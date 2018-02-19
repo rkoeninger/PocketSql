@@ -5,13 +5,13 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(DeclareVariableStatement declare, Env env)
+        public static EngineResult Evaluate(DeclareVariableStatement declare, Scope scope)
         {
             foreach (var declaration in declare.Declarations)
             {
-                env.Vars.Declare(
+                scope.Env.Vars.Declare(
                     declaration.VariableName.Value,
-                    declaration.Value == null ? null : Evaluate(declaration.Value, NullArgument.It, env));
+                    declaration.Value == null ? null : Evaluate(declaration.Value, NullArgument.It, scope));
             }
 
             return null;

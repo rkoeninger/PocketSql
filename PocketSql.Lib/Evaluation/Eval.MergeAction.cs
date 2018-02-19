@@ -6,15 +6,15 @@ namespace PocketSql.Evaluation
     public static partial class Eval
     {
         // TODO: return output if output clause is present
-        public static void Evaluate(MergeAction action, Table targetTable, Row row, Env env)
+        public static void Evaluate(MergeAction action, Table targetTable, Row row, Scope scope)
         {
             switch (action)
             {
                 case InsertMergeAction insert:
-                    Evaluate(targetTable, insert.Columns, insert.Source, env);
+                    Evaluate(targetTable, insert.Columns, insert.Source, scope);
                     return;
                 case UpdateMergeAction update:
-                    Evaluate(update.SetClauses, row, null, env);
+                    Evaluate(update.SetClauses, row, null, scope);
                     return;
                 case DeleteMergeAction _:
                     targetTable.Rows.Remove(row);

@@ -5,7 +5,7 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(CreateTableStatement createTable, Env env)
+        public static EngineResult Evaluate(CreateTableStatement createTable, Scope scope)
         {
             var table = new Table();
 
@@ -18,7 +18,7 @@ namespace PocketSql.Evaluation
                 });
             }
 
-            env.Tables.Declare(createTable.SchemaObjectName.BaseIdentifier.Value, table);
+            scope.Env.Tables.Declare(createTable.SchemaObjectName.BaseIdentifier.Value, table);
             return null;
         }
     }

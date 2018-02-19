@@ -10,7 +10,7 @@ namespace PocketSql.Evaluation
             Table table,
             IList<ColumnReferenceExpression> cols,
             ValuesInsertSource values,
-            Env env)
+            Scope scope)
         {
             foreach (var valuesExpr in values.RowValues)
             {
@@ -19,11 +19,11 @@ namespace PocketSql.Evaluation
                 for (var i = 0; i < cols.Count; ++i)
                 {
                     var name = cols[i].MultiPartIdentifier.Identifiers[0].Value;
-                    row.SetValue(name, Evaluate(valuesExpr.ColumnValues[i], NullArgument.It, env));
+                    row.SetValue(name, Evaluate(valuesExpr.ColumnValues[i], NullArgument.It, scope));
                 }
             }
 
-            env.RowCount = values.RowValues.Count;
+            scope.Env.RowCount = values.RowValues.Count;
             return new EngineResult(values.RowValues.Count);
         }
     }

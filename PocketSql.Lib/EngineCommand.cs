@@ -75,7 +75,7 @@ namespace PocketSql
                     .Cast<IDbDataParameter>()
                     .Select(p => (p.ParameterName, IsInput(p), IsOutput(p), p.Value))
                     .ToList(),
-                env);
+                new Scope(env));
             OnEval(Parameters, env);
             return new List<EngineResult> { results };
         }
@@ -94,7 +94,7 @@ namespace PocketSql
             }
 
             var env = Env.Of(connection, Parameters);
-            var results = Eval.Evaluate(fragment, env);
+            var results = Eval.Evaluate(fragment, new Scope(env));
             OnEval(Parameters, env);
             return results;
         }

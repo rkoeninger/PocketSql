@@ -6,15 +6,15 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static T Evaluate<T>(ScalarExpression expr, IArgument arg, Env env) =>
-            (T)Evaluate(expr, arg, env);
+        public static T Evaluate<T>(ScalarExpression expr, IArgument arg, Scope scope) =>
+            (T)Evaluate(expr, arg, scope);
 
-        public static object Evaluate(ScalarExpression expr, IArgument arg, Env env)
+        public static object Evaluate(ScalarExpression expr, IArgument arg, Scope scope)
         {
             switch (expr)
             {
                 case ParenthesisExpression paren:
-                    return Evaluate(paren.Expression, arg, env);
+                    return Evaluate(paren.Expression, arg, scope);
                 case IntegerLiteral intLiteral:
                     return int.Parse(intLiteral.Value);
                 case NumericLiteral numericExpr:
@@ -24,12 +24,12 @@ namespace PocketSql.Evaluation
                 case UnaryExpression unaryExpr:
                     return Evaluate(
                         unaryExpr.UnaryExpressionType,
-                        Evaluate(unaryExpr.Expression, arg, env));
+                        Evaluate(unaryExpr.Expression, arg, scope));
                 case BinaryExpression binaryExpr:
                     return Evaluate(
                         binaryExpr.BinaryExpressionType,
-                        Evaluate(binaryExpr.FirstExpression, arg, env),
-                        Evaluate(binaryExpr.SecondExpression, arg, env));
+                        Evaluate(binaryExpr.FirstExpression, arg, scope),
+                        Evaluate(binaryExpr.SecondExpression, arg, scope));
                 case ColumnReferenceExpression colExpr:
                     switch (arg)
                     {
@@ -41,13 +41,13 @@ namespace PocketSql.Evaluation
                             throw FeatureNotSupportedException.Subtype(arg);
                     }
                 case VariableReference varRef:
-                    return env.Vars[varRef.Name];
+                    return scope.Env.Vars[varRef.Name];
                 case GlobalVariableExpression globRef:
-                    return env.GetGlobal(globRef.Name);
+                    return scope.Env.GetGlobal(globRef.Name);
                 case CaseExpression caseExpr:
-                    return Evaluate(caseExpr, arg, env);
+                    return Evaluate(caseExpr, arg, scope);
                 case FunctionCall funCall:
-                    return Evaluate(funCall, arg, env);
+                    return Evaluate(funCall, arg, scope);
                 default:
                     throw FeatureNotSupportedException.Subtype(expr);
             }

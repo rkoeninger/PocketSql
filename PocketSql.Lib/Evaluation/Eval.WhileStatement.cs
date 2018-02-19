@@ -5,13 +5,13 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(WhileStatement loop, Env env)
+        public static EngineResult Evaluate(WhileStatement loop, Scope scope)
         {
             EngineResult result = null;
 
-            while (Evaluate(loop.Predicate, NullArgument.It, env))
+            while (Evaluate(loop.Predicate, NullArgument.It, scope))
             {
-                result = Evaluate(loop.Statement, env);
+                result = Evaluate(loop.Statement, scope);
             }
 
             return result;

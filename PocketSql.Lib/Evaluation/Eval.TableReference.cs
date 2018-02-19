@@ -5,22 +5,22 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static Table Evaluate(TableReference tableRef, Table joinedTables, Env env)
+        public static Table Evaluate(TableReference tableRef, Table joinedTables, Scope scope)
         {
             switch (tableRef)
             {
                 case NamedTableReference named:
                     var name = named.SchemaObject.BaseIdentifier.Value;
-                    return env.Views.IsDefined(name)
-                        ? Evaluate(env.Views[name].Query, env).ResultSet
-                        : env.Tables[name];
+                    return scope.Env.Views.IsDefined(name)
+                        ? Evaluate(scope.Env.Views[name].Query, scope).ResultSet
+                        : scope.Env.Tables[name];
                 case DataModificationTableReference dml:
                     // TODO: how does this work?
-                    return Evaluate(dml.DataModificationSpecification, env).ResultSet;
+                    return Evaluate(dml.DataModificationSpecification, scope).ResultSet;
                 case JoinParenthesisTableReference paren:
-                    return Evaluate(paren.Join, joinedTables, env);
+                    return Evaluate(paren.Join, joinedTables, scope);
                 case OdbcQualifiedJoinTableReference odbc:
-                    return Evaluate(odbc.TableReference, joinedTables, env);
+                    return Evaluate(odbc.TableReference, joinedTables, scope);
                 case QualifiedJoin qjoin:
                 case UnqualifiedJoin ujoin:
                 case JoinTableReference join:

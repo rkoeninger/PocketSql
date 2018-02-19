@@ -5,9 +5,9 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(SetVariableStatement set, Env env)
+        public static EngineResult Evaluate(SetVariableStatement set, Scope scope)
         {
-            env.Vars[set.Variable.Name] = Evaluate(set.Expression, NullArgument.It, env);
+            scope.Env.Vars[set.Variable.Name] = Evaluate(set.Expression, NullArgument.It, scope);
             return null;
         }
     }

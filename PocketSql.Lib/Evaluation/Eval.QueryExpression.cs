@@ -4,7 +4,7 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(QueryExpression queryExpr, Env env)
+        public static EngineResult Evaluate(QueryExpression queryExpr, Scope scope)
         {
             // TODO: offset/fetch should be done here?
             //       order only gets applied if not already ordered
@@ -14,16 +14,16 @@ namespace PocketSql.Evaluation
             switch (queryExpr)
             {
                 case QuerySpecification querySpec:
-                    return Evaluate(querySpec, env);
+                    return Evaluate(querySpec, scope);
                 case QueryParenthesisExpression paren:
                     // TODO: need to handle surrounding offset/fetch?
-                    return Evaluate(paren.QueryExpression, env);
+                    return Evaluate(paren.QueryExpression, scope);
                 case BinaryQueryExpression binaryExpr:
                     return Evaluate(
                         binaryExpr.BinaryQueryExpressionType,
                         binaryExpr.All,
-                        Evaluate(binaryExpr.FirstQueryExpression, env).ResultSet,
-                        Evaluate(binaryExpr.SecondQueryExpression, env).ResultSet);
+                        Evaluate(binaryExpr.FirstQueryExpression, scope).ResultSet,
+                        Evaluate(binaryExpr.SecondQueryExpression, scope).ResultSet);
                 default:
                     throw FeatureNotSupportedException.Subtype(queryExpr);
             }

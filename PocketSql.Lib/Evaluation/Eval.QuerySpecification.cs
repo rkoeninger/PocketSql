@@ -9,7 +9,7 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(QuerySpecification querySpec, Env env)
+        public static EngineResult Evaluate(QuerySpecification querySpec, Scope scope)
         {
             // First the product of all tables in the from clause is formed.
             // The where clause is then evaluated to eliminate rows that do not satisfy the search_condition.
@@ -24,9 +24,9 @@ namespace PocketSql.Evaluation
             // FROM
 
             var table = querySpec.FromClause?.TableReferences?
-                .Aggregate((Table)null, (ts, tr) => Evaluate(tr, ts, env));
+                .Aggregate((Table)null, (ts, tr) => Evaluate(tr, ts, scope));
             var selections = querySpec.SelectElements
-                .SelectMany(ExtractSelection(table, env)).ToList();
+                .SelectMany(ExtractSelection(table, scope)).ToList();
             var projection = new Table();
 
             foreach (var (name, type, _) in selections)
@@ -46,7 +46,7 @@ namespace PocketSql.Evaluation
 
                 for (var i = 0; i < selections.Count; ++i)
                 {
-                    resultRow.Values[i] = Evaluate(selections[i].Item3, NullArgument.It, env);
+                    resultRow.Values[i] = Evaluate(selections[i].Item3, NullArgument.It, scope);
                 }
 
                 return new EngineResult(projection);
@@ -59,7 +59,7 @@ namespace PocketSql.Evaluation
             foreach (var row in table.Rows)
             {
                 if (querySpec.WhereClause == null
-                    || Evaluate(querySpec.WhereClause.SearchCondition, new RowArgument(row), env))
+                    || Evaluate(querySpec.WhereClause.SearchCondition, new RowArgument(row), scope))
                 {
                     CopyOnto(row, tableCopy);
                 }
@@ -73,14 +73,14 @@ namespace PocketSql.Evaluation
 
                 var groups = tableCopy.Rows.GroupBy(row =>
                     EquatableList.Of(querySpec.GroupByClause.GroupingSpecifications
-                        .Select(g => (InferName(g), Evaluate(g, new RowArgument(row), env))))).ToList();
+                        .Select(g => (InferName(g), Evaluate(g, new RowArgument(row), scope))))).ToList();
 
                 // HAVING
 
                 if (querySpec.HavingClause != null)
                 {
                     groups = groups
-                        .Where(x => Evaluate(querySpec.HavingClause.SearchCondition, new GroupArgument(x.Key, x.ToList()), env))
+                        .Where(x => Evaluate(querySpec.HavingClause.SearchCondition, new GroupArgument(x.Key, x.ToList()), scope))
                         .ToList();
                 }
 
@@ -91,7 +91,7 @@ namespace PocketSql.Evaluation
                     groups.Select(x => new GroupArgument(x.Key, x.ToList())),
                     projection,
                     selections,
-                    env);
+                    scope);
             }
             else
             {
@@ -102,7 +102,7 @@ namespace PocketSql.Evaluation
                     tableCopy.Rows.Select(x => new RowArgument(x)),
                     projection,
                     selections,
-                    env);
+                    scope);
             }
 
             // DISTINCT
@@ -137,8 +137,8 @@ namespace PocketSql.Evaluation
                 var temp = projection.CopyLayout();
 
                 foreach (var row in restElements.Aggregate(
-                    Order(projection.Rows, firstElement, env),
-                    (orderedRows, element) => Order(orderedRows, element, env)))
+                    Order(projection.Rows, firstElement, scope),
+                    (orderedRows, element) => Order(orderedRows, element, scope)))
                 {
                     CopyOnto(row, temp);
                 }
@@ -151,8 +151,8 @@ namespace PocketSql.Evaluation
 
             if (querySpec.OffsetClause != null)
             {
-                var offset = (int)Evaluate(querySpec.OffsetClause.OffsetExpression, NullArgument.It, env);
-                var fetch = (int)Evaluate(querySpec.OffsetClause.FetchExpression, NullArgument.It, env);
+                var offset = (int)Evaluate(querySpec.OffsetClause.OffsetExpression, NullArgument.It, scope);
+                var fetch = (int)Evaluate(querySpec.OffsetClause.FetchExpression, NullArgument.It, scope);
 
                 for (var i = 0; i < offset; ++i)
                 {
@@ -169,11 +169,11 @@ namespace PocketSql.Evaluation
         }
 
         private static void Select<T>(
-            Func<ScalarExpression, T, Env, object> evaluate,
+            Func<ScalarExpression, T, Scope, object> evaluate,
             IEnumerable<T> source,
             Table target,
             IList<(string, DbType, ScalarExpression)> selections,
-            Env env)
+            Scope scope)
         {
             foreach (var row in source)
             {
@@ -181,7 +181,7 @@ namespace PocketSql.Evaluation
 
                 for (var i = 0; i < selections.Count; ++i)
                 {
-                    resultRow.Values[i] = evaluate(selections[i].Item3, row, env);
+                    resultRow.Values[i] = evaluate(selections[i].Item3, row, scope);
                 }
             }
         }
@@ -207,18 +207,18 @@ namespace PocketSql.Evaluation
         private static IOrderedEnumerable<Row> Order(
             IEnumerable<Row> seq,
             ExpressionWithSortOrder element,
-            Env env)
+            Scope scope)
         {
-            object Func(Row x) => Evaluate(element.Expression, new RowArgument(x), env);
+            object Func(Row x) => Evaluate(element.Expression, new RowArgument(x), scope);
             return element.SortOrder == SortOrder.Descending ? seq.OrderByDescending(Func) : seq.OrderBy(Func);
         }
 
         private static IOrderedEnumerable<Row> Order(
             IOrderedEnumerable<Row> seq,
             ExpressionWithSortOrder element,
-            Env env)
+            Scope scope)
         {
-            object Func(Row x) => Evaluate(element.Expression, new RowArgument(x), env);
+            object Func(Row x) => Evaluate(element.Expression, new RowArgument(x), scope);
             return element.SortOrder == SortOrder.Descending ? seq.ThenByDescending(Func) : seq.ThenBy(Func);
         }
     }

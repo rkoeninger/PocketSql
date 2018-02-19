@@ -85,7 +85,7 @@
     <Compile Include="Evaluation\Eval.TableReference.cs" />
     <Compile Include="Evaluation\Eval.TSqlFragment.cs" />
     <Compile Include="Evaluation\Eval.TSqlStatement.cs" />
-    <Compile Include="Evaluation\Eval.UnaryExpression.cs" />
+    <Compile Include="Evaluation\Eval.UnaryExpressionType.cs" />
     <Compile Include="Evaluation\Eval.UpdateSpecification.cs" />
     <Compile Include="Evaluation\Eval.ValuesInsertSource.cs" />
     <Compile Include="Evaluation\Eval.WhileStatement.cs" />

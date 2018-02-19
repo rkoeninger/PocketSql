@@ -6,20 +6,20 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static List<EngineResult> Evaluate(TSqlFragment fragment, Env env)
+        public static List<EngineResult> Evaluate(TSqlFragment fragment, Scope scope)
         {
             switch (fragment)
             {
                 case StatementList statements:
-                    return Evaluate(statements, env);
+                    return Evaluate(statements, scope);
                 case TSqlStatement statement:
-                    var r = Evaluate(statement, env);
+                    var r = Evaluate(statement, scope);
                     return r != null ? new List<EngineResult> { r } : new List<EngineResult>();
                 case TSqlScript script:
                     return (
                         from b in script.Batches
                         from s in b.Statements
-                        let x = Evaluate(s, env)
+                        let x = Evaluate(s, scope)
                         where x != null
                         select x
                     ).ToList();

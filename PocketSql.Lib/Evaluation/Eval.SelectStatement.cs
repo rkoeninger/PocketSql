@@ -5,14 +5,14 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(SelectStatement select, Env env)
+        public static EngineResult Evaluate(SelectStatement select, Scope scope)
         {
-            var results = Evaluate(select.QueryExpression, env);
+            var results = Evaluate(select.QueryExpression, scope);
 
             if (select.Into != null)
             {
-                env.Tables.Declare(select.Into.Identifiers.Last().Value, results.ResultSet);
-                env.RowCount = results.ResultSet.Rows.Count;
+                scope.Env.Tables.Declare(select.Into.Identifiers.Last().Value, results.ResultSet);
+                scope.Env.RowCount = results.ResultSet.Rows.Count;
                 return new EngineResult(results.ResultSet.Rows.Count);
             }
 

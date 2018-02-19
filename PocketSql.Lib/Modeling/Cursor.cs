@@ -19,10 +19,10 @@ namespace PocketSql.Modeling
         private int index;
         private bool open;
 
-        public void Open(Env env)
+        public void Open(Scope scope)
         {
             if (open) throw new InvalidOperationException("Cursor already open");
-            results = Eval.Evaluate(query, env).ResultSet;
+            results = Eval.Evaluate(query, scope).ResultSet;
             open = true;
         }
 

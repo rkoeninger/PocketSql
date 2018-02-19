@@ -7,7 +7,7 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static void Evaluate(IList<SetClause> clauses, Row row, Table output, Env env)
+        public static void Evaluate(IList<SetClause> clauses, Row row, Table output, Scope scope)
         {
             foreach (var clause in clauses)
             {
@@ -21,7 +21,7 @@ namespace PocketSql.Evaluation
                         row.Values[row.GetColumnOrdinal(columnName)] = Evaluate(
                             set.AssignmentKind,
                             row.Values[row.GetColumnOrdinal(columnName)],
-                            Evaluate(set.NewValue, new RowArgument(row), env));
+                            Evaluate(set.NewValue, new RowArgument(row), scope));
                         break;
                     default:
                         throw FeatureNotSupportedException.Subtype(clause);

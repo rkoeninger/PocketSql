@@ -6,13 +6,13 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(ExecuteSpecification exec, Env env)
+        public static EngineResult Evaluate(ExecuteSpecification exec, Scope scope)
         {
             // TODO: exec.ExecuteContext for permissions
             // TODO: exec.LinkedServer for DB
             var execRef = (ExecutableProcedureReference)exec.ExecutableEntity;
             var procName = execRef.ProcedureReference.ProcedureReference.Name.Identifiers.Last().Value;
-            var proc = env.Procedures[procName];
+            var proc = scope.Env.Procedures[procName];
             return Evaluate(
                 proc,
                 execRef.Parameters
@@ -20,9 +20,9 @@ namespace PocketSql.Evaluation
                         p.Variable.Name,
                         !p.IsOutput,
                         p.IsOutput,
-                        Evaluate(p.ParameterValue, NullArgument.It, env)))
+                        Evaluate(p.ParameterValue, NullArgument.It, scope)))
                     .ToList(),
-                env);
+                scope);
         }
     }
 }

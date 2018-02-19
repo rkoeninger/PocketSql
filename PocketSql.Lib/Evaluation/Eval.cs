@@ -27,7 +27,7 @@ namespace PocketSql.Evaluation
         }
 
         private static Func<SelectElement, IEnumerable<(string, DbType, ScalarExpression)>>
-            ExtractSelection(Table table, Env env) => s =>
+            ExtractSelection(Table table, Scope scope) => s =>
         {
             switch (s)
             {
@@ -41,7 +41,7 @@ namespace PocketSql.Evaluation
                     return new[]
                     {(
                         scalar.ColumnName?.Value ?? InferName(scalar.Expression),
-                        InferType(scalar.Expression, table, env),
+                        InferType(scalar.Expression, table, scope),
                         scalar.Expression
                     )}.AsEnumerable();
                 case SelectSetVariable set:
@@ -74,7 +74,7 @@ namespace PocketSql.Evaluation
             return null;
         }
 
-        private static DbType InferType(ScalarExpression expr, Table table, Env env)
+        private static DbType InferType(ScalarExpression expr, Table table, Scope scope)
         {
             // TODO: a lot of work to do here for type inference
             //       how does sql server do it?
@@ -84,7 +84,7 @@ namespace PocketSql.Evaluation
             switch (expr)
             {
                 case ParenthesisExpression paren:
-                    return InferType(paren.Expression, table, env);
+                    return InferType(paren.Expression, table, scope);
                 case IntegerLiteral _:
                     return DbType.Int32;
                 case StringLiteral _:
@@ -98,11 +98,11 @@ namespace PocketSql.Evaluation
                     return DbType.Object; // TODO: retain variable type information
                 case BinaryExpression binExpr:
                     // TODO: so, so brittle
-                    return InferType(binExpr.FirstExpression, table, env);
+                    return InferType(binExpr.FirstExpression, table, scope);
                 case FunctionCall fun:
                     switch (fun.FunctionName.Value.ToLower())
                     {
-                        case "sum": return InferType(fun.Parameters[0], table, env);
+                        case "sum": return InferType(fun.Parameters[0], table, scope);
                         case "count": return DbType.Int32;
                         case "trim":
                         case "ltrim":
@@ -110,10 +110,10 @@ namespace PocketSql.Evaluation
                         case "upper":
                         case "lower":
                             return DbType.String;
-                        default: return env.Functions[fun.FunctionName.Value].ReturnType;
+                        default: return scope.Env.Functions[fun.FunctionName.Value].ReturnType;
                     }
                 case CaseExpression c:
-                    return InferType(c.ElseExpression, table, env);
+                    return InferType(c.ElseExpression, table, scope);
                 default:
                     throw FeatureNotSupportedException.Value(expr);
             }

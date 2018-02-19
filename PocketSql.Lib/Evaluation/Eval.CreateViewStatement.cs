@@ -5,9 +5,9 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(CreateViewStatement createView, Env env)
+        public static EngineResult Evaluate(CreateViewStatement createView, Scope scope)
         {
-            env.Views.Declare(new View
+            scope.Env.Views.Declare(new View
             {
                 Name = createView.SchemaObjectName.BaseIdentifier.Value,
                 Query = createView.SelectStatement.QueryExpression

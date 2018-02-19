@@ -5,23 +5,23 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(DeleteSpecification delete, Env env)
+        public static EngineResult Evaluate(DeleteSpecification delete, Scope scope)
         {
             var tableRef = (NamedTableReference)delete.Target;
-            var table = env.Tables[tableRef.SchemaObject.BaseIdentifier.Value];
+            var table = scope.Env.Tables[tableRef.SchemaObject.BaseIdentifier.Value];
             var rowCount = 0;
 
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
                 if (delete.WhereClause == null
-                    || Evaluate(delete.WhereClause.SearchCondition, new RowArgument(row), env))
+                    || Evaluate(delete.WhereClause.SearchCondition, new RowArgument(row), scope))
                 {
                     table.Rows.Remove(row);
                     rowCount++;
                 }
             }
 
-            env.RowCount = rowCount;
+            scope.Env.RowCount = rowCount;
             return new EngineResult(rowCount);
         }
     }

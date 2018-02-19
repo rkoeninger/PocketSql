@@ -6,16 +6,16 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static void Evaluate(CursorStatement statement, Env env)
+        public static void Evaluate(CursorStatement statement, Scope scope)
         {
             // TODO: global cursors? statement.Cursor.IsGlobal
             var name = statement.Cursor.Name.Value;
-            var cursor = (Cursor)env.Vars[name];
+            var cursor = (Cursor)scope.Env.Vars[name];
 
             switch (statement)
             {
                 case OpenCursorStatement _:
-                    cursor.Open(env);
+                    cursor.Open(scope);
                     return;
                 case CloseCursorStatement _:
                     cursor.Close();
@@ -24,13 +24,13 @@ namespace PocketSql.Evaluation
                     cursor.Deallocate();
                     return;
                 case FetchCursorStatement fetch:
-                    var result = CursorFetch(fetch, cursor, env);
-                    env.FetchStatus = result == null ? 1 : 0;
-                    if (env.FetchStatus != 0) return;
+                    var result = CursorFetch(fetch, cursor, scope);
+                    scope.Env.FetchStatus = result == null ? 1 : 0;
+                    if (result == null) return;
 
                     foreach (var (v, x) in fetch.IntoVariables.Zip(result.Values, (v, x) => (v, x)))
                     {
-                        env.Vars.DeclareOrSet(v.Name, x);
+                        scope.Env.Vars.DeclareOrSet(v.Name, x);
                     }
 
                     return;
@@ -39,7 +39,7 @@ namespace PocketSql.Evaluation
             }
         }
 
-        private static Row CursorFetch(FetchCursorStatement fetch, Cursor cursor, Env env)
+        private static Row CursorFetch(FetchCursorStatement fetch, Cursor cursor, Scope scope)
         {
             var orientation = fetch.FetchType?.Orientation ?? FetchOrientation.None;
 
@@ -55,9 +55,9 @@ namespace PocketSql.Evaluation
                 case FetchOrientation.Last:
                     return cursor.MoveLast();
                 case FetchOrientation.Absolute:
-                    return cursor.MoveAbsolute((int)Evaluate(fetch.FetchType.RowOffset, NullArgument.It, env));
+                    return cursor.MoveAbsolute(Evaluate<int>(fetch.FetchType?.RowOffset, NullArgument.It, scope));
                 case FetchOrientation.Relative:
-                    return cursor.MoveRelative((int)Evaluate(fetch.FetchType.RowOffset, NullArgument.It, env));
+                    return cursor.MoveRelative(Evaluate<int>(fetch.FetchType?.RowOffset, NullArgument.It, scope));
                 default:
                     throw FeatureNotSupportedException.Value(orientation);
             }

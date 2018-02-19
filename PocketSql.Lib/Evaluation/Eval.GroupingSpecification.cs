@@ -5,12 +5,12 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static object Evaluate(GroupingSpecification groupingSpec, RowArgument row, Env env)
+        public static object Evaluate(GroupingSpecification groupingSpec, RowArgument row, Scope scope)
         {
             switch (groupingSpec)
             {
                 case ExpressionGroupingSpecification expr:
-                    return Evaluate(expr.Expression, row, env);
+                    return Evaluate(expr.Expression, row, scope);
                 default:
                     throw FeatureNotSupportedException.Subtype(groupingSpec);
             }

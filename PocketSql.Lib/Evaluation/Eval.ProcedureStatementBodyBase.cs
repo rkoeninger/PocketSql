@@ -6,21 +6,21 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static void Evaluate(ProcedureStatementBodyBase exec, Env env)
+        public static void Evaluate(ProcedureStatementBodyBase exec, Scope scope)
         {
             switch (exec)
             {
                 case AlterFunctionStatement alterFunc:
-                    env.Functions.Set(BuildFunc(alterFunc));
+                    scope.Env.Functions.Set(BuildFunc(alterFunc));
                     return;
                 case AlterProcedureStatement alterProc:
-                    env.Procedures.Set(BuildProc(alterProc));
+                    scope.Env.Procedures.Set(BuildProc(alterProc));
                     return;
                 case CreateFunctionStatement createFunc:
-                    env.Functions.Declare(BuildFunc(createFunc));
+                    scope.Env.Functions.Declare(BuildFunc(createFunc));
                     return;
                 case CreateProcedureStatement createProc:
-                    env.Procedures.Declare(BuildProc(createProc));
+                    scope.Env.Procedures.Declare(BuildProc(createProc));
                     return;
                 default:
                     throw FeatureNotSupportedException.Subtype(exec);

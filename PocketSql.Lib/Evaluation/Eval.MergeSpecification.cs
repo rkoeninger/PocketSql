@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Modeling;
@@ -8,12 +7,12 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(MergeSpecification merge, Env env)
+        public static EngineResult Evaluate(MergeSpecification merge, Scope scope)
         {
             var targetTableRef = (NamedTableReference)merge.Target;
-            var targetTable = env.Tables[targetTableRef.SchemaObject.BaseIdentifier.Value];
+            var targetTable = scope.Env.Tables[targetTableRef.SchemaObject.BaseIdentifier.Value];
             var sourceTableRef = (NamedTableReference)merge.TableReference;
-            var sourceTable = env.Tables[sourceTableRef.SchemaObject.BaseIdentifier.Value];
+            var sourceTable = scope.Env.Tables[sourceTableRef.SchemaObject.BaseIdentifier.Value];
             var rowCount = 0;
             var matched = new List<Row>();
             var notMatchedByTarget = new List<Row>();
@@ -22,12 +21,12 @@ namespace PocketSql.Evaluation
             // TODO: only search for and build up collections that will be required by match clauses
 
             // find matched and not matched (by target)
-            foreach (Row row in sourceTable.Rows)
+            foreach (var row in sourceTable.Rows)
             {
                 // TODO: need to respect table aliases and combine rows
                 // TODO: need to define new row classes that aggregate rows via aliases
                 var targetRow = targetTable.Rows.FirstOrDefault(x =>
-                    Evaluate(merge.SearchCondition, new RowArgument(row), env));
+                    Evaluate(merge.SearchCondition, new RowArgument(row), scope));
 
                 if (targetRow == null)
                 {
@@ -40,10 +39,10 @@ namespace PocketSql.Evaluation
             }
 
             // find not matched by source
-            foreach (Row row in targetTable.Rows)
+            foreach (var row in targetTable.Rows)
             {
                 var sourceRow = sourceTable.Rows.FirstOrDefault(x =>
-                    Evaluate(merge.SearchCondition, new RowArgument(row), env));
+                    Evaluate(merge.SearchCondition, new RowArgument(row), scope));
 
                 if (sourceRow == null)
                 {
@@ -57,10 +56,10 @@ namespace PocketSql.Evaluation
             {
                 foreach (var row in matched)
                 {
-                    if (Evaluate(clause.SearchCondition, new RowArgument(row), env))
+                    if (Evaluate(clause.SearchCondition, new RowArgument(row), scope))
                     {
                         rowCount++;
-                        Evaluate(clause.Action, targetTable, row, env);
+                        Evaluate(clause.Action, targetTable, row, scope);
                     }
                 }
             }
@@ -73,10 +72,10 @@ namespace PocketSql.Evaluation
             {
                 foreach (var row in notMatchedByTarget)
                 {
-                    if (Evaluate(clause.SearchCondition, new RowArgument(row), env))
+                    if (Evaluate(clause.SearchCondition, new RowArgument(row), scope))
                     {
                         rowCount++;
-                        Evaluate(clause.Action, targetTable, row, env);
+                        Evaluate(clause.Action, targetTable, row, scope);
                     }
                 }
             }
@@ -87,17 +86,17 @@ namespace PocketSql.Evaluation
             {
                 foreach (var row in notMatchedBySource)
                 {
-                    if (Evaluate(clause.SearchCondition, new RowArgument(row), env))
+                    if (Evaluate(clause.SearchCondition, new RowArgument(row), scope))
                     {
                         rowCount++;
-                        Evaluate(clause.Action, targetTable, row, env);
+                        Evaluate(clause.Action, targetTable, row, scope);
                     }
                 }
             }
 
             // TODO: output into
 
-            env.RowCount = rowCount;
+            scope.Env.RowCount = rowCount;
             return new EngineResult(rowCount);
         }
     }

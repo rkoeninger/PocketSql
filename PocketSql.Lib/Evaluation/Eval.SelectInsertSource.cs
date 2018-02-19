@@ -10,7 +10,7 @@ namespace PocketSql.Evaluation
             Table table,
             IList<ColumnReferenceExpression> cols,
             Table selectedRows,
-            Env env)
+            Scope scope)
         {
             foreach (var valuesExpr in selectedRows.Rows)
             {
@@ -23,7 +23,7 @@ namespace PocketSql.Evaluation
                 }
             }
 
-            env.RowCount = selectedRows.Rows.Count;
+            scope.Env.RowCount = selectedRows.Rows.Count;
             return new EngineResult(selectedRows.Rows.Count);
         }
     }

@@ -5,21 +5,21 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static void Evaluate(DropObjectsStatement drop, Env env)
+        public static void Evaluate(DropObjectsStatement drop, Scope scope)
         {
             switch (drop)
             {
                 case DropFunctionStatement _:
-                    DropAll(drop, env.Functions);
+                    DropAll(drop, scope.Env.Functions);
                     return;
                 case DropProcedureStatement _:
-                    DropAll(drop, env.Procedures);
+                    DropAll(drop, scope.Env.Procedures);
                     return;
                 case DropTableStatement _:
-                    DropAll(drop, env.Tables);
+                    DropAll(drop, scope.Env.Tables);
                     return;
                 case DropViewStatement _:
-                    DropAll(drop, env.Views);
+                    DropAll(drop, scope.Env.Views);
                     return;
                 default:
                     throw FeatureNotSupportedException.Subtype(drop);
