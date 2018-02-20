@@ -32,6 +32,7 @@ namespace PocketSql.Evaluation
             switch (s)
             {
                 // TODO: respect table alias in star expression
+                // TODO: function calls like count(*) are SelectStarExpressions
                 case SelectStarExpression star:
                     return table.Columns.Select(c => (
                         c.Name,
@@ -113,6 +114,8 @@ namespace PocketSql.Evaluation
                         default: return scope.Env.Functions[fun.FunctionName.Value].ReturnType;
                     }
                 case CaseExpression c:
+                    return InferType(c.ElseExpression, table, scope);
+                case IIfCall c:
                     return InferType(c.ElseExpression, table, scope);
                 default:
                     throw FeatureNotSupportedException.Value(expr);

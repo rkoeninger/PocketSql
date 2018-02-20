@@ -69,6 +69,7 @@
     <Compile Include="Evaluation\Eval.FunctionCall.cs" />
     <Compile Include="Evaluation\Eval.GroupingSpecification.cs" />
     <Compile Include="Evaluation\Eval.IfStatement.cs" />
+    <Compile Include="Evaluation\Eval.IIfCall.cs" />
     <Compile Include="Evaluation\Eval.InsertSpecification.cs" />
     <Compile Include="Evaluation\Eval.MergeAction.cs" />
     <Compile Include="Evaluation\Eval.MergeSpecification.cs" />

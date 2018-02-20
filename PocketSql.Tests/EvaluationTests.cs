@@ -678,6 +678,21 @@ namespace PocketSql.Tests
             }
         }
 
+        [Test]
+        public void SelectIIfExpression()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                Assert.AreEqual(4, connection.QueryFirst<int>(@"
+                    select iif('a' = 'a', 4, 3)"));
+
+                Assert.AreEqual(3, connection.QueryFirst<int>(@"
+                    select iif('a' = 'b', 4, 3)"));
+            }
+        }
+
         public class Person
         {
             public string Name { get; set; }

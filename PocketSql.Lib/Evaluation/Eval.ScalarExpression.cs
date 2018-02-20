@@ -46,6 +46,8 @@ namespace PocketSql.Evaluation
                     return scope.Env.GetGlobal(globRef.Name);
                 case CaseExpression caseExpr:
                     return Evaluate(caseExpr, arg, scope);
+                case IIfCall iif:
+                    return Evaluate(iif, arg, scope);
                 case FunctionCall funCall:
                     return Evaluate(funCall, arg, scope);
                 default:
