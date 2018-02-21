@@ -33,7 +33,7 @@ namespace PocketSql.Evaluation
             {
                 projection.Columns.Add(new Column
                 {
-                    Name = name,
+                    Name = new[] { name },
                     Type = type
                 });
             }
@@ -115,7 +115,7 @@ namespace PocketSql.Evaluation
 
                 foreach (var item in temp.Rows
                     .Select(r => EquatableList.Of(temp.Columns
-                        .Select(c => (c.Name, r.GetValue(c.Name)))))
+                        .Select(c => (c.Name.LastOrDefault(), r.GetValue(c.Name.LastOrDefault())))))
                     .Distinct())
                 {
                     var row = projection.NewRow();

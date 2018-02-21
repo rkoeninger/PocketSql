@@ -59,20 +59,15 @@ namespace PocketSql.Evaluation
             switch (name.ToLower())
             {
                 case "lower" when paramCount == 1:
-                    var s0 = Evaluate<string>(funCall.Parameters[0], arg, scope);
-                    return s0?.ToLower();
+                    return Evaluate<string>(funCall.Parameters[0], arg, scope)?.ToLower();
                 case "upper" when paramCount == 1:
-                    var s1 = Evaluate<string>(funCall.Parameters[0], arg, scope);
-                    return s1?.ToUpper();
+                    return Evaluate<string>(funCall.Parameters[0], arg, scope)?.ToUpper();
                 case "trim" when paramCount == 1:
-                    var s2 = Evaluate<string>(funCall.Parameters[0], arg, scope);
-                    return s2?.Trim();
+                    return Evaluate<string>(funCall.Parameters[0], arg, scope)?.Trim();
                 case "ltrim" when paramCount == 1:
-                    var s3 = Evaluate<string>(funCall.Parameters[0], arg, scope);
-                    return s3?.TrimStart();
+                    return Evaluate<string>(funCall.Parameters[0], arg, scope)?.TrimStart();
                 case "rtrim" when paramCount == 1:
-                    var s4 = Evaluate<string>(funCall.Parameters[0], arg, scope);
-                    return s4?.TrimEnd();
+                    return Evaluate<string>(funCall.Parameters[0], arg, scope)?.TrimEnd();
                 case "reverse" when paramCount == 1:
                     var s5 = Evaluate<string>(funCall.Parameters[0], arg, scope);
                     return s5 == null ? null : new string(s5.Reverse().ToArray());

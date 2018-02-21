@@ -35,9 +35,9 @@ namespace PocketSql.Evaluation
                 // TODO: function calls like count(*) are SelectStarExpressions
                 case SelectStarExpression star:
                     return table.Columns.Select(c => (
-                        c.Name,
+                        c.Name.LastOrDefault(),
                         c.Type,
-                        (ScalarExpression)CreateColumnReferenceExpression(c.Name)));
+                        (ScalarExpression)CreateColumnReferenceExpression(c.Name.LastOrDefault())));
                 case SelectScalarExpression scalar:
                     return new[]
                     {(

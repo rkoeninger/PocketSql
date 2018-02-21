@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using PocketSql.Evaluation;
 
 namespace PocketSql
@@ -28,7 +29,7 @@ namespace PocketSql
 
         public DataTable GetSchemaTable() => throw new NotImplementedException();
 
-        public string GetName(int i) => data[tableIndex].ResultSet.Columns[i].Name;
+        public string GetName(int i) => data[tableIndex].ResultSet.Columns[i].Name.LastOrDefault();
         public int GetOrdinal(string name) => data[tableIndex].ResultSet.GetColumnOrdinal(name);
 
         public Type GetFieldType(int i) => Eval.TranslateCsType(data[tableIndex].ResultSet.Columns[i].Type);

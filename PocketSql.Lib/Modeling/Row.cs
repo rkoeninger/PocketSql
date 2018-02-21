@@ -13,13 +13,13 @@ namespace PocketSql.Modeling
         public Column GetColumn(int ordinal) => Columns[ordinal];
 
         public Column GetColumn(string name) =>
-            Columns.FirstOrDefault(c => c.Name.Similar(name))
+            Columns.FirstOrDefault(c => name != null && name.Similar(c.Name.LastOrDefault()))
                 ?? throw new Exception($"Column \"{name}\" does not exist in row");
 
         public int GetColumnOrdinal(string name)
         {
             for (var i = 0; i < Columns.Count; ++i)
-                if (name.Similar(Columns[i].Name))
+                if (name != null && name.Similar(Columns[i].Name.LastOrDefault()))
                     return i;
 
             throw new Exception($"Column \"{name}\" does not exist in row");

@@ -13,7 +13,7 @@ namespace PocketSql.Evaluation
             {
                 table.Columns.Add(new Column
                 {
-                    Name = column.ColumnIdentifier.Value,
+                    Name = new[] { column.ColumnIdentifier.Value },
                     Type = TranslateDbType(column.DataType)
                 });
             }

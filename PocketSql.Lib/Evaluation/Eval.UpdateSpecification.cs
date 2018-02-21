@@ -25,7 +25,7 @@ namespace PocketSql.Evaluation
                 {
                     output.Columns.Add(new Column
                     {
-                        Name = name,
+                        Name = new[] { name },
                         Type = type
                     });
                 }
@@ -33,7 +33,7 @@ namespace PocketSql.Evaluation
 
             var rowCount = 0;
 
-            foreach (Row row in table.Rows)
+            foreach (var row in table.Rows)
             {
                 if (update.WhereClause == null
                     || Evaluate(update.WhereClause.SearchCondition, new RowArgument(row), scope))
