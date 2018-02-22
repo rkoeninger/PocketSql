@@ -1,9 +1,9 @@
-﻿using System.Data;
-
-namespace PocketSql.Modeling
+﻿namespace PocketSql.Modeling
 {
     public class Schema : INamed
     {
+        public static Schema Named(string name) => new Schema(name);
+
         public Schema(string name)
         {
             Name = name;

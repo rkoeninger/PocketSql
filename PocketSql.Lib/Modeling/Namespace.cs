@@ -24,6 +24,18 @@ namespace PocketSql.Modeling
         public Maybe<T> GetMaybe(string name) =>
             members.TryGetValue(name, out var value) ? Maybe.Some(value) : Maybe.None<T>();
 
+        public T GetOrAdd(string name, Func<string, T> make)
+        {
+            if (members.TryGetValue(name, out var result))
+            {
+                return result;
+            }
+
+            var value = make(name);
+            members.Add(name, value);
+            return value;
+        }
+
         public void Set(string name, T value)
         {
             if (!IsDefined(name)) throw new Exception($"{typeof(T).Name} \"{name}\" not defined");

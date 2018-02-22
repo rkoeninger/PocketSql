@@ -10,10 +10,11 @@ namespace PocketSql.Evaluation
             switch (tableRef)
             {
                 case NamedTableReference named:
-                    var name = named.SchemaObject.BaseIdentifier.Value;
-                    return scope.Env.Views.IsDefined(name)
-                        ? Evaluate(scope.Env.Views[name].Query, scope).ResultSet
-                        : scope.Env.Tables[name];
+                    var baseName = named.SchemaObject.BaseIdentifier.Value;
+                    var schema = scope.Env.GetSchema(named.SchemaObject);
+                    return schema.Views.GetMaybe(baseName)
+                        .Select(v => Evaluate(v.Query, scope).ResultSet)
+                        .OrElse(() => schema.Tables[baseName]);
                 case DataModificationTableReference dml:
                     // TODO: how does this work?
                     return Evaluate(dml.DataModificationSpecification, scope).ResultSet;

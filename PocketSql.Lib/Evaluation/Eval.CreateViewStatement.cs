@@ -7,11 +7,17 @@ namespace PocketSql.Evaluation
     {
         public static EngineResult Evaluate(CreateViewStatement createView, Scope scope)
         {
-            scope.Env.Views.Declare(new View
+            var databaseName = createView.SchemaObjectName.DatabaseIdentifier?.Value ?? scope.Env.DefaultDatabase;
+            var schemaName = createView.SchemaObjectName.SchemaIdentifier?.Value ?? scope.Env.DefaultSchema;
+            var viewName = createView.SchemaObjectName.BaseIdentifier.Value;
+            var view = new View
             {
-                Name = createView.SchemaObjectName.BaseIdentifier.Value,
+                Name = viewName,
                 Query = createView.SelectStatement.QueryExpression
-            });
+            };
+            var database = scope.Env.Engine.Databases.GetOrAdd(databaseName, Database.Named);
+            var schema = database.Schemas.GetOrAdd(schemaName, Schema.Named);
+            schema.Views.Declare(view);
             return null;
         }
     }

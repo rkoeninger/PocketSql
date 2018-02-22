@@ -2,6 +2,8 @@
 {
     public class Database : INamed
     {
+        public static Database Named(string name) => new Database(name);
+
         public Database(string name)
         {
             Name = name;
