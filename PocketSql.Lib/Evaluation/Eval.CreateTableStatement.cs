@@ -16,7 +16,13 @@ namespace PocketSql.Evaluation
                 Name = tableName,
                 Columns = createTable.Definition.ColumnDefinitions.Select(c => new Column
                 {
-                    Name = new[] { c.ColumnIdentifier.Value },
+                    Name = new[]
+                    {
+                        databaseName,
+                        schemaName,
+                        tableName,
+                        c.ColumnIdentifier.Value
+                    }.Where(x => x != null).ToArray(),
                     Type = TranslateDbType(c.DataType)
                 }).ToList()
             };
