@@ -1,4 +1,5 @@
-﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using System.Linq;
+using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Modeling;
 
 namespace PocketSql.Evaluation
@@ -12,18 +13,13 @@ namespace PocketSql.Evaluation
             var tableName = createTable.SchemaObjectName.BaseIdentifier.Value;
             var table = new Table
             {
-                Name = tableName
-            };
-
-            foreach (var column in createTable.Definition.ColumnDefinitions)
-            {
-                table.Columns.Add(new Column
+                Name = tableName,
+                Columns = createTable.Definition.ColumnDefinitions.Select(c => new Column
                 {
-                    Name = new[] { column.ColumnIdentifier.Value },
-                    Type = TranslateDbType(column.DataType)
-                });
-            }
-
+                    Name = new[] { c.ColumnIdentifier.Value },
+                    Type = TranslateDbType(c.DataType)
+                }).ToList()
+            };
             var database = scope.Env.Engine.Databases.GetOrAdd(databaseName, Database.Named);
             var schema = database.Schemas.GetOrAdd(schemaName, Schema.Named);
             schema.Tables.Declare(table);
