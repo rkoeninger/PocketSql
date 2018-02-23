@@ -46,6 +46,12 @@ namespace PocketSql.Evaluation
                         scalar.Expression
                     )}.AsEnumerable();
                 case SelectSetVariable set:
+                    scope.Env.Vars[set.Variable.Name] =
+                        Evaluate(
+                            set.AssignmentKind,
+                            scope.Env.Vars[set.Variable.Name],
+                            Evaluate(set.Expression, NullArgument.It, scope));
+                    return null;
                 default:
                     throw FeatureNotSupportedException.Subtype(s);
             }
