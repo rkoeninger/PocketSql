@@ -11,16 +11,24 @@ namespace PocketSql.Evaluation
             switch (exec)
             {
                 case AlterFunctionStatement alterFunc:
-                    scope.Env.Functions.Set(BuildFunc(alterFunc));
+                    scope.Env.GetSchema(alterFunc.Name).Functions.Set(
+                        alterFunc.Name.BaseIdentifier.Value,
+                        BuildFunc(alterFunc));
                     return;
                 case AlterProcedureStatement alterProc:
-                    scope.Env.Procedures.Set(BuildProc(alterProc));
+                    scope.Env.GetSchema(alterProc.ProcedureReference.Name).Procedures.Set(
+                        alterProc.ProcedureReference.Name.BaseIdentifier.Value,
+                        BuildProc(alterProc));
                     return;
                 case CreateFunctionStatement createFunc:
-                    scope.Env.Functions.Declare(BuildFunc(createFunc));
+                    scope.Env.GetSchema(createFunc.Name).Functions.Declare(
+                        createFunc.Name.BaseIdentifier.Value,
+                        BuildFunc(createFunc));
                     return;
                 case CreateProcedureStatement createProc:
-                    scope.Env.Procedures.Declare(BuildProc(createProc));
+                    scope.Env.GetSchema(createProc.ProcedureReference.Name).Procedures.Declare(
+                        createProc.ProcedureReference.Name.BaseIdentifier.Value,
+                        BuildProc(createProc));
                     return;
                 default:
                     throw FeatureNotSupportedException.Subtype(exec);
@@ -30,7 +38,12 @@ namespace PocketSql.Evaluation
         private static Function BuildFunc(FunctionStatementBody funcExpr) =>
             new Function
             {
-                Name = funcExpr.Name.BaseIdentifier.Value,
+                Name = new[]
+                {
+                    funcExpr.Name.DatabaseIdentifier?.Value,
+                    funcExpr.Name.SchemaIdentifier?.Value,
+                    funcExpr.Name.BaseIdentifier?.Value
+                }.Where(x => x != null).ToArray(),
                 Parameters = funcExpr.Parameters.ToDictionary(
                     x => x.VariableName.Value,
                     x => TranslateDbType(x.DataType)),
@@ -41,7 +54,12 @@ namespace PocketSql.Evaluation
         private static Procedure BuildProc(ProcedureStatementBody procExpr) =>
             new Procedure
             {
-                Name = procExpr.ProcedureReference.Name.Identifiers.Last().Value,
+                Name = new[]
+                {
+                    procExpr.ProcedureReference.Name.DatabaseIdentifier?.Value,
+                    procExpr.ProcedureReference.Name.SchemaIdentifier?.Value,
+                    procExpr.ProcedureReference.Name.BaseIdentifier?.Value
+                }.Where(x => x != null).ToArray(),
                 Parameters = procExpr.Parameters.ToDictionary(
                     x => x.VariableName.Value,
                     x => TranslateType(x.DataType)),
