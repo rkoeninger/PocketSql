@@ -51,7 +51,7 @@ namespace PocketSql.Evaluation
                             set.AssignmentKind,
                             scope.Env.Vars[set.Variable.Name],
                             Evaluate(set.Expression, NullArgument.It, scope));
-                    return null;
+                    return null; // TODO: what to return for projection column(s)?
                 default:
                     throw FeatureNotSupportedException.Subtype(s);
             }
