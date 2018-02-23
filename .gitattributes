@@ -1,0 +1,11 @@
+.gitattributes  text
+.gitignore      text
+*.config        text
+*.cs            text
+*.csproj        text
+*.dependencies  text
+*.lock          text
+*.md            text
+*.references    text
+*.sln           text
+*.yml           text
