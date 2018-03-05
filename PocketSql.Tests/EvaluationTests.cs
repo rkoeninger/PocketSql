@@ -610,7 +610,6 @@ namespace PocketSql.Tests
                     (47, 'uio'),
                     (47, 'zxc')"));
 
-                // TODO: does `set @total += @X` work? should it?
                 var result = connection.ExecuteScalar<int>(@"
                     declare @total int = 0
                     declare cur cursor for select * from Things
@@ -620,7 +619,7 @@ namespace PocketSql.Tests
 
                     while @@fetch_status = 0
                     begin
-                        set @total = @total + @X
+                        set @total += @X
                         fetch from cur into @X, @Y
                     end
 
