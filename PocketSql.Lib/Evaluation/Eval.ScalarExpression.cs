@@ -34,7 +34,9 @@ namespace PocketSql.Evaluation
                     switch (arg)
                     {
                         case RowArgument row:
-                            return row.Value.GetValue(colExpr.MultiPartIdentifier.Identifiers.Last().Value);
+                            return row.Value.GetValue(
+                                colExpr.MultiPartIdentifier.Identifiers.Select(x => x.Value).ToArray(),
+                                scope);
                         case GroupArgument group:
                             return group.Key.Elements.First(x => x.Item1.Similar(colExpr.MultiPartIdentifier.Identifiers.Last().Value)).Item2;
                         default:

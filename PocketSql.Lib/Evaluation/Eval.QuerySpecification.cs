@@ -23,8 +23,16 @@ namespace PocketSql.Evaluation
 
             // FROM
 
-            var table = querySpec.FromClause?.TableReferences?
-                .Aggregate((Table)null, (ts, tr) => Evaluate(tr, ts, scope));
+            Table table = null;
+
+            if (querySpec.FromClause?.TableReferences != null)
+            {
+                foreach (var tableRef in querySpec.FromClause.TableReferences)
+                {
+                    (table, scope) = Evaluate(tableRef, table, scope);
+                }
+            }
+
             var selections = querySpec.SelectElements
                 .SelectMany(ExtractSelection(table, scope)).ToList();
             var projection = new Table();

@@ -23,9 +23,11 @@ namespace PocketSql.Modeling
             throw new Exception($"Column \"{name}\" does not exist in row");
         }
 
-        // TODO: expand name with default database/schema/match tables in scope
+        // TODO: expand name with tables in scope
         public int GetColumnOrdinal(string[] name, Scope scope)
         {
+            name = name.Where(x => x != null).ToArray();
+
             if (name.Length == 0) throw new Exception("Cannot access column without name");
             if (name.Length == 1) return GetColumnOrdinal(name[0]);
 
@@ -38,8 +40,11 @@ namespace PocketSql.Modeling
                 .Concat(new[] { name.Last() })
                 .ToArray();
 
+            if (resolvedName.Length < 3) resolvedName = new[] { scope.Env.DefaultSchema }.Concat(resolvedName).ToArray();
+            if (resolvedName.Length < 4) resolvedName = new[] { scope.Env.DefaultDatabase }.Concat(resolvedName).ToArray();
+
             for (var i = 0; i < Columns.Count; ++i)
-                if (name != null && name.SequenceEqual(Columns[i].Name, Naming.Comparer))
+                if (resolvedName != null && resolvedName.SequenceEqual(Columns[i].Name, Naming.Comparer))
                     return i;
 
             throw new Exception($"Column \"{string.Join(".", name)}\" does not exist in row");
@@ -47,6 +52,9 @@ namespace PocketSql.Modeling
 
         public object GetValue(string name) =>
             Values[GetColumnOrdinal(name)];
+
+        public object GetValue(string[] name, Scope scope) =>
+            Values[GetColumnOrdinal(name, scope)];
 
         public void SetValue(string name, object value) =>
             Values[GetColumnOrdinal(name)] = value;
