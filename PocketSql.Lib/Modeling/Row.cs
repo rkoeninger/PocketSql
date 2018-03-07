@@ -44,7 +44,7 @@ namespace PocketSql.Modeling
             if (resolvedName.Length < 4) resolvedName = new[] { scope.Env.DefaultDatabase }.Concat(resolvedName).ToArray();
 
             for (var i = 0; i < Columns.Count; ++i)
-                if (resolvedName != null && resolvedName.SequenceEqual(Columns[i].Name, Naming.Comparer))
+                if (resolvedName.SequenceEqual(Columns[i].Name, Naming.Comparer))
                     return i;
 
             throw new Exception($"Column \"{string.Join(".", name)}\" does not exist in row");
