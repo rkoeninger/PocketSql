@@ -57,6 +57,41 @@ namespace PocketSql.Evaluation
             }
         };
 
+        private static (Table, Scope) Join(
+            Table accumulatedTables,
+            Table targetTable,
+            QualifiedJoinType type,
+            Scope scope)
+        {
+            switch (type)
+            {
+                case QualifiedJoinType.Inner:
+                case QualifiedJoinType.LeftOuter:
+                case QualifiedJoinType.RightOuter:
+                case QualifiedJoinType.FullOuter:
+                    break;
+            }
+
+            return (targetTable, scope);
+        }
+
+        private static (Table, Scope) Join(
+            Table accumulatedTables,
+            Table targetTable,
+            UnqualifiedJoinType type,
+            Scope scope)
+        {
+            switch (type)
+            {
+                case UnqualifiedJoinType.CrossApply:
+                case UnqualifiedJoinType.CrossJoin:
+                case UnqualifiedJoinType.OuterApply:
+                    break;
+            }
+
+            return (targetTable, scope);
+        }
+
         private static string InferName(GroupingSpecification groupSpec)
         {
             switch (groupSpec)
