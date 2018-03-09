@@ -30,7 +30,7 @@ namespace PocketSql.Evaluation
                 case OdbcQualifiedJoinTableReference odbc:
                     return Evaluate(odbc.TableReference, joinedTables, scope);
                 case QualifiedJoin qjoin:
-                    return Join(joinedTables, null, qjoin.QualifiedJoinType, scope);
+                    return Join(joinedTables, null, qjoin.SearchCondition, qjoin.QualifiedJoinType, scope);
                 case UnqualifiedJoin ujoin:
                     return Join(joinedTables, null, ujoin.UnqualifiedJoinType, scope);
                 default:

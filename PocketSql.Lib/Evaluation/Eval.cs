@@ -57,23 +57,67 @@ namespace PocketSql.Evaluation
             }
         };
 
+        // Need to accumulate table aliases in Scope
         private static (Table, Scope) Join(
             Table accumulatedTables,
             Table targetTable,
+            BooleanExpression condition,
             QualifiedJoinType type,
             Scope scope)
         {
             switch (type)
             {
                 case QualifiedJoinType.Inner:
+                    var innerRows = accumulatedTables.Rows.SelectMany(a =>
+                        targetTable.Rows
+                            .Select(b => JoinRows(a, b))
+                            .Where(c => Evaluate(condition, new RowArgument(c), scope)));
+                    break;
                 case QualifiedJoinType.LeftOuter:
+                    var leftRows = accumulatedTables.Rows.SelectMany(a =>
+                        targetTable.Rows
+                            .Select(x => JoinRows(a, x))
+                            .Where(c => Evaluate(condition, new RowArgument(c), scope))
+                            .DefaultIfEmpty(LeftRow(a, targetTable)));
+                    break;
                 case QualifiedJoinType.RightOuter:
+                    var rightRows = targetTable.Rows.SelectMany(a =>
+                        accumulatedTables.Rows
+                            .Select(x => JoinRows(a, x))
+                            .Where(c => Evaluate(condition, new RowArgument(c), scope))
+                            .DefaultIfEmpty(RightRow(accumulatedTables, a)));
+                    break;
                 case QualifiedJoinType.FullOuter:
+                    // TODO: Do like LeftJoin but track right rows in results
+                    // then add the right rows with nulls for left columns to results
                     break;
             }
 
             return (targetTable, scope);
         }
+
+        private static Row JoinRows(Row x, Row y) =>
+            new Row
+            {
+                Columns = x.Columns.Concat(y.Columns).ToList(),
+                Values = x.Values.Concat(y.Values).ToList()
+            };
+
+        private static Row LeftRow(Row x, Table ys) =>
+            new Row
+            {
+                Columns = x.Columns.Concat(ys.Columns).ToList(),
+                Values = x.Values.Concat(Nulls(ys.Columns.Count)).ToList()
+            };
+
+        private static Row RightRow(Table xs, Row y) =>
+            new Row
+            {
+                Columns = xs.Columns.Concat(y.Columns).ToList(),
+                Values = Nulls(xs.Columns.Count).Concat(y.Values).ToList()
+            };
+
+        private static IEnumerable<object> Nulls(int n) => Enumerable.Repeat<object>(null, n);
 
         private static (Table, Scope) Join(
             Table accumulatedTables,
