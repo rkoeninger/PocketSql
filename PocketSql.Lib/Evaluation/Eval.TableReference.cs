@@ -30,9 +30,13 @@ namespace PocketSql.Evaluation
                 case OdbcQualifiedJoinTableReference odbc:
                     return Evaluate(odbc.TableReference, joinedTables, scope);
                 case QualifiedJoin qjoin:
-                    return Join(joinedTables, null, qjoin.SearchCondition, qjoin.QualifiedJoinType, scope);
+                    var (leftTable, leftScope) = Evaluate(qjoin.FirstTableReference, joinedTables, scope);
+                    var (rightTable, rightScope) = Evaluate(qjoin.SecondTableReference, leftTable, leftScope);
+                    return Join(leftTable, rightTable, qjoin.SearchCondition, qjoin.QualifiedJoinType, rightScope);
                 case UnqualifiedJoin ujoin:
-                    return Join(joinedTables, null, ujoin.UnqualifiedJoinType, scope);
+                    var (leftTable2, leftScope2) = Evaluate(ujoin.FirstTableReference, joinedTables, scope);
+                    var (rightTable2, rightScope2) = Evaluate(ujoin.SecondTableReference, leftTable2, leftScope2);
+                    return Join(leftTable2, rightTable2, ujoin.UnqualifiedJoinType, rightScope2);
                 default:
                     throw FeatureNotSupportedException.Subtype(tableRef);
             }

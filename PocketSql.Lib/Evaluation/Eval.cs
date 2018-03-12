@@ -63,40 +63,49 @@ namespace PocketSql.Evaluation
             Table targetTable,
             BooleanExpression condition,
             QualifiedJoinType type,
+            Scope scope) => (
+                new Table
+                {
+                    Columns = accumulatedTables.Columns.Concat(targetTable.Columns).ToList(),
+                    Rows = JoinRows(accumulatedTables, targetTable, condition, type, scope).ToList()
+                },
+                scope);
+
+        private static IEnumerable<Row> JoinRows(
+            Table accumulatedTables,
+            Table targetTable,
+            BooleanExpression condition,
+            QualifiedJoinType type,
             Scope scope)
         {
             switch (type)
             {
                 case QualifiedJoinType.Inner:
-                    var innerRows = accumulatedTables.Rows.SelectMany(a =>
+                    return accumulatedTables.Rows.SelectMany(a =>
                         targetTable.Rows
-                            .Select(b => JoinRows(a, b))
+                            .Select(b => InnerRow(a, b))
                             .Where(c => Evaluate(condition, new RowArgument(c), scope)));
-                    break;
                 case QualifiedJoinType.LeftOuter:
-                    var leftRows = accumulatedTables.Rows.SelectMany(a =>
+                    return accumulatedTables.Rows.SelectMany(a =>
                         targetTable.Rows
-                            .Select(x => JoinRows(a, x))
+                            .Select(x => InnerRow(a, x))
                             .Where(c => Evaluate(condition, new RowArgument(c), scope))
                             .DefaultIfEmpty(LeftRow(a, targetTable)));
-                    break;
                 case QualifiedJoinType.RightOuter:
-                    var rightRows = targetTable.Rows.SelectMany(a =>
+                    return targetTable.Rows.SelectMany(a =>
                         accumulatedTables.Rows
-                            .Select(x => JoinRows(a, x))
+                            .Select(x => InnerRow(a, x))
                             .Where(c => Evaluate(condition, new RowArgument(c), scope))
                             .DefaultIfEmpty(RightRow(accumulatedTables, a)));
-                    break;
                 case QualifiedJoinType.FullOuter:
                     // TODO: Do like LeftJoin but track right rows in results
                     // then add the right rows with nulls for left columns to results
-                    break;
+                default:
+                    throw FeatureNotSupportedException.Value(type);
             }
-
-            return (targetTable, scope);
         }
 
-        private static Row JoinRows(Row x, Row y) =>
+        private static Row InnerRow(Row x, Row y) =>
             new Row
             {
                 Columns = x.Columns.Concat(y.Columns).ToList(),
