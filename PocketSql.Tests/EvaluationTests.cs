@@ -692,8 +692,7 @@ namespace PocketSql.Tests
             }
         }
 
-        [Test]
-        public void InnerJoin()
+        private Engine CreateEngineWithCityColorTaste()
         {
             var engine = new Engine(140);
 
@@ -743,7 +742,18 @@ namespace PocketSql.Tests
                     (24, 'bitter'),
                     (25, 'savory'),
                     (26, 'salty')");
+            }
 
+            return engine;
+        }
+
+        [Test]
+        public void InnerJoin()
+        {
+            var engine = CreateEngineWithCityColorTaste();
+
+            using (var connection = engine.GetConnection())
+            {
                 var results = connection.Query<CityColorTaste>(@"
                     select a.City, b.Color, c.Taste
                     from TableA as a
@@ -751,6 +761,38 @@ namespace PocketSql.Tests
                     join TableC as c on b.Y = c.Y").ToList();
 
                 Assert.AreEqual(8, results.Count);
+            }
+        }
+
+        [Test]
+        public void CrossJoin()
+        {
+            var engine = CreateEngineWithCityColorTaste();
+
+            using (var connection = engine.GetConnection())
+            {
+                var results = connection.Query<CityColorTaste>(@"
+                    select *
+                    from TableA as a
+                    cross join TableB as b").ToList();
+
+                Assert.AreEqual(96, results.Count);
+            }
+        }
+
+        [Test]
+        public void CrossApply()
+        {
+            var engine = CreateEngineWithCityColorTaste();
+
+            using (var connection = engine.GetConnection())
+            {
+                var results = connection.Query<CityColorTaste>(@"
+                    select * from TableA as a
+                    cross apply
+                    (select * from TableB as b) as c").ToList();
+
+                Assert.AreEqual(96, results.Count);
             }
         }
 

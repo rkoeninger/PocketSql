@@ -1,5 +1,6 @@
-﻿using PocketSql.Modeling;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
+using System.Linq;
+using PocketSql.Modeling;
 
 namespace PocketSql
 {
@@ -31,5 +32,37 @@ namespace PocketSql
 
         public Scope PushCte(string name, Table table) =>
             new Scope(Env, Aliases, Ctes.SetItem(name, table));
+
+        public string[] ExpandColumnName(string[] name)
+        {
+            var resolvedName = name
+                .Take(name.Length - 1)
+                .SelectMany(x =>
+                    Aliases.TryGetValue(x, out var resolved)
+                        ? resolved
+                        : new[] { x })
+                .Concat(new[] { name.Last() })
+                .ToArray();
+
+            if (resolvedName.Length < 3) resolvedName = new[] { Env.DefaultSchema }.Concat(resolvedName).ToArray();
+            if (resolvedName.Length < 4) resolvedName = new[] { Env.DefaultDatabase }.Concat(resolvedName).ToArray();
+
+            return resolvedName;
+        }
+
+        public string[] ExpandTableName(string[] name)
+        {
+            var resolvedName = name
+                .SelectMany(x =>
+                    Aliases.TryGetValue(x, out var resolved)
+                        ? resolved
+                        : new[] { x })
+                .ToArray();
+
+            if (resolvedName.Length < 2) resolvedName = new[] { Env.DefaultSchema }.Concat(resolvedName).ToArray();
+            if (resolvedName.Length < 3) resolvedName = new[] { Env.DefaultDatabase }.Concat(resolvedName).ToArray();
+
+            return resolvedName;
+        }
     }
 }

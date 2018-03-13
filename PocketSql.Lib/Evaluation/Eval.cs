@@ -67,11 +67,11 @@ namespace PocketSql.Evaluation
                 new Table
                 {
                     Columns = accumulatedTables.Columns.Concat(targetTable.Columns).ToList(),
-                    Rows = JoinRows(accumulatedTables, targetTable, condition, type, scope).ToList()
+                    Rows = QualifiedJoinRows(accumulatedTables, targetTable, condition, type, scope).ToList()
                 },
                 scope);
 
-        private static IEnumerable<Row> JoinRows(
+        private static IEnumerable<Row> QualifiedJoinRows(
             Table accumulatedTables,
             Table targetTable,
             BooleanExpression condition,
@@ -105,6 +105,37 @@ namespace PocketSql.Evaluation
             }
         }
 
+        private static (Table, Scope) Join(
+            Table accumulatedTables,
+            Table targetTable,
+            UnqualifiedJoinType type,
+            Scope scope) => (
+                new Table
+                {
+                    Columns = accumulatedTables.Columns.Concat(targetTable.Columns).ToList(),
+                    Rows = UnqualifiedJoinRows(accumulatedTables, targetTable, type, scope).ToList()
+                },
+                scope);
+
+        private static IEnumerable<Row> UnqualifiedJoinRows(
+            Table accumulatedTables,
+            Table targetTable,
+            UnqualifiedJoinType type,
+            Scope scope)
+        {
+            switch (type)
+            {
+                case UnqualifiedJoinType.CrossJoin:
+                case UnqualifiedJoinType.CrossApply:
+                    return accumulatedTables.Rows.SelectMany(a =>
+                        targetTable.Rows
+                            .Select(b => InnerRow(a, b)));
+                case UnqualifiedJoinType.OuterApply:
+                default:
+                    throw FeatureNotSupportedException.Value(type);
+            }
+        }
+
         private static Row InnerRow(Row x, Row y) =>
             new Row
             {
@@ -127,23 +158,6 @@ namespace PocketSql.Evaluation
             };
 
         private static IEnumerable<object> Nulls(int n) => Enumerable.Repeat<object>(null, n);
-
-        private static (Table, Scope) Join(
-            Table accumulatedTables,
-            Table targetTable,
-            UnqualifiedJoinType type,
-            Scope scope)
-        {
-            switch (type)
-            {
-                case UnqualifiedJoinType.CrossApply:
-                case UnqualifiedJoinType.CrossJoin:
-                case UnqualifiedJoinType.OuterApply:
-                    break;
-            }
-
-            return (targetTable, scope);
-        }
 
         private static string InferName(GroupingSpecification groupSpec)
         {

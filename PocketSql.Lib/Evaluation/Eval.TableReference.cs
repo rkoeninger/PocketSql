@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Modeling;
 
@@ -21,7 +22,7 @@ namespace PocketSql.Evaluation
                             ? scope
                             : scope.PushAlias(
                                 named.Alias.Value,
-                                named.SchemaObject.Identifiers.Select(x => x.Value).ToArray()));
+                                scope.ExpandTableName(named.SchemaObject.Identifiers.Select(x => x.Value).ToArray())));
                 case DataModificationTableReference dml:
                     // TODO: how does this work?
                     return (Evaluate(dml.DataModificationSpecification, scope).ResultSet, scope);
@@ -29,6 +30,10 @@ namespace PocketSql.Evaluation
                     return Evaluate(paren.Join, joinedTables, scope);
                 case OdbcQualifiedJoinTableReference odbc:
                     return Evaluate(odbc.TableReference, joinedTables, scope);
+                case QueryDerivedTable query:
+                    var table = Evaluate(query.QueryExpression, scope).ResultSet;
+                    table.Name = Guid.NewGuid().ToString().Replace("-", "");
+                    return (table, scope.PushAlias(query.Alias.Value, new[] { table.Name }));
                 case QualifiedJoin qjoin:
                     var (leftTable, leftScope) = Evaluate(qjoin.FirstTableReference, joinedTables, scope);
                     var (rightTable, rightScope) = Evaluate(qjoin.SecondTableReference, leftTable, leftScope);
