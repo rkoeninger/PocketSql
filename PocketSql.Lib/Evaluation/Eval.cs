@@ -98,8 +98,10 @@ namespace PocketSql.Evaluation
                             .Where(c => Evaluate(condition, new RowArgument(c), scope))
                             .DefaultIfEmpty(RightRow(accumulatedTables, a)));
                 case QualifiedJoinType.FullOuter:
-                    // TODO: Do like LeftJoin but track right rows in results
-                    // then add the right rows with nulls for left columns to results
+                    return OuterRows(
+                        accumulatedTables,
+                        targetTable,
+                        c => Evaluate(condition, new RowArgument(c), scope));
                 default:
                     throw FeatureNotSupportedException.Value(type);
             }
@@ -131,6 +133,7 @@ namespace PocketSql.Evaluation
                         targetTable.Rows
                             .Select(b => InnerRow(a, b)));
                 case UnqualifiedJoinType.OuterApply:
+                    return OuterRows(accumulatedTables, targetTable, _ => true);
                 default:
                     throw FeatureNotSupportedException.Value(type);
             }
@@ -156,6 +159,47 @@ namespace PocketSql.Evaluation
                 Columns = xs.Columns.Concat(y.Columns).ToList(),
                 Values = Nulls(xs.Columns.Count).Concat(y.Values).ToList()
             };
+
+        private static IEnumerable<Row> OuterRows(
+            Table xs,
+            Table ys,
+            Func<Row, bool> cond)
+        {
+            var outerRows = new List<Row>();
+            var matchedRightRows = new HashSet<Row>();
+
+            foreach (var a in xs.Rows)
+            {
+                var matchCount = 0;
+
+                foreach (var b in ys.Rows)
+                {
+                    var c = InnerRow(a, b);
+
+                    if (cond(c))
+                    {
+                        matchCount++;
+                        outerRows.Add(c);
+                        matchedRightRows.Add(b);
+                    }
+                }
+
+                if (matchCount == 0)
+                {
+                    outerRows.Add(LeftRow(a, ys));
+                }
+            }
+
+            foreach (var b in ys.Rows)
+            {
+                if (!matchedRightRows.Contains(b))
+                {
+                    outerRows.Add(RightRow(xs, b));
+                }
+            }
+
+            return outerRows;
+        }
 
         private static IEnumerable<object> Nulls(int n) => Enumerable.Repeat<object>(null, n);
 
