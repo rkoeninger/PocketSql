@@ -13,16 +13,8 @@ namespace PocketSql.Evaluation
         {
             switch (statement)
             {
-                case SelectStatement select:
-                    return Evaluate(select, scope);
-                case UpdateStatement update:
-                    return Evaluate(update.UpdateSpecification, scope);
-                case InsertStatement insert:
-                    return Evaluate(insert.InsertSpecification, scope);
-                case DeleteStatement delete:
-                    return Evaluate(delete.DeleteSpecification, scope);
-                case MergeStatement merge:
-                    return Evaluate(merge.MergeSpecification, scope);
+                case StatementWithCtesAndXmlNamespaces ctes:
+                    return Evaluate(ctes, scope);
                 case TruncateTableStatement truncate:
                     return Evaluate(truncate, scope);
                 case CreateTableStatement createTable:

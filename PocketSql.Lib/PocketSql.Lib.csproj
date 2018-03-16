@@ -84,6 +84,7 @@
     <Compile Include="Evaluation\Eval.SetClauses.cs" />
     <Compile Include="Evaluation\Eval.SetVariable.cs" />
     <Compile Include="Evaluation\Eval.StatementList.cs" />
+    <Compile Include="Evaluation\Eval.StatementWithCtesAndXmlNamespaces.cs" />
     <Compile Include="Evaluation\Eval.TableReference.cs" />
     <Compile Include="Evaluation\Eval.TSqlFragment.cs" />
     <Compile Include="Evaluation\Eval.TSqlStatement.cs" />
