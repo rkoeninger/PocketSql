@@ -17,62 +17,62 @@ namespace PocketSql.Evaluation
             var matched = new List<Row>();
             var notMatchedByTarget = new List<Row>();
             var notMatchedBySource = new List<Row>();
+            var matchedClauses = merge.ActionClauses
+                .Where(x => x.Condition == MergeCondition.Matched)
+                .ToList();
+            var notMatchedByTargetClauses = merge.ActionClauses
+                .Where(x => x.Condition == MergeCondition.NotMatchedByTarget
+                    || x.Condition == MergeCondition.Matched)
+                .ToList();
+            var notMatchedBySourceClauses = merge.ActionClauses
+                .Where(x => x.Condition == MergeCondition.NotMatchedBySource)
+                .ToList();
 
-            // TODO: only search for and build up collections that will be required by match clauses
-
-            // find matched and not matched (by target)
-            foreach (var row in sourceTable.Rows)
+            if (matchedClauses.Any() || notMatchedByTargetClauses.Any())
             {
-                // TODO: need to respect table aliases and combine rows
-                // TODO: need to define new row classes that aggregate rows via aliases
-                var targetRow = targetTable.Rows.FirstOrDefault(x =>
-                    Evaluate(merge.SearchCondition, new RowArgument(row), scope));
-
-                if (targetRow == null)
+                foreach (var s in sourceTable.Rows)
                 {
-                    notMatchedByTarget.Add(row);
-                }
-                else
-                {
-                    matched.Add(row);
-                }
-            }
+                    // TODO: need to respect table aliases and combine rows
+                    // TODO: need to define new row classes that aggregate rows via aliases
+                    var rows = targetTable.Rows
+                        .Select(t => InnerRow(s, t))
+                        .Where(row =>
+                            Evaluate(merge.SearchCondition, new RowArgument(row), scope))
+                        .ToList();
 
-            // find not matched by source
-            foreach (var row in targetTable.Rows)
-            {
-                var sourceRow = sourceTable.Rows.FirstOrDefault(x =>
-                    Evaluate(merge.SearchCondition, new RowArgument(row), scope));
-
-                if (sourceRow == null)
-                {
-                    notMatchedBySource.Add(row);
-                }
-            }
-
-            // apply matched
-            foreach (var clause in merge.ActionClauses.Where(x =>
-                x.Condition == MergeCondition.Matched))
-            {
-                foreach (var row in matched)
-                {
-                    if (Evaluate(clause.SearchCondition, new RowArgument(row), scope))
+                    if (matchedClauses.Any() && rows.Any())
                     {
-                        rowCount++;
-                        Evaluate(clause.Action, targetTable, row, scope);
+                        matched.AddRange(rows);
+                    }
+                    else if (notMatchedByTargetClauses.Any())
+                    {
+                        notMatchedByTarget.Add(LeftRow(s, targetTable));
+                    }
+                }
+            }
+
+            if (notMatchedBySourceClauses.Any())
+            {
+                foreach (var t in targetTable.Rows)
+                {
+                    var isMatched = sourceTable.Rows.Any(s =>
+                        Evaluate(merge.SearchCondition, new RowArgument(InnerRow(s, t)), scope));
+
+                    if (!isMatched)
+                    {
+                        notMatchedBySource.Add(RightRow(sourceTable, t));
                     }
                 }
             }
 
             // TODO: what order should merge actions be applied?
 
-            // apply not matched (by target)
-            foreach (var clause in merge.ActionClauses.Where(x =>
-                x.Condition == MergeCondition.NotMatched || x.Condition == MergeCondition.NotMatchedByTarget))
+            foreach (var clause in matchedClauses)
             {
-                foreach (var row in notMatchedByTarget)
+                foreach (var row in matched)
                 {
-                    if (Evaluate(clause.SearchCondition, new RowArgument(row), scope))
+                    if (clause.SearchCondition == null
+                        || Evaluate(clause.SearchCondition, new RowArgument(row), scope))
                     {
                         rowCount++;
                         Evaluate(clause.Action, targetTable, row, scope);
@@ -80,9 +80,20 @@ namespace PocketSql.Evaluation
                 }
             }
 
-            // apply not matched by source
-            foreach (var clause in merge.ActionClauses.Where(x =>
-                x.Condition == MergeCondition.NotMatchedBySource))
+            foreach (var clause in notMatchedByTargetClauses)
+            {
+                foreach (var row in notMatchedByTarget)
+                {
+                    if (clause.SearchCondition == null
+                        || Evaluate(clause.SearchCondition, new RowArgument(row), scope))
+                    {
+                        rowCount++;
+                        Evaluate(clause.Action, targetTable, row, scope);
+                    }
+                }
+            }
+
+            foreach (var clause in notMatchedBySourceClauses)
             {
                 foreach (var row in notMatchedBySource)
                 {
@@ -94,7 +105,7 @@ namespace PocketSql.Evaluation
                 }
             }
 
-            // TODO: output into
+            // TODO: output
 
             scope.Env.RowCount = rowCount;
             return new EngineResult(rowCount);
