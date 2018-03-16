@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace PocketSql.Modeling
 {
-    public class EquatableList : IEquatable<EquatableList>
+    public static class EquatableArray
     {
-        public static EquatableList Of(IEnumerable<(string, object)> seq)
+        public static EquatableArray<T> Of<T>(IEnumerable<T> seq) where T : IEquatable<T>
         {
-            var list = new EquatableList();
+            var list = new EquatableArray<T>();
 
             foreach (var x in seq)
             {
@@ -17,16 +17,19 @@ namespace PocketSql.Modeling
 
             return list;
         }
+    }
 
-        public IList<(string, object)> Elements { get; } = new List<(string, object)>();
+    public class EquatableArray<T> : IEquatable<EquatableArray<T>> where T : IEquatable<T>
+    {
+        public IList<T> Elements { get; } = new List<T>();
 
         public override bool Equals(object obj) =>
-            obj is EquatableList && Equals((EquatableList)obj);
+            obj is EquatableArray<T> && Equals((EquatableArray<T>) obj);
 
         public override int GetHashCode() =>
             Elements.Aggregate(1, (hash, obj) => hash + obj.GetHashCode() * 357);
 
-        public bool Equals(EquatableList other) =>
+        public bool Equals(EquatableArray<T> other) =>
             other?.Elements.SequenceEqual(Elements) ?? false;
     }
 }

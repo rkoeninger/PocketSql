@@ -13,14 +13,10 @@ namespace PocketSql.Evaluation
                 case AssignmentKind.AddEquals:
                     // TODO: handle numeric conversions properly
                     // TODO: and how do nulls work?
-                    if (current == null && value == null)
-                        return null;
-                    if (current == null && value != null)
-                        return value;
-                    if (current != null && value == null)
-                        return current;
+                    if (current == null || value == null)
+                        return current ?? value;
                     if (current is int && value is int)
-                        return (int?)current + (int?)value;
+                        return (int)current + (int)value;
                     return (decimal)current + (decimal)value;
                 case AssignmentKind.SubtractEquals:
                     return (decimal)current - (decimal)value;

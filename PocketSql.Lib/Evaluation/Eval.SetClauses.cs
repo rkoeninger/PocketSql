@@ -7,7 +7,10 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static void Evaluate(IList<SetClause> clauses, Row row, Table output, Scope scope)
+        public static void Evaluate(IList<SetClause> clauses, Row row, Table output, Scope scope) =>
+            Evaluate(clauses, row, row, output, scope);
+
+        public static void Evaluate(IList<SetClause> clauses, Row targetRow, Row sourceRow, Table output, Scope scope)
         {
             foreach (var clause in clauses)
             {
@@ -17,11 +20,11 @@ namespace PocketSql.Evaluation
                 {
                     case AssignmentSetClause set:
                         var columnName = set.Column.MultiPartIdentifier.Identifiers.Last().Value;
-                        if (output != null) oldValues[columnName] = row.GetColumn(columnName);
-                        row.Values[row.GetColumnOrdinal(columnName)] = Evaluate(
+                        if (output != null) oldValues[columnName] = targetRow.GetColumn(columnName);
+                        targetRow.Values[targetRow.GetColumnOrdinal(columnName)] = Evaluate(
                             set.AssignmentKind,
-                            row.Values[row.GetColumnOrdinal(columnName)],
-                            Evaluate(set.NewValue, new RowArgument(row), scope));
+                            sourceRow.Values[sourceRow.GetColumnOrdinal(columnName)],
+                            Evaluate(set.NewValue, new RowArgument(sourceRow), scope));
                         break;
                     default:
                         throw FeatureNotSupportedException.Subtype(clause);

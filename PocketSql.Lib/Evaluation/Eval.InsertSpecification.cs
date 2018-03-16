@@ -1,4 +1,5 @@
 ﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
+using PocketSql.Modeling;
 
 namespace PocketSql.Evaluation
 {
@@ -12,7 +13,7 @@ namespace PocketSql.Evaluation
             switch (insert.InsertSource)
             {
                 case ValuesInsertSource values:
-                    return Evaluate(table, insert.Columns, values, scope);
+                    return Evaluate(table, insert.Columns, values, NullArgument.It, scope);
                 case SelectInsertSource select:
                     return Evaluate(table, insert.Columns, Evaluate(select.Select, scope).ResultSet, scope);
                 default:

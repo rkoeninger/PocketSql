@@ -139,6 +139,52 @@ namespace PocketSql.Evaluation
             }
         }
 
+        private static Row InnerRow(Table xs, Row x, Table ys, Row y, Scope scope) =>
+            new Row
+            {
+                Columns = x.Columns.Concat(y.Columns).ToList(),
+                Values = x.Values.Concat(y.Values).ToList(),
+                Sources = new Dictionary<EquatableArray<string>, Row>
+                {
+                    {
+                        EquatableArray.Of(scope.ExpandTableName(new [] {xs.Name})),
+                        x
+                    },
+                    {
+                        EquatableArray.Of(scope.ExpandTableName(new [] {ys.Name})),
+                        y
+                    }
+                }
+            };
+
+        private static Row LeftRow(Table xs, Row x, Table ys, Scope scope) =>
+            new Row
+            {
+                Columns = x.Columns.Concat(ys.Columns).ToList(),
+                Values = x.Values.Concat(Nulls(ys.Columns.Count)).ToList(),
+                Sources = new Dictionary<EquatableArray<string>, Row>
+                {
+                    {
+                        EquatableArray.Of(scope.ExpandTableName(new [] {xs.Name})),
+                        x
+                    }
+                }
+            };
+
+        private static Row RightRow(Table xs, Table ys, Row y, Scope scope) =>
+            new Row
+            {
+                Columns = xs.Columns.Concat(y.Columns).ToList(),
+                Values = Nulls(xs.Columns.Count).Concat(y.Values).ToList(),
+                Sources = new Dictionary<EquatableArray<string>, Row>
+                {
+                    {
+                        EquatableArray.Of(scope.ExpandTableName(new [] {ys.Name})),
+                        y
+                    }
+                }
+            };
+
         private static Row InnerRow(Row x, Row y) =>
             new Row
             {

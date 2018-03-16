@@ -95,7 +95,8 @@
     <Compile Include="Modeling\Column.cs" />
     <Compile Include="Modeling\Cursor.cs" />
     <Compile Include="Modeling\Database.cs" />
-    <Compile Include="Modeling\EquatableList.cs" />
+    <Compile Include="Modeling\EquatableArray.cs" />
+    <Compile Include="Modeling\EquatableAssociationList.cs" />
     <Compile Include="Modeling\Function.cs" />
     <Compile Include="Modeling\IArgument.cs" />
     <Compile Include="Modeling\INamed.cs" />

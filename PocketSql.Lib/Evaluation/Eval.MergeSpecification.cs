@@ -9,10 +9,18 @@ namespace PocketSql.Evaluation
     {
         public static EngineResult Evaluate(MergeSpecification merge, Scope scope)
         {
-            var targetTableRef = (NamedTableReference)merge.Target;
-            var targetTable = scope.Env.Tables[targetTableRef.SchemaObject.BaseIdentifier.Value];
-            var sourceTableRef = (NamedTableReference)merge.TableReference;
-            var sourceTable = scope.Env.Tables[sourceTableRef.SchemaObject.BaseIdentifier.Value];
+            var (targetTable, scope2) = Evaluate(merge.Target, null, scope);
+            scope =
+                merge.TableAlias == null
+                    ? scope2
+                    : scope2.PushAlias(
+                        merge.TableAlias.Value,
+                        scope.ExpandTableName(
+                            ((NamedTableReference)merge.Target).SchemaObject.Identifiers
+                                .Select(x => x.Value)
+                                .ToArray()));
+            var (sourceTable, scope3) = Evaluate(merge.TableReference, null, scope);
+            scope = scope3;
             var rowCount = 0;
             var matched = new List<Row>();
             var notMatchedByTarget = new List<Row>();
@@ -22,7 +30,7 @@ namespace PocketSql.Evaluation
                 .ToList();
             var notMatchedByTargetClauses = merge.ActionClauses
                 .Where(x => x.Condition == MergeCondition.NotMatchedByTarget
-                    || x.Condition == MergeCondition.Matched)
+                    || x.Condition == MergeCondition.NotMatched)
                 .ToList();
             var notMatchedBySourceClauses = merge.ActionClauses
                 .Where(x => x.Condition == MergeCondition.NotMatchedBySource)
@@ -32,12 +40,13 @@ namespace PocketSql.Evaluation
             {
                 foreach (var s in sourceTable.Rows)
                 {
-                    // TODO: need to respect table aliases and combine rows
-                    // TODO: need to define new row classes that aggregate rows via aliases
                     var rows = targetTable.Rows
-                        .Select(t => InnerRow(s, t))
+                        .Select(t => InnerRow(sourceTable, s, targetTable, t, scope))
                         .Where(row =>
-                            Evaluate(merge.SearchCondition, new RowArgument(row), scope))
+                            Evaluate(
+                                merge.SearchCondition,
+                                new RowArgument(row),
+                                scope))
                         .ToList();
 
                     if (matchedClauses.Any() && rows.Any())
@@ -46,7 +55,7 @@ namespace PocketSql.Evaluation
                     }
                     else if (notMatchedByTargetClauses.Any())
                     {
-                        notMatchedByTarget.Add(LeftRow(s, targetTable));
+                        notMatchedByTarget.Add(LeftRow(sourceTable, s, targetTable, scope));
                     }
                 }
             }
@@ -56,11 +65,14 @@ namespace PocketSql.Evaluation
                 foreach (var t in targetTable.Rows)
                 {
                     var isMatched = sourceTable.Rows.Any(s =>
-                        Evaluate(merge.SearchCondition, new RowArgument(InnerRow(s, t)), scope));
+                        Evaluate(
+                            merge.SearchCondition,
+                            new RowArgument(InnerRow(sourceTable, s, targetTable, t, scope)),
+                            scope));
 
                     if (!isMatched)
                     {
-                        notMatchedBySource.Add(RightRow(sourceTable, t));
+                        notMatchedBySource.Add(RightRow(sourceTable, targetTable, t, scope));
                     }
                 }
             }

@@ -6,6 +6,7 @@ namespace PocketSql.Modeling
 {
     public class Row
     {
+        public IDictionary<EquatableArray<string>, Row> Sources { get; set; } = new Dictionary<EquatableArray<string>, Row>();
         public IList<Column> Columns { get; set; } = new List<Column>();
         public IList<object> Values { get; set; } = new List<object>();
         public bool IsNull(int i) => Values[i] == null || Values[i] == DBNull.Value;

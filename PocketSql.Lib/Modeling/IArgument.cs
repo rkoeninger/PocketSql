@@ -16,13 +16,13 @@ namespace PocketSql.Modeling
 
     public class GroupArgument : IArgument
     {
-        public GroupArgument(EquatableList key, List<Row> rows)
+        public GroupArgument(EquatableAssociationList key, List<Row> rows)
         {
             Key = key;
             Rows = rows;
         }
 
-        public EquatableList Key { get; set; }
+        public EquatableAssociationList Key { get; set; }
         public List<Row> Rows { get; set; }
     }
 

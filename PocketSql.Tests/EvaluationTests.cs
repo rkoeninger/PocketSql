@@ -370,8 +370,8 @@ namespace PocketSql.Tests
                     (6, 80)"));
 
                 connection.Execute(@"
-                    merge Target
-                    using Source
+                    merge Target as t
+                    using Source as s
                     on TargetId = SourceId
                     when matched then
                         update set
@@ -386,8 +386,8 @@ namespace PocketSql.Tests
                         from Target
                         where TargetId = @id", new { id });
 
-                Assert.AreEqual(30, GetTargetAmount(1)); // TODO: should be 50?
-                Assert.AreEqual(0, GetTargetAmount(4)); // TODO: should be 90?
+                Assert.AreEqual(50, GetTargetAmount(1));
+                Assert.AreEqual(90, GetTargetAmount(4));
                 Assert.AreEqual(80, GetTargetAmount(6));
             }
         }

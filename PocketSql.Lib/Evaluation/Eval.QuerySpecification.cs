@@ -80,7 +80,7 @@ namespace PocketSql.Evaluation
                 // TODO: rollup, cube, grouping sets
 
                 var groups = tableCopy.Rows.GroupBy(row =>
-                    EquatableList.Of(querySpec.GroupByClause.GroupingSpecifications
+                    EquatableAssociationList.Of(querySpec.GroupByClause.GroupingSpecifications
                         .Select(g => (InferName(g), Evaluate(g, new RowArgument(row), scope))))).ToList();
 
                 // HAVING
@@ -122,7 +122,7 @@ namespace PocketSql.Evaluation
                 projection.Rows.Clear();
 
                 foreach (var item in temp.Rows
-                    .Select(r => EquatableList.Of(temp.Columns
+                    .Select(r => EquatableAssociationList.Of(temp.Columns
                         .Select(c => (c.Name.LastOrDefault(), r.GetValue(c.Name.LastOrDefault())))))
                     .Distinct())
                 {
