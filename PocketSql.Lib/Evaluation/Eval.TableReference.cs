@@ -17,6 +17,7 @@ namespace PocketSql.Evaluation
                     return (
                         schema.Views.GetMaybe(baseName)
                             .Select(v => Evaluate(v.Query, scope).ResultSet)
+                            .Or(() => scope.Ctes.GetMaybe(baseName))
                             .OrElse(() => schema.Tables[baseName]),
                         named.Alias == null
                             ? scope

@@ -7,6 +7,11 @@ namespace PocketSql.Evaluation
     {
         public static EngineResult Evaluate(SelectStatement select, Scope scope)
         {
+            if (select.WithCtesAndXmlNamespaces != null)
+            {
+                scope = Evaluate(select.WithCtesAndXmlNamespaces.CommonTableExpressions, scope);
+            }
+
             var results = Evaluate(select.QueryExpression, scope);
 
             if (select.Into != null)

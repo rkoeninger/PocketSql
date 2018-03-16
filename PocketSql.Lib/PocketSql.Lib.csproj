@@ -56,6 +56,7 @@
     <Compile Include="Evaluation\Eval.BooleanExpression.cs" />
     <Compile Include="Evaluation\Eval.BooleanTernaryExpressionType.cs" />
     <Compile Include="Evaluation\Eval.CaseExpression.cs" />
+    <Compile Include="Evaluation\Eval.CommonTableExpressions.cs" />
     <Compile Include="Evaluation\Eval.CreateTableStatement.cs" />
     <Compile Include="Evaluation\Eval.CreateViewStatement.cs" />
     <Compile Include="Evaluation\Eval.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Evaluation\Eval.ValuesInsertSource.cs" />
     <Compile Include="Evaluation\Eval.WhileStatement.cs" />
     <Compile Include="Evaluation\Eval.TruncateTableStatement.cs" />
+    <Compile Include="Modeling\Extensions.cs" />
     <Compile Include="FeatureNotSupportedException.cs" />
     <Compile Include="Modeling\Column.cs" />
     <Compile Include="Modeling\Cursor.cs" />

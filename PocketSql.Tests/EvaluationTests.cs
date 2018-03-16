@@ -393,6 +393,50 @@ namespace PocketSql.Tests
         }
 
         [Test]
+        public void SimpleSelectCTE()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute("create table Things (X int, Y int)");
+
+                Assert.AreEqual(16, connection.Execute(@"
+                    insert into Things
+                    (X, Y)
+                    values
+                    (34, 12),
+                    (23, 54),
+                    (67, 83),
+                    (63, 26),
+                    (75, 94),
+                    (17, 25),
+                    (47, 56),
+                    (47, 25),
+                    (95, 83),
+                    (67, 46),
+                    (63, 97),
+                    (75, 38),
+                    (95, 85),
+                    (17, 35),
+                    (23, 84),
+                    (92, 32)"));
+
+                Assert.AreEqual(4, connection.Query(@"
+                    ; with Temp as
+                    (
+                        select Y
+                        from Things
+                        where X > 50
+                    )
+                    select Y
+                    from Temp
+                    where Y < 50"
+                    ).Count());
+            }
+        }
+
+        [Test]
         public void StoredProc()
         {
             var engine = new Engine(140);

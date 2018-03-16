@@ -38,6 +38,7 @@ An in-process implementation of T-SQL, packaged as a library, suitable for testi
     * constraints imposed by it
 	* ability to set indentity insert on and off
   * `default` values for columns
+  * implicit type conversions and type checking
 
 ### Undecided
 
