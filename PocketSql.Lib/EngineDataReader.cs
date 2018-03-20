@@ -25,7 +25,10 @@ namespace PocketSql
 
         public int Depth => 0;
         public int RecordsAffected => data[tableIndex].RecordsAffected;
-        public int FieldCount => data[tableIndex].ResultSet.Columns.Count;
+        public int FieldCount =>
+            tableIndex < 0 || tableIndex >= data.Count
+                ? 0
+                : data[tableIndex].ResultSet?.Columns?.Count ?? 0;
 
         public DataTable GetSchemaTable() => throw new NotImplementedException();
 
@@ -97,7 +100,10 @@ namespace PocketSql
         public bool Read()
         {
             rowIndex++;
-            return rowIndex < data[tableIndex].ResultSet.Rows.Count;
+            return
+                tableIndex >= 0
+                && tableIndex < (data?.Count ?? 0)
+                && rowIndex < (data[tableIndex].ResultSet?.Rows?.Count ?? 0);
         }
     }
 }

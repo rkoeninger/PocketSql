@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PocketSql.Lib", "PocketSql.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PocketSql.Tests", "PocketSql.Tests\PocketSql.Tests.csproj", "{BC5462C1-077A-4918-9947-9B608028332F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PocketSql.Demo", "PocketSql.Demo\PocketSql.Demo.csproj", "{5DD1F0D9-4A74-4CC0-BBF1-ED98FE802B07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{BC5462C1-077A-4918-9947-9B608028332F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC5462C1-077A-4918-9947-9B608028332F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC5462C1-077A-4918-9947-9B608028332F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DD1F0D9-4A74-4CC0-BBF1-ED98FE802B07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DD1F0D9-4A74-4CC0-BBF1-ED98FE802B07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DD1F0D9-4A74-4CC0-BBF1-ED98FE802B07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DD1F0D9-4A74-4CC0-BBF1-ED98FE802B07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

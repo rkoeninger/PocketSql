@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace PocketSql.Modeling
 {
-    public class Namespace<T>
+    public class Namespace<T> : IEnumerable<T>
     {
         private readonly IDictionary<string, T> members = new Dictionary<string, T>(Naming.Comparer);
 
@@ -75,5 +76,9 @@ namespace PocketSql.Modeling
 
             return ns;
         }
+
+        public IEnumerator<T> GetEnumerator() => members.Values.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
