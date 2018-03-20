@@ -43,9 +43,8 @@ An in-process implementation of T-SQL, packaged as a library, suitable for testi
 ### Undecided
 
   * Working Transactions with `rollback`/`commit`
-  * XML types and namespaces
   * Nested table results
-  * Customizable collations (everything is `OrdinalInvariantCulture.CaseInsensitive`)
+  * Customizable collations (everything is case insensitive by default)
 
 ### Unplanned/Excluded Features
 
@@ -53,6 +52,7 @@ An in-process implementation of T-SQL, packaged as a library, suitable for testi
   * `INFORMATION_SCHEMA` and other control tables and procedures
   * Optimizations around indexes
   * `for` keyword that specifies output format
+  * XML types and namespaces
   * any special handling of the `go` statement
   * Query plan caching
   * Ability to report query plan
