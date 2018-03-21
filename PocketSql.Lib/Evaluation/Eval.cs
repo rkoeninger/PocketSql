@@ -373,8 +373,6 @@ namespace PocketSql.Evaluation
                     return DbType.Binary;
                 case SqlDataTypeOption.Bit:
                     return DbType.Boolean;
-                case SqlDataTypeOption.Char:
-                    return DbType.AnsiString;
                 case SqlDataTypeOption.Date:
                     return DbType.Date;
                 case SqlDataTypeOption.DateTime:
@@ -384,7 +382,12 @@ namespace PocketSql.Evaluation
                 case SqlDataTypeOption.DateTimeOffset:
                     return DbType.DateTimeOffset;
                 case SqlDataTypeOption.Cursor:
+                case SqlDataTypeOption.Char:
+                case SqlDataTypeOption.Text:
                 case SqlDataTypeOption.VarChar:
+                case SqlDataTypeOption.NChar:
+                case SqlDataTypeOption.NText:
+                case SqlDataTypeOption.NVarChar:
                     return DbType.AnsiString;
                 default:
                     throw FeatureNotSupportedException.Value(type);
