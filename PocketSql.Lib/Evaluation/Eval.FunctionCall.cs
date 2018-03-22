@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Modeling;
 
@@ -76,6 +77,73 @@ namespace PocketSql.Evaluation
                     var i6 = Evaluate<int>(funCall.Parameters[1], arg, scope);
                     var j6 = Evaluate<int>(funCall.Parameters[2], arg, scope);
                     return s6?.Substring(i6, j6);
+                case "dateadd":
+                    Func<DateTime, int, DateTime> dateAdd = null;
+                    switch (funCall.Parameters[0])
+                    {
+                        case ColumnReferenceExpression colExpr:
+                            var dateUnit = colExpr.MultiPartIdentifier.Identifiers.LastOrDefault()?.Value?.ToLower();
+                            switch (dateUnit)
+                            {
+                                case "year":
+                                case "yy":
+                                case "yyyy":
+                                    dateAdd = (d, x) => d.AddYears(x);
+                                    break;
+                                case "quarter":
+                                case "qq":
+                                case "q":
+                                    dateAdd = (d, x) => d.AddMonths(x * 3);
+                                    break;
+                                case "month":
+                                case "mm":
+                                case "m":
+                                    dateAdd = (d, x) => d.AddMonths(x);
+                                    break;
+                                case "week":
+                                case "wk":
+                                case "ww":
+                                    dateAdd = (d, x) => d.AddDays(x * 7);
+                                    break;
+                                case "dayofyear":
+                                case "dy":
+                                case "y":
+                                case "weekday":
+                                case "dw":
+                                case "w":
+                                case "day":
+                                case "dd":
+                                case "d":
+                                    dateAdd = (d, x) => d.AddDays(x);
+                                    break;
+                                case "hour":
+                                case "hh":
+                                    dateAdd = (d, x) => d.AddHours(x);
+                                    break;
+                                case "minute":
+                                case "mi":
+                                case "n":
+                                    dateAdd = (d, x) => d.AddMinutes(x);
+                                    break;
+                                case "second":
+                                case "ss":
+                                case "s":
+                                    dateAdd = (d, x) => d.AddSeconds(x);
+                                    break;
+                                case "millisecond":
+                                case "ms":
+                                    dateAdd = (d, x) => d.AddMilliseconds(x);
+                                    break;
+                                default:
+                                    throw FeatureNotSupportedException.Value(dateUnit, "datepart");
+                            }
+                            break;
+                    }
+
+                    if (dateAdd == null) throw new Exception("invalid DATEADD() time increment argument");
+                    var x1 = Evaluate<int>(funCall.Parameters[1], arg, scope);
+                    var d1 = Evaluate<DateTime>(funCall.Parameters[2], arg, scope);
+                    return dateAdd(d1, x1);
                 default:
                     var env2 = scope.Env.Fork();
                     var f = scope.Env.Functions[name];

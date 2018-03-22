@@ -11,7 +11,7 @@ namespace PocketSql.Evaluation
                 case UnaryExpressionType.Positive:
                     return value;
                 case UnaryExpressionType.Negative:
-                    return -1 * (decimal)value;
+                    return -1 * (int)value;
                 case UnaryExpressionType.BitwiseNot:
                     return ~(int)value;
                 default:

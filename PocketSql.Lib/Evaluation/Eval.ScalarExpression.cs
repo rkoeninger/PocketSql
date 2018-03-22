@@ -7,7 +7,7 @@ namespace PocketSql.Evaluation
     public static partial class Eval
     {
         public static T Evaluate<T>(ScalarExpression expr, IArgument arg, Scope scope) =>
-            (T)Evaluate(expr, arg, scope);
+            Evaluate(expr, arg, scope).As<T>();
 
         public static object Evaluate(ScalarExpression expr, IArgument arg, Scope scope)
         {

@@ -109,6 +109,7 @@
     <Compile Include="Modeling\Row.cs" />
     <Compile Include="Modeling\Schema.cs" />
     <Compile Include="Modeling\Table.cs" />
+    <Compile Include="Modeling\Types.cs" />
     <Compile Include="Modeling\View.cs" />
     <Compile Include="Naming.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

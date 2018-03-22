@@ -309,6 +309,8 @@ namespace PocketSql.Evaluation
                         case "upper":
                         case "lower":
                             return DbType.String;
+                        case "dateadd":
+                            return DbType.DateTime;
                         default: return scope.Env.Functions[fun.FunctionName.Value].ReturnType;
                     }
                 case CaseExpression c:

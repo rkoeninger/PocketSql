@@ -884,5 +884,22 @@ namespace PocketSql.Tests
             public string Name { get; set; }
             public int Age { get; set; }
         }
+
+        [Test]
+        public void DateAdd()
+        {
+            var engine = new Engine(140);
+
+            using (var connection = engine.GetConnection())
+            {
+                DateTime Run(string datepart, int x) =>
+                    connection.ExecuteScalar<DateTime>(
+                        $"select dateadd({datepart}, {x}, '2018-01-01')");
+
+                Assert.AreEqual(new DateTime(2018, 1, 2), Run("day", 1));
+                Assert.AreEqual(new DateTime(2017, 2, 1), Run("month", -11));
+                Assert.AreEqual(new DateTime(2018, 1, 1, 7, 0, 0), Run("hour", 7));
+            }
+        }
     }
 }
