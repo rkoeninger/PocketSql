@@ -18,7 +18,7 @@ namespace PocketSql
         }
 
         private static SqlVersion IntToSqlVersion(int version) =>
-            Enum.TryParse("Sql" + version, out SqlVersion sqlVersion)
+            Enum.TryParse("Sql" + (version < 40 ? version * 10 : version), out SqlVersion sqlVersion)
                 ? sqlVersion
                 : throw new NotSupportedException($"SQL Server version {version} not supported");
 

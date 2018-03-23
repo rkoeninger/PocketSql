@@ -10,9 +10,9 @@ namespace PocketSql.Tests
     public class EvaluationTests
     {
         [Test]
-        public void CreateInsertSelect()
+        public void CreateInsertSelect([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -35,9 +35,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectOrdered()
+        public void InsertSelectOrdered([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -117,9 +117,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectOffsetFetch()
+        public void InsertSelectOffsetFetch([Range(11, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -139,9 +139,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectDistinct()
+        public void InsertSelectDistinct([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -173,9 +173,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectIntoSelect()
+        public void InsertSelectIntoSelect([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -209,9 +209,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelect()
+        public void InsertSelect([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -246,9 +246,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectTransform()
+        public void InsertSelectTransform([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -265,9 +265,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectGroupBy()
+        public void InsertSelectGroupBy([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -304,9 +304,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectGroupByHaving()
+        public void InsertSelectGroupByHaving([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -341,9 +341,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void MergePermanentTableOntoPermanentTable()
+        public void MergePermanentTableOntoPermanentTable([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -393,9 +393,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SimpleSelectCTE()
+        public void SimpleSelectCTE([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -437,9 +437,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void StoredProc()
+        public void StoredProc([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -495,9 +495,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void BuiltInFunction()
+        public void BuiltInFunction([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -529,9 +529,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void UserDefinedFunction()
+        public void UserDefinedFunction([Range(9, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -548,9 +548,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectView()
+        public void SelectView([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -589,9 +589,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void DeclareSetSelect()
+        public void DeclareSetSelect([Range(8, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -603,9 +603,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void OutputParameter()
+        public void OutputParameter([Range(8, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -633,9 +633,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CursorFetchNext()
+        public void CursorFetchNext([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -675,9 +675,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectRowCountGlobal()
+        public void SelectRowCountGlobal([Range(10, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -701,9 +701,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectCaseExpression()
+        public void SelectCaseExpression([Range(8, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -722,9 +722,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectIIfExpression()
+        public void SelectIIfExpression([Range(11, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -736,9 +736,9 @@ namespace PocketSql.Tests
             }
         }
 
-        private Engine CreateEngineWithCityColorTaste()
+        private Engine CreateEngineWithCityColorTaste(int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -792,9 +792,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InnerJoin()
+        public void InnerJoin([Range(10, 14)]int version)
         {
-            var engine = CreateEngineWithCityColorTaste();
+            var engine = CreateEngineWithCityColorTaste(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -809,9 +809,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void OuterJoin()
+        public void OuterJoin([Range(10, 14)]int version)
         {
-            var engine = CreateEngineWithCityColorTaste();
+            var engine = CreateEngineWithCityColorTaste(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -825,9 +825,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CrossJoin()
+        public void CrossJoin([Range(10, 14)]int version)
         {
-            var engine = CreateEngineWithCityColorTaste();
+            var engine = CreateEngineWithCityColorTaste(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -841,9 +841,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CrossApply()
+        public void CrossApply([Range(10, 14)]int version)
         {
-            var engine = CreateEngineWithCityColorTaste();
+            var engine = CreateEngineWithCityColorTaste(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -857,9 +857,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void OuterApply()
+        public void OuterApply([Range(10, 14)]int version)
         {
-            var engine = CreateEngineWithCityColorTaste();
+            var engine = CreateEngineWithCityColorTaste(version);
 
             using (var connection = engine.GetConnection())
             {
@@ -886,9 +886,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void DateAdd()
+        public void DateAdd([Range(8, 14)]int version)
         {
-            var engine = new Engine(140);
+            var engine = new Engine(version);
 
             using (var connection = engine.GetConnection())
             {
