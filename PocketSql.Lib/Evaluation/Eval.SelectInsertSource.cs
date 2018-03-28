@@ -10,6 +10,7 @@ namespace PocketSql.Evaluation
             Table table,
             IList<ColumnReferenceExpression> cols,
             Table selectedRows,
+            IOutputSink sink,
             Scope scope)
         {
             foreach (var valuesExpr in selectedRows.Rows)

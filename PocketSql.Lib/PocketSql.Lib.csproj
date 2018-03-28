@@ -109,6 +109,7 @@
     <Compile Include="Modeling\Function.cs" />
     <Compile Include="Modeling\IArgument.cs" />
     <Compile Include="Modeling\INamed.cs" />
+    <Compile Include="Modeling\IOutputSink.cs" />
     <Compile Include="Modeling\Maybe.cs" />
     <Compile Include="Modeling\Namespace.cs" />
     <Compile Include="Modeling\Procedure.cs" />

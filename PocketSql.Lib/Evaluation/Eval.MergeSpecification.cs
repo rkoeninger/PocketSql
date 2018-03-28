@@ -79,6 +79,9 @@ namespace PocketSql.Evaluation
 
             // TODO: what order should merge actions be applied?
 
+            // TODO: build proper output sink
+            var sink = new NullOutputSink();
+
             foreach (var clause in matchedClauses)
             {
                 foreach (var row in matched)
@@ -87,7 +90,7 @@ namespace PocketSql.Evaluation
                         || Evaluate(clause.SearchCondition, new RowArgument(row), scope))
                     {
                         rowCount++;
-                        Evaluate(clause.Action, targetTable, row, scope);
+                        Evaluate(clause.Action, targetTable, row, sink, scope);
                     }
                 }
             }
@@ -100,7 +103,7 @@ namespace PocketSql.Evaluation
                         || Evaluate(clause.SearchCondition, new RowArgument(row), scope))
                     {
                         rowCount++;
-                        Evaluate(clause.Action, targetTable, row, scope);
+                        Evaluate(clause.Action, targetTable, row, sink, scope);
                     }
                 }
             }
@@ -112,7 +115,7 @@ namespace PocketSql.Evaluation
                     if (Evaluate(clause.SearchCondition, new RowArgument(row), scope))
                     {
                         rowCount++;
-                        Evaluate(clause.Action, targetTable, row, scope);
+                        Evaluate(clause.Action, targetTable, row, sink, scope);
                     }
                 }
             }

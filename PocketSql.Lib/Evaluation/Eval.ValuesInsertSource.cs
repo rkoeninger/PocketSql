@@ -11,6 +11,7 @@ namespace PocketSql.Evaluation
             IList<ColumnReferenceExpression> cols,
             ValuesInsertSource values,
             IArgument arg,
+            IOutputSink sink,
             Scope scope)
         {
             foreach (var valuesExpr in values.RowValues)
