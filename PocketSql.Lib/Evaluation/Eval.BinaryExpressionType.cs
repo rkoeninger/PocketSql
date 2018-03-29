@@ -13,15 +13,15 @@ namespace PocketSql.Evaluation
                         return (string)left + (string)right;
                     if (left is int && right is int)
                         return (int) left + (int) right;
-                    return (decimal)left + (decimal)right;
+                    return (int)left + (int)right;
                 case BinaryExpressionType.Subtract:
-                    return (decimal)left - (decimal)right;
+                    return (int)left - (int)right;
                 case BinaryExpressionType.Multiply:
-                    return (decimal)left * (decimal)right;
+                    return (int)left * (int)right;
                 case BinaryExpressionType.Divide:
-                    return (decimal)left / (decimal)right;
+                    return (int)left / (int)right;
                 case BinaryExpressionType.Modulo:
-                    return (decimal)left % (decimal)right;
+                    return (int)left % (int)right;
                 case BinaryExpressionType.BitwiseAnd:
                     return (int)left & (int)right;
                 case BinaryExpressionType.BitwiseOr:
