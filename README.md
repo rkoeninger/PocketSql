@@ -40,14 +40,11 @@ An in-process implementation of T-SQL, packaged as a library, suitable for testi
   * `default` values for columns
   * implicit type conversions and type checking
 
-### Undecided
+### Currently Unplanned/Excluded Features
 
   * Working Transactions with `rollback`/`commit`
   * Nested table results
   * Customizable collations (everything is case insensitive by default)
-
-### Unplanned/Excluded Features
-
   * Backup/restore capability
   * `INFORMATION_SCHEMA` and other control tables and procedures
   * Optimizations around indexes
