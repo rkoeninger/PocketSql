@@ -7,7 +7,7 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(MergeSpecification merge, Scope scope)
+        public static EngineResult Evaluate(MergeSpecification merge, IOutputSink sink, Scope scope)
         {
             var (targetTable, scope2) = Evaluate(merge.Target, null, scope);
             scope =
@@ -79,9 +79,6 @@ namespace PocketSql.Evaluation
 
             // TODO: what order should merge actions be applied?
 
-            // TODO: build proper output sink
-            var sink = new NullOutputSink();
-
             foreach (var clause in matchedClauses)
             {
                 foreach (var row in matched)
@@ -119,8 +116,6 @@ namespace PocketSql.Evaluation
                     }
                 }
             }
-
-            // TODO: output
 
             scope.Env.RowCount = rowCount;
             return new EngineResult(rowCount);

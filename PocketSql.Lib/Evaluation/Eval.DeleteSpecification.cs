@@ -5,7 +5,7 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(DeleteSpecification delete, Scope scope)
+        public static EngineResult Evaluate(DeleteSpecification delete, IOutputSink sink, Scope scope)
         {
             var tableRef = (NamedTableReference)delete.Target;
             var table = scope.Env.Tables[tableRef.SchemaObject.BaseIdentifier.Value];
@@ -19,6 +19,8 @@ namespace PocketSql.Evaluation
                     table.Rows.Remove(row);
                     rowCount++;
                 }
+
+                sink.Deleted(row);
             }
 
             scope.Env.RowCount = rowCount;

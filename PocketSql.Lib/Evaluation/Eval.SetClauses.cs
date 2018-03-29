@@ -7,20 +7,16 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static void Evaluate(IList<SetClause> clauses, Row row, Table output, Scope scope) =>
-            Evaluate(clauses, row, row, output, scope);
-
-        public static void Evaluate(IList<SetClause> clauses, Row targetRow, Row sourceRow, Table output, Scope scope)
+        public static void Evaluate(IList<SetClause> clauses, Row targetRow, Row sourceRow, IOutputSink sink, Scope scope)
         {
+            var originalTargetRow = targetRow.Copy();
+
             foreach (var clause in clauses)
             {
-                var oldValues = output == null ? null : new Dictionary<string, object>();
-
                 switch (clause)
                 {
                     case AssignmentSetClause set:
                         var columnName = set.Column.MultiPartIdentifier.Identifiers.Last().Value;
-                        if (output != null) oldValues[columnName] = targetRow.GetColumn(columnName);
                         targetRow.Values[targetRow.GetColumnOrdinal(columnName)] = Evaluate(
                             set.AssignmentKind,
                             sourceRow.Values[sourceRow.GetColumnOrdinal(columnName)],
@@ -29,12 +25,9 @@ namespace PocketSql.Evaluation
                     default:
                         throw FeatureNotSupportedException.Subtype(clause);
                 }
-
-                if (output != null)
-                {
-                    // TODO: add row to output, differentiating between inserted. and deleted.
-                }
             }
+
+            sink.Updated(originalTargetRow, targetRow);
         }
     }
 }

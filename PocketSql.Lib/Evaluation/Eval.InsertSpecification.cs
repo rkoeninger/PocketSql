@@ -5,11 +5,10 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(InsertSpecification insert, Scope scope)
+        public static EngineResult Evaluate(InsertSpecification insert, IOutputSink sink, Scope scope)
         {
             var namedTableRef = (NamedTableReference)insert.Target;
             var table = scope.Env.Tables[namedTableRef.SchemaObject.BaseIdentifier.Value];
-            var sink = new NullOutputSink();
 
             switch (insert.InsertSource)
             {

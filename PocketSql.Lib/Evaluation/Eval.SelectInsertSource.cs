@@ -22,6 +22,8 @@ namespace PocketSql.Evaluation
                     var columnName = col.MultiPartIdentifier.Identifiers[0].Value;
                     row.SetValue(columnName, valuesExpr.GetValue(columnName));
                 }
+
+                sink.Inserted(row);
             }
 
             scope.Env.RowCount = selectedRows.Rows.Count;

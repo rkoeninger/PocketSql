@@ -59,5 +59,12 @@ namespace PocketSql.Modeling
 
         public void SetValue(string name, object value) =>
             Values[GetColumnOrdinal(name)] = value;
+
+        public Row Copy() => new Row
+        {
+            Sources = Sources,
+            Columns = Columns,
+            Values = Values.ToList()
+        };
     }
 }

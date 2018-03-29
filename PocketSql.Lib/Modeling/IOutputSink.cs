@@ -17,19 +17,17 @@ namespace PocketSql.Modeling
 
         public TableOutputSink(IList<Column> columns)
         {
-            Output = new Table
-            {
-                Columns = columns
-            };
+            Output = new Table { Columns = columns };
         }
 
         public void Inserted(Row row)
         {
+            var outputRow = Output.NewRow();
+
             foreach (var i in Enumerable.Range(0, Output.Columns.Count))
             {
-                var outputRow = Output.NewRow();
                 var columnName = Output.Columns[i].Name.LastOrDefault();
-                var prefix = Output.Columns[i].Name.ElementAtOrDefault(1);
+                var prefix = Output.Columns[i].Name.FirstOrDefault();
 
                 if (columnName == null)
                 {
@@ -60,11 +58,12 @@ namespace PocketSql.Modeling
 
         public void Updated(Row oldRow, Row newRow)
         {
+            var outputRow = Output.NewRow();
+
             foreach (var i in Enumerable.Range(0, Output.Columns.Count))
             {
-                var outputRow = Output.NewRow();
                 var columnName = Output.Columns[i].Name.LastOrDefault();
-                var prefix = Output.Columns[i].Name.ElementAtOrDefault(1);
+                var prefix = Output.Columns[i].Name.FirstOrDefault();
 
                 if (columnName == null)
                 {
@@ -95,11 +94,12 @@ namespace PocketSql.Modeling
 
         public void Deleted(Row row)
         {
+            var outputRow = Output.NewRow();
+
             foreach (var i in Enumerable.Range(0, Output.Columns.Count))
             {
-                var outputRow = Output.NewRow();
                 var columnName = Output.Columns[i].Name.LastOrDefault();
-                var prefix = Output.Columns[i].Name.ElementAtOrDefault(1);
+                var prefix = Output.Columns[i].Name.FirstOrDefault();
 
                 if (columnName == null)
                 {
