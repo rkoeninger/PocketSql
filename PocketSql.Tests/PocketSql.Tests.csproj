@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsOfAttribute.cs" />
     <Compile Include="EvaluationTests.cs" />
   </ItemGroup>
   <ItemGroup>

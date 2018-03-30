@@ -10,7 +10,7 @@ namespace PocketSql.Tests
     public class EvaluationTests
     {
         [Test]
-        public void CreateInsertSelect([Range(10, 14)]int version)
+        public void CreateInsertSelect([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
