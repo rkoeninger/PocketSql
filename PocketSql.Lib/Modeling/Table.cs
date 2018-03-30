@@ -68,6 +68,20 @@ namespace PocketSql.Modeling
                 Columns = Columns.ToList()
             };
 
+        public Row AddCopy(Row r)
+        {
+            var s = NewRow();
+
+            // TODO: match names instead?
+
+            foreach (var i in Enumerable.Range(0, s.Columns.Count))
+            {
+                s.Values[i] = r.Values[i];
+            }
+
+            return s;
+        }
+
         // TODO: public Table Select(Func<Row, Row> selector)
         // TODO: public Table Where(Func<Row, bool> filter)
         // TODO: public Table OrderBy(clauses)

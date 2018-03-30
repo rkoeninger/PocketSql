@@ -1,51 +1,86 @@
-﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using System;
+using System.Linq;
+using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Modeling;
 
 namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(BinaryQueryExpressionType type, bool all, Table first, Table right)
+        public static EngineResult Evaluate(BinaryQueryExpressionType type, bool all, Table left, Table right)
         {
-            // TODO: what to do when columns don't match?
             // TODO: does offset/fetch/top happen before or after?
+
+            if (left.Columns.Count != right.Columns.Count)
+            {
+                throw new Exception("tables must have the same number of columns");
+            }
+
+            foreach (var i in Enumerable.Range(0, left.Columns.Count))
+            {
+                var a = left.Columns[i];
+                var b = right.Columns[i];
+
+                if (a.Name.Length > 0 && b.Name.Length > 0 && !a.Name.Last().Similar(b.Name.Last()))
+                {
+                    throw new Exception("columns must have the same names");
+                }
+
+                // TODO: identify lowest common type
+                if (a.Type != b.Type)
+                {
+                    throw new Exception("types must match");
+                }
+            }
+
+            var result = new Table { Columns = left.Columns };
+
+            bool Contains(Table t, Row r) =>
+                t.Rows.Any(s =>
+                    Enumerable.Range(0, r.Columns.Count).All(i =>
+                        Equality.Equal(r.Values[i], s.Values[i])));
 
             switch (type)
             {
                 case BinaryQueryExpressionType.Except:
-                    // The SQL EXCEPT operator takes the distinct rows of one query and
-                    // returns the rows that do not appear in a second result set. The
-                    // EXCEPT ALL operator does not remove duplicates. For purposes of
-                    // row elimination and duplicate removal, the EXCEPT operator does
-                    // not distinguish between NULLs.
+                    foreach (var x in left.Rows)
+                    {
+                        if (!Contains(right, x) && (all || !Contains(result, x))) result.AddCopy(x);
+                    }
+
+                    break;
                 case BinaryQueryExpressionType.Intersect:
-                    // The SQL INTERSECT operator takes the results of two queries and
-                    // returns only rows that appear in both result sets.For purposes of
-                    // duplicate removal the INTERSECT operator does not distinguish between
-                    // NULLs.The INTERSECT operator removes duplicate rows from the final
-                    // result set. The INTERSECT ALL operator does not remove duplicate rows
-                    // from the final result set.
+                    foreach (var x in left.Rows)
+                    {
+                        if (Contains(right, x) && (all || !Contains(result, x))) result.AddCopy(x);
+                    }
+
+                    if (all)
+                    {
+                        foreach (var x in right.Rows)
+                        {
+                            if (Contains(left, x)) result.AddCopy(x);
+                        }
+                    }
+
+                    break;
                 case BinaryQueryExpressionType.Union:
-                    // In SQL the UNION clause combines the results of two SQL queries into
-                    // a single table of all matching rows. The two queries must result in
-                    // the same number of columns and compatible data types in order to unite.
-                    // Any duplicate records are automatically removed unless UNION ALL is used.
+                    foreach (var x in left.Rows)
+                    {
+                        if (all || !Contains(result, x)) result.AddCopy(x);
+                    }
 
-                    // UNION can be useful in data warehouse applications where tables aren't
-                    // perfectly normalized. A simple example would be a database having
-                    // tables sales2005 and sales2006 that have identical structures but are
-                    // separated because of performance considerations. A UNION query could
-                    // combine results from both tables.
+                    foreach (var x in right.Rows)
+                    {
+                        if (all || !Contains(result, x)) result.AddCopy(x);
+                    }
 
-                    // Note that UNION does not guarantee the order of rows. Rows from the
-                    // second operand may appear before, after, or mixed with rows from the
-                    // first operand.In situations where a specific order is desired, ORDER BY
-                    // must be used.
-
-                    // Note that UNION ALL may be much faster than plain UNION.
+                    break;
                 default:
                     throw FeatureNotSupportedException.Value(type);
             }
+
+            return new EngineResult(result);
         }
     }
 }
