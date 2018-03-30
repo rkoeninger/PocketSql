@@ -35,7 +35,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectOrdered([Range(10, 14)]int version)
+        public void InsertSelectOrdered([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -117,7 +117,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectOffsetFetch([Range(11, 14)]int version)
+        public void InsertSelectOffsetFetch([AsOf(11)]int version)
         {
             var engine = new Engine(version);
 
@@ -139,7 +139,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectDistinct([Range(10, 14)]int version)
+        public void InsertSelectDistinct([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -173,7 +173,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectIntoSelect([Range(10, 14)]int version)
+        public void InsertSelectIntoSelect([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -209,7 +209,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelect([Range(10, 14)]int version)
+        public void InsertSelect([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -246,7 +246,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectTransform([Range(10, 14)]int version)
+        public void InsertSelectTransform([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -265,7 +265,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectGroupBy([Range(10, 14)]int version)
+        public void InsertSelectGroupBy([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -304,7 +304,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectGroupByHaving([Range(10, 14)]int version)
+        public void InsertSelectGroupByHaving([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -341,7 +341,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void MergePermanentTableOntoPermanentTable([Range(10, 14)]int version)
+        public void MergePermanentTableOntoPermanentTable([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -393,7 +393,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SimpleSelectCTE([Range(10, 14)]int version)
+        public void SimpleSelectCTE([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -437,7 +437,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void StoredProc([Range(10, 14)]int version)
+        public void StoredProc([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -495,7 +495,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void BuiltInFunction([Range(10, 14)]int version)
+        public void BuiltInFunction([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -529,7 +529,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void UserDefinedFunction([Range(9, 14)]int version)
+        public void UserDefinedFunction([AsOf(9)]int version)
         {
             var engine = new Engine(version);
 
@@ -548,7 +548,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectView([Range(10, 14)]int version)
+        public void SelectView([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -589,7 +589,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void DeclareSetSelect([Range(8, 14)]int version)
+        public void DeclareSetSelect([AsOf(8)]int version)
         {
             var engine = new Engine(version);
 
@@ -603,7 +603,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void OutputParameter([Range(8, 14)]int version)
+        public void OutputParameter([AsOf(8)]int version)
         {
             var engine = new Engine(version);
 
@@ -633,7 +633,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CursorFetchNext([Range(10, 14)]int version)
+        public void CursorFetchNext([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -675,7 +675,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectRowCountGlobal([Range(10, 14)]int version)
+        public void SelectRowCountGlobal([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -701,7 +701,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectCaseExpression([Range(8, 14)]int version)
+        public void SelectCaseExpression([AsOf(8)]int version)
         {
             var engine = new Engine(version);
 
@@ -722,7 +722,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectIIfExpression([Range(11, 14)]int version)
+        public void SelectIIfExpression([AsOf(11)]int version)
         {
             var engine = new Engine(version);
 
@@ -792,7 +792,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InnerJoin([Range(10, 14)]int version)
+        public void InnerJoin([AsOf(10)]int version)
         {
             var engine = CreateEngineWithCityColorTaste(version);
 
@@ -809,7 +809,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void OuterJoin([Range(10, 14)]int version)
+        public void OuterJoin([AsOf(10)]int version)
         {
             var engine = CreateEngineWithCityColorTaste(version);
 
@@ -825,7 +825,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CrossJoin([Range(10, 14)]int version)
+        public void CrossJoin([AsOf(10)]int version)
         {
             var engine = CreateEngineWithCityColorTaste(version);
 
@@ -841,7 +841,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CrossApply([Range(10, 14)]int version)
+        public void CrossApply([AsOf(10)]int version)
         {
             var engine = CreateEngineWithCityColorTaste(version);
 
@@ -857,7 +857,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void OuterApply([Range(10, 14)]int version)
+        public void OuterApply([AsOf(10)]int version)
         {
             var engine = CreateEngineWithCityColorTaste(version);
 
@@ -886,7 +886,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void DateAdd([Range(8, 14)]int version)
+        public void DateAdd([AsOf(8)]int version)
         {
             var engine = new Engine(version);
 
@@ -903,7 +903,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertOutput([Range(10, 14)] int version)
+        public void InsertOutput([AsOf(10)] int version)
         {
             var engine = new Engine(version);
 
@@ -931,7 +931,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void UpdateOutput([Range(10, 14)] int version)
+        public void UpdateOutput([AsOf(10)] int version)
         {
             var engine = new Engine(version);
 
@@ -1013,7 +1013,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void Union([Range(10, 14)]int version)
+        public void Union([AsOf(10)]int version)
         {
             var engine = SetupBinaryQueryEngine(version);
 
@@ -1028,7 +1028,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void UnionAll([Range(10, 14)]int version)
+        public void UnionAll([AsOf(10)]int version)
         {
             var engine = SetupBinaryQueryEngine(version);
 
@@ -1043,7 +1043,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void Intersect([Range(10, 14)]int version)
+        public void Intersect([AsOf(10)]int version)
         {
             var engine = SetupBinaryQueryEngine(version);
 
@@ -1058,7 +1058,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void IntersectAll([Range(10, 14)]int version)
+        public void IntersectAll([AsOf(10)]int version)
         {
             var engine = SetupBinaryQueryEngine(version);
 
@@ -1073,7 +1073,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void Except([Range(10, 14)]int version)
+        public void Except([AsOf(10)]int version)
         {
             var engine = SetupBinaryQueryEngine(version);
 
@@ -1097,7 +1097,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void ExceptAll([Range(10, 14)]int version)
+        public void ExceptAll([AsOf(10)]int version)
         {
             var engine = SetupBinaryQueryEngine(version);
 
