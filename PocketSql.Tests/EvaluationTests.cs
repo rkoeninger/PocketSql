@@ -1119,5 +1119,89 @@ namespace PocketSql.Tests
                 Assert.AreEqual(3, results.Count);
             }
         }
+
+        [Test]
+        public void IdentityColumn([AsOf(8)]int version)
+        {
+            var engine = new Engine(version);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute(@"
+                    create table Things
+                    (
+                        X int identity,
+                        Y varchar(8)
+                    )");
+
+                connection.Execute(@"
+                    insert into Things (Y) values ('abc')
+                    insert into Things (Y) values ('def')
+                    insert into Things (Y) values ('ghi')");
+                var things = connection.Query<Thing>(@"select * from Things");
+                Assert.IsTrue(new[]
+                {
+                    new Thing(1, "abc"),
+                    new Thing(2, "def"),
+                    new Thing(3, "ghi")
+                }.SequenceEqual(things));
+            }
+        }
+
+        [Test]
+        public void IdentitySeedIncrementColumn([AsOf(8)]int version)
+        {
+            var engine = new Engine(version);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute(@"
+                    create table Things
+                    (
+                        X int identity(100, 10),
+                        Y varchar(8)
+                    )");
+
+                connection.Execute(@"
+                    insert into Things (Y) values ('abc')
+                    insert into Things (Y) values ('def')
+                    insert into Things (Y) values ('ghi')");
+                var things = connection.Query<Thing>(@"select * from Things");
+                Assert.IsTrue(new[]
+                {
+                    new Thing(100, "abc"),
+                    new Thing(110, "def"),
+                    new Thing(120, "ghi")
+                }.SequenceEqual(things));
+            }
+        }
+
+        [Test]
+        public void DefaultColumn([AsOf(8)]int version)
+        {
+            var engine = new Engine(version);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute(@"
+                    create table Things
+                    (
+                        X int,
+                        Y varchar(8) default('abc')
+                    )");
+
+                connection.Execute(@"
+                    insert into Things (X) values (1)
+                    insert into Things (X) values (2)
+                    insert into Things (X) values (3)");
+                var things = connection.Query<Thing>(@"select * from Things");
+                Assert.IsTrue(new[]
+                {
+                    new Thing(1, "abc"),
+                    new Thing(2, "abc"),
+                    new Thing(3, "abc")
+                }.SequenceEqual(things));
+            }
+        }
     }
 }

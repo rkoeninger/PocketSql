@@ -9,6 +9,10 @@ namespace PocketSql.Modeling
         public string Name { get; set; }
         public IList<Column> Columns { get; set; } = new List<Column>();
         public IList<Row> Rows { get; set; } = new List<Row>();
+        public IDictionary<string, Func<object>> Defaults { get; } = new Dictionary<string, Func<object>>();
+        public string IdentityColumnName { get; set; }
+        public int IdentityValue { get; set; } = 1;
+        public int IdentityIncrement { get; set; } = 1;
 
         public Row NewRow()
         {
@@ -18,6 +22,18 @@ namespace PocketSql.Modeling
                 Values = Enumerable.Repeat((object)DBNull.Value, Columns.Count).ToList()
             };
             Rows.Add(row);
+
+            if (IdentityColumnName != null)
+            {
+                row.SetValue(IdentityColumnName, IdentityValue);
+                IdentityValue += IdentityIncrement;
+            }
+
+            foreach (var def in Defaults)
+            {
+                row.SetValue(def.Key, def.Value());
+            }
+
             return row;
         }
 
