@@ -35,7 +35,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectOrdered([AsOf(10)]int version)
+        public void SelectOrderBy([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -64,6 +64,10 @@ namespace PocketSql.Tests
                     (95, 'jkl'),
                     (92, 'zxc')"));
 
+                var things = connection.Query<Thing>(@"
+                    select X, Y
+                    from Things
+                    order by X, Y desc");
                 Assert.IsTrue(new []
                 {
                     new Thing(17, "yui"),
@@ -82,7 +86,7 @@ namespace PocketSql.Tests
                     new Thing(92, "zxc"),
                     new Thing(95, "jkl"),
                     new Thing(95, "asd")
-                }.SequenceEqual(connection.Query<Thing>("select X, Y from Things order by X, Y desc")));
+                }.SequenceEqual(things));
             }
         }
 
@@ -117,7 +121,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectOffsetFetch([AsOf(11)]int version)
+        public void SelectOffsetFetch([AsOf(11)]int version)
         {
             var engine = new Engine(version);
 
@@ -139,7 +143,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectDistinct([AsOf(10)]int version)
+        public void SelectDistinct([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -173,7 +177,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectIntoSelect([AsOf(10)]int version)
+        public void SelectInto([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -246,7 +250,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectTransform([AsOf(10)]int version)
+        public void SelectExpression([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -265,7 +269,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectGroupBy([AsOf(10)]int version)
+        public void SelectGroupBy([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -294,7 +298,10 @@ namespace PocketSql.Tests
                     (2, 'b'),
                     (9, 'd')"));
 
-                var result = connection.Query<Thing>("select sum(X) as X, Y from Things group by Y").ToList();
+                var result = connection.Query<Thing>(@"
+                    select sum(X) as X, Y
+                    from Things
+                    group by Y").ToList();
                 Assert.AreEqual(4, result.Count);
                 Assert.AreEqual(17, result.First(t => t.Y == "a").X);
                 Assert.AreEqual(26, result.First(t => t.Y == "b").X);
@@ -304,7 +311,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelectGroupByHaving([AsOf(10)]int version)
+        public void SelectGroupByHaving([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -333,7 +340,11 @@ namespace PocketSql.Tests
                     (2, 'b'),
                     (9, 'd')"));
 
-                var result = connection.Query<Thing>("select sum(X) as X, Y from Things group by Y having sum(X) >= 20").ToList();
+                var result = connection.Query<Thing>(@"
+                    select sum(X) as X, Y
+                    from Things
+                    group by Y
+                    having sum(X) >= 20").ToList();
                 Assert.AreEqual(2, result.Count);
                 Assert.AreEqual(26, result.First(t => t.Y == "b").X);
                 Assert.AreEqual(20, result.First(t => t.Y == "d").X);
@@ -701,7 +712,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectCaseExpression([AsOf(8)]int version)
+        public void CaseExpression([AsOf(8)]int version)
         {
             var engine = new Engine(version);
 
@@ -722,7 +733,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectIIfExpression([AsOf(11)]int version)
+        public void IIfExpression([AsOf(11)]int version)
         {
             var engine = new Engine(version);
 
