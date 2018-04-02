@@ -10,7 +10,7 @@ namespace PocketSql.Tests
     public class EvaluationTests
     {
         [Test]
-        public void CreateInsertSelect([AsOf(10)]int version)
+        public void UpdatePlusEquals([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -352,7 +352,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void MergePermanentTableOntoPermanentTable([AsOf(10)]int version)
+        public void MergeTables([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
@@ -404,7 +404,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SimpleSelectCTE([AsOf(10)]int version)
+        public void SelectCte([AsOf(10)]int version)
         {
             var engine = new Engine(version);
 
