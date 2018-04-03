@@ -135,44 +135,6 @@ namespace PocketSql.Evaluation
                 }
             }
 
-            // ORDER BY
-
-            if (querySpec.OrderByClause != null)
-            {
-                var elements = querySpec.OrderByClause.OrderByElements;
-                var firstElement = elements.First();
-                var restElements = elements.Skip(1);
-                var temp = projection.CopyLayout();
-
-                foreach (var row in restElements.Aggregate(
-                    Order(projection.Rows, firstElement, scope),
-                    (orderedRows, element) => Order(orderedRows, element, scope)))
-                {
-                    CopyOnto(row, temp);
-                }
-
-                projection.Rows.Clear();
-                CopyOnto(temp, projection);
-            }
-
-            // OFFSET
-
-            if (querySpec.OffsetClause != null)
-            {
-                var offset = (int)Evaluate(querySpec.OffsetClause.OffsetExpression, NullArgument.It, scope);
-                var fetch = (int)Evaluate(querySpec.OffsetClause.FetchExpression, NullArgument.It, scope);
-
-                for (var i = 0; i < offset; ++i)
-                {
-                    projection.Rows.RemoveAt(0);
-                }
-
-                while (projection.Rows.Count > fetch)
-                {
-                    projection.Rows.RemoveAt(projection.Rows.Count - 1);
-                }
-            }
-
             return new EngineResult(projection);
         }
 
@@ -192,42 +154,6 @@ namespace PocketSql.Evaluation
                     resultRow.Values[i] = evaluate(selections[i].Item3, row, scope);
                 }
             }
-        }
-
-        private static void CopyOnto(Table source, Table target)
-        {
-            foreach (var row in source.Rows)
-            {
-                CopyOnto(row, target);
-            }
-        }
-
-        private static void CopyOnto(Row row, Table target)
-        {
-            var copy = target.NewRow();
-
-            foreach (var i in Enumerable.Range(0, target.Columns.Count))
-            {
-                copy.Values[i] = row.Values[i];
-            }
-        }
-
-        private static IOrderedEnumerable<Row> Order(
-            IEnumerable<Row> seq,
-            ExpressionWithSortOrder element,
-            Scope scope)
-        {
-            object Func(Row x) => Evaluate(element.Expression, new RowArgument(x), scope);
-            return element.SortOrder == SortOrder.Descending ? seq.OrderByDescending(Func) : seq.OrderBy(Func);
-        }
-
-        private static IOrderedEnumerable<Row> Order(
-            IOrderedEnumerable<Row> seq,
-            ExpressionWithSortOrder element,
-            Scope scope)
-        {
-            object Func(Row x) => Evaluate(element.Expression, new RowArgument(x), scope);
-            return element.SortOrder == SortOrder.Descending ? seq.ThenByDescending(Func) : seq.ThenBy(Func);
         }
     }
 }

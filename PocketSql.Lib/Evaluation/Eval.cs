@@ -26,6 +26,42 @@ namespace PocketSql.Evaluation
             };
         }
 
+        private static void CopyOnto(Table source, Table target)
+        {
+            foreach (var row in source.Rows)
+            {
+                CopyOnto(row, target);
+            }
+        }
+
+        private static void CopyOnto(Row row, Table target)
+        {
+            var copy = target.NewRow();
+
+            foreach (var i in Enumerable.Range(0, target.Columns.Count))
+            {
+                copy.Values[i] = row.Values[i];
+            }
+        }
+
+        private static IOrderedEnumerable<Row> Order(
+            IEnumerable<Row> seq,
+            ExpressionWithSortOrder element,
+            Scope scope)
+        {
+            object Func(Row x) => Evaluate(element.Expression, new RowArgument(x), scope);
+            return element.SortOrder == SortOrder.Descending ? seq.OrderByDescending(Func) : seq.OrderBy(Func);
+        }
+
+        private static IOrderedEnumerable<Row> Order(
+            IOrderedEnumerable<Row> seq,
+            ExpressionWithSortOrder element,
+            Scope scope)
+        {
+            object Func(Row x) => Evaluate(element.Expression, new RowArgument(x), scope);
+            return element.SortOrder == SortOrder.Descending ? seq.ThenByDescending(Func) : seq.ThenBy(Func);
+        }
+
         private static Func<SelectElement, IEnumerable<(string, DbType, ScalarExpression)>>
             ExtractSelection(Table table, Scope scope) => s =>
         {
