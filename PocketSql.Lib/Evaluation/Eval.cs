@@ -337,8 +337,11 @@ namespace PocketSql.Evaluation
                 case FunctionCall fun:
                     switch (fun.FunctionName.Value.ToLower())
                     {
-                        case "sum": return InferType(fun.Parameters[0], table, scope);
-                        case "count": return DbType.Int32;
+                        case "isnull":
+                        case "sum":
+                            return InferType(fun.Parameters[0], table, scope);
+                        case "count":
+                            return DbType.Int32;
                         case "trim":
                         case "ltrim":
                         case "rtrim":

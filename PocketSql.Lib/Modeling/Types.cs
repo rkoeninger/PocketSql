@@ -28,6 +28,7 @@ namespace PocketSql.Modeling
 
         public static T As<T>(this object x)
         {
+            if (typeof(T) == typeof(object)) return (T)x;
             if (typeof(T) == typeof(DateTime)) return (T)(object)x.AsDateTime();
             if (typeof(T) == typeof(int)) return (T)(object)x.AsInt();
             if (typeof(T) == typeof(string)) return (T)(object)x.AsString();

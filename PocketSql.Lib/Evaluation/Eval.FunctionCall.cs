@@ -59,6 +59,9 @@ namespace PocketSql.Evaluation
 
             switch (name.ToLower())
             {
+                case "isnull" when paramCount == 2:
+                    return Evaluate<object>(funCall.Parameters[0], arg, scope)
+                        ?? Evaluate<object>(funCall.Parameters[1], arg, scope);
                 case "lower" when paramCount == 1:
                     return Evaluate<string>(funCall.Parameters[0], arg, scope)?.ToLower();
                 case "upper" when paramCount == 1:

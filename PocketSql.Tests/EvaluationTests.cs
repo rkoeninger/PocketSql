@@ -213,6 +213,33 @@ namespace PocketSql.Tests
         }
 
         [Test]
+        public void SelectIsNull([AsOf(10)]int version)
+        {
+            var engine = new Engine(version);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute("create table Things (X int, Y varchar(8) null)");
+
+                Assert.AreEqual(4, connection.Execute(@"
+                    insert into Things
+                    (X, Y)
+                    values
+                    (34, 'qwe'),
+                    (23, null),
+                    (67, 'ert'),
+                    (63, null)"));
+                var things = connection.Query<Thing>("select isnull(Y, 'missing') as Y, X from Things");
+                Assert.IsTrue(new[]{
+                    new Thing(34, "qwe"),
+                    new Thing(23, "missing"),
+                    new Thing(67, "ert"),
+                    new Thing(63, "missing")
+                }.SequenceEqual(things));
+            }
+        }
+
+        [Test]
         public void InsertSelect([AsOf(10)]int version)
         {
             var engine = new Engine(version);
