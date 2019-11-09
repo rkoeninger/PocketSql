@@ -66,6 +66,11 @@ namespace PocketSql
         public Table GetTable(Schema schema, Identifier id) =>
             schema.Tables[id.Value];
 
+        public Table GetTable(NamedTableReference tableRef) =>
+            GetTable(
+                GetSchema(Database, tableRef.SchemaObject.SchemaIdentifier),
+                tableRef.SchemaObject.BaseIdentifier);
+
         public View GetView(Schema schema, Identifier id) =>
             schema.Views[id.Value];
 

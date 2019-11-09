@@ -304,6 +304,20 @@ namespace PocketSql.Tests
         }
 
         [Test]
+        public void CreateAndInsertAndSelectCustomSchema([AsOf(8)]int version)
+        {
+            var engine = new Engine(version);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute("create table abc.Things (X int, Y varchar(8))");
+                connection.Execute("insert into abc.Things (X, Y) values (1, 'abc')");
+                var thing = connection.QueryFirstOrDefault<Thing>("select * from abc.Things");
+                Assert.AreEqual(new Thing(1, "abc"), thing);
+            }
+        }
+
+        [Test]
         public void SelectExpression([AsOf(10)]int version)
         {
             var engine = new Engine(version);
