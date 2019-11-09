@@ -240,6 +240,33 @@ namespace PocketSql.Tests
         }
 
         [Test]
+        public void SelectNullIf([AsOf(10)]int version)
+        {
+            var engine = new Engine(version);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute("create table Things (X int, Y varchar(8) null)");
+
+                Assert.AreEqual(4, connection.Execute(@"
+                    insert into Things
+                    (X, Y)
+                    values
+                    (34, 'qwe'),
+                    (23, 'asd'),
+                    (67, 'qwe'),
+                    (63, 'ert')"));
+                var things = connection.Query<Thing>("select nullif(Y, 'qwe') as Y, X from Things");
+                Assert.IsTrue(new[]{
+                    new Thing(34, null),
+                    new Thing(23, "asd"),
+                    new Thing(67, null),
+                    new Thing(63, "ert")
+                }.SequenceEqual(things));
+            }
+        }
+
+        [Test]
         public void InsertSelect([AsOf(10)]int version)
         {
             var engine = new Engine(version);

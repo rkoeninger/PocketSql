@@ -356,6 +356,8 @@ namespace PocketSql.Evaluation
                     return InferType(c.ElseExpression, table, scope);
                 case IIfCall c:
                     return InferType(c.ElseExpression, table, scope);
+                case NullIfExpression nullIf:
+                    return InferType(nullIf.FirstExpression, table, scope);
                 default:
                     throw FeatureNotSupportedException.Value(expr);
             }
