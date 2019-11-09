@@ -52,6 +52,8 @@ namespace PocketSql.Evaluation
                     return Evaluate(iif, arg, scope);
                 case FunctionCall funCall:
                     return Evaluate(funCall, arg, scope);
+                case NullLiteral _:
+                    return null;
                 default:
                     throw FeatureNotSupportedException.Subtype(expr);
             }

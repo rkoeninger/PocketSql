@@ -1214,5 +1214,25 @@ namespace PocketSql.Tests
                 }.SequenceEqual(things));
             }
         }
+
+        [Test]
+        public void InsertNull([AsOf(8)]int version)
+        {
+            var engine = new Engine(version);
+
+            using (var connection = engine.GetConnection())
+            {
+                connection.Execute(@"
+                    create table Things
+                    (
+                        X int,
+                        Y varchar(8) null
+                    )");
+                connection.Execute(@"
+                    insert into Things (X, Y) values (0, null)");
+                var things = connection.Query<Thing>(@"select * from Things");
+                Assert.IsTrue(new[] { new Thing(0, null) }.SequenceEqual(things));
+            }
+        }
     }
 }
