@@ -41,8 +41,19 @@ namespace PocketSql
         public bool IsDBNull(int i) => data[tableIndex].ResultSet.Rows[rowIndex].IsNull(i);
 
         public bool GetBoolean(int i) => (bool)GetValue(i);
+        public bool AsBoolean(object val) 
+        {
+            if (val is int) return (int)val != 0;
+            if (val is string) return bool.Parse((string)val);
+            return (bool)val;
+        }
         public byte GetByte(int i) => (byte)GetValue(i);
         public DateTime GetDateTime(int i) => (DateTime)GetValue(i);
+        public DateTime AsDate(object val)
+        {
+            if (val is string) return DateTime.Parse(val.ToString());
+            return (DateTime)val;
+        }
         public decimal GetDecimal(int i) => (decimal)GetValue(i);
         public double GetDouble(int i) => (double)GetValue(i);
         public float GetFloat(int i) => (float)GetValue(i);
@@ -52,7 +63,20 @@ namespace PocketSql
         public long GetInt64(int i) => (long)GetValue(i);
         public string GetString(int i) => (string)GetValue(i);
         public char GetChar(int i) => (char)GetValue(i);
-        public object GetValue(int i) => data[tableIndex].ResultSet.Rows[rowIndex].Values[i];
+    public object GetValue(int i)
+    {
+      switch(data[tableIndex].ResultSet.Columns[i].Type)
+      {
+        case DbType.Boolean:
+          return AsBoolean(data[tableIndex].ResultSet.Rows[rowIndex].Values[i]);
+        case DbType.Date:
+        case DbType.DateTime:
+        case DbType.DateTime2:
+          return AsDate(data[tableIndex].ResultSet.Rows[rowIndex].Values[i]);
+        default:
+          return data[tableIndex].ResultSet.Rows[rowIndex].Values[i];
+      }
+    }
 
         public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferOffset, int length)
         {
