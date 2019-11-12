@@ -359,8 +359,7 @@ namespace PocketSql.Evaluation
                 case NullIfExpression nullIf:
                     return InferType(nullIf.FirstExpression, table, scope);
                 case NullLiteral _:
-                    return DbType.String;
-
+                    return DbType.String; // TODO: should there be a Null type?
                 default:
                     throw FeatureNotSupportedException.Value(expr);
             }
@@ -438,10 +437,8 @@ namespace PocketSql.Evaluation
                 case SqlDataTypeOption.NText:
                 case SqlDataTypeOption.NVarChar:
                     return DbType.AnsiString;
-
                 case SqlDataTypeOption.Decimal:
                     return DbType.Decimal;
-
                 default:
                     throw FeatureNotSupportedException.Value(type);
             }
@@ -469,13 +466,10 @@ namespace PocketSql.Evaluation
                 case DbType.DateTime2:
                 case DbType.DateTimeOffset:
                     return typeof(DateTime);
-
                 case DbType.Decimal:
                     return typeof(decimal);
-
                 case DbType.Boolean:
                     return typeof(bool);
-
                  default:
                     throw FeatureNotSupportedException.Value(type);
             }
