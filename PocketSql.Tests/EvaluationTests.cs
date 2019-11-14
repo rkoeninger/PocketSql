@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace PocketSql.Tests
 {
-    [TestFixture]
+  [TestFixture]
     public class EvaluationTests
     {
         [Test]

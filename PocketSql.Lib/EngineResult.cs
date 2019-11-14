@@ -4,7 +4,9 @@ namespace PocketSql
 {
     public class EngineResult
     {
-        public EngineResult() { }
+        public EngineResult()
+        {
+        }
 
         public EngineResult(int recordsAffected)
         {

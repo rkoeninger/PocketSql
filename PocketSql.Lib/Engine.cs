@@ -9,7 +9,9 @@ namespace PocketSql
     {
         private readonly SqlVersion sqlVersion;
 
-        public Engine(int version) : this(IntToSqlVersion(version)) { }
+        public Engine(int version) : this(IntToSqlVersion(version))
+        {
+        }
 
         private Engine(SqlVersion sqlVersion)
         {

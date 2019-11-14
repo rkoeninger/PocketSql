@@ -35,8 +35,12 @@ namespace PocketSql
 
         // Command control doesn't do anything
         public void Dispose() { }
-        public void Prepare() { }
-        public void Cancel() { }
+        public void Prepare()
+        {
+        }
+        public void Cancel()
+        {
+        }
 
         // TODO: how to set nullability on parameter?
         public IDbDataParameter CreateParameter() => new EngineParameter(true);
