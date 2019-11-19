@@ -1,21 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{883E1AC6-FA3A-4F6B-BBA1-2DE408142567}"
-	ProjectSection(SolutionItems) = preProject
-		.gitignore = .gitignore
-		.travis.yml = .travis.yml
-		appveyor.yml = appveyor.yml
-		README.md = README.md
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PocketSql.Lib", "PocketSql.Lib\PocketSql.Lib.csproj", "{58C3D4E7-91A9-4053-AD92-33025B5E799B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PocketSql.Lib", "PocketSql.Lib\PocketSql.Lib.csproj", "{F9C39C16-D766-4C1D-85D3-37D2F9D4D752}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PocketSql.Tests", "PocketSql.Tests\PocketSql.Tests.csproj", "{BC5462C1-077A-4918-9947-9B608028332F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PocketSql.Demo", "PocketSql.Demo\PocketSql.Demo.csproj", "{5DD1F0D9-4A74-4CC0-BBF1-ED98FE802B07}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PocketSql.Tests", "PocketSql.Tests\PocketSql.Tests.csproj", "{CA179FFC-9097-4C2C-896B-EAA9C505CC79}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,23 +13,19 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F9C39C16-D766-4C1D-85D3-37D2F9D4D752}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F9C39C16-D766-4C1D-85D3-37D2F9D4D752}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F9C39C16-D766-4C1D-85D3-37D2F9D4D752}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F9C39C16-D766-4C1D-85D3-37D2F9D4D752}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BC5462C1-077A-4918-9947-9B608028332F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BC5462C1-077A-4918-9947-9B608028332F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BC5462C1-077A-4918-9947-9B608028332F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BC5462C1-077A-4918-9947-9B608028332F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5DD1F0D9-4A74-4CC0-BBF1-ED98FE802B07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5DD1F0D9-4A74-4CC0-BBF1-ED98FE802B07}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5DD1F0D9-4A74-4CC0-BBF1-ED98FE802B07}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5DD1F0D9-4A74-4CC0-BBF1-ED98FE802B07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58C3D4E7-91A9-4053-AD92-33025B5E799B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58C3D4E7-91A9-4053-AD92-33025B5E799B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58C3D4E7-91A9-4053-AD92-33025B5E799B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58C3D4E7-91A9-4053-AD92-33025B5E799B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA179FFC-9097-4C2C-896B-EAA9C505CC79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA179FFC-9097-4C2C-896B-EAA9C505CC79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA179FFC-9097-4C2C-896B-EAA9C505CC79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA179FFC-9097-4C2C-896B-EAA9C505CC79}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C70F7D22-19E6-484D-80F2-48B52537FA02}
+		SolutionGuid = {C246E0D2-A0CD-4517-A87D-F42351C3D07E}
 	EndGlobalSection
 EndGlobal

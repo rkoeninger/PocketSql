@@ -1,146 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F9C39C16-D766-4C1D-85D3-37D2F9D4D752}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>PocketSql</RootNamespace>
-    <AssemblyName>PocketSql</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <LangVersion>7.2</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <Description>T-SQL interpreter fit for testing</Description>
+    <Copyright>Copyright © Robert Koeninger 2018-2020</Copyright>
+    <Authors>Robert Koeninger</Authors>
+    <Company />
+    <PackageId>PocketSql</PackageId>
+    <Product>PocketSql</Product>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Microsoft.Data.Tools.Schema.Sql, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.SqlServer.DacFx.150.4573.2\lib\net46\Microsoft.Data.Tools.Schema.Sql.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Data.Tools.Utilities, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.SqlServer.DacFx.150.4573.2\lib\net46\Microsoft.Data.Tools.Utilities.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.SqlServer.Dac, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.SqlServer.DacFx.150.4573.2\lib\net46\Microsoft.SqlServer.Dac.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.SqlServer.Dac.Extensions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.SqlServer.DacFx.150.4573.2\lib\net46\Microsoft.SqlServer.Dac.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.SqlServer.TransactSql.ScriptDom, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.SqlServer.DacFx.150.4573.2\lib\net46\Microsoft.SqlServer.TransactSql.ScriptDom.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.SqlServer.Types, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.SqlServer.DacFx.150.4573.2\lib\net46\Microsoft.SqlServer.Types.dll</HintPath>
-    </Reference>
-    <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
-    <Reference Include="System" />
-    <Reference Include="System.Collections.Immutable, Version=1.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.1.4.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="Microsoft.SqlServer.DacFx" Version="150.4573.2" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Engine.cs" />
-    <Compile Include="EngineCommand.cs" />
-    <Compile Include="EngineConnection.cs" />
-    <Compile Include="EngineDataReader.cs" />
-    <Compile Include="EngineParameter.cs" />
-    <Compile Include="EngineParameterCollection.cs" />
-    <Compile Include="EngineResult.cs" />
-    <Compile Include="EngineTransaction.cs" />
-    <Compile Include="Equality.cs" />
-    <Compile Include="Evaluation\Eval.AssignmentKind.cs" />
-    <Compile Include="Evaluation\Eval.BinaryExpressionType.cs" />
-    <Compile Include="Evaluation\Eval.BinaryQueryExpressionType.cs" />
-    <Compile Include="Evaluation\Eval.BooleanBinaryExpressionType.cs" />
-    <Compile Include="Evaluation\Eval.BooleanComparisonType.cs" />
-    <Compile Include="Evaluation\Eval.BooleanExpression.cs" />
-    <Compile Include="Evaluation\Eval.BooleanTernaryExpressionType.cs" />
-    <Compile Include="Evaluation\Eval.CaseExpression.cs" />
-    <Compile Include="Evaluation\Eval.CommonTableExpressions.cs" />
-    <Compile Include="Evaluation\Eval.CreateTableStatement.cs" />
-    <Compile Include="Evaluation\Eval.CreateViewStatement.cs" />
-    <Compile Include="Evaluation\Eval.cs" />
-    <Compile Include="Evaluation\Eval.CursorStatement.cs" />
-    <Compile Include="Evaluation\Eval.DataModificationSpecification.cs" />
-    <Compile Include="Evaluation\Eval.DeclareCursorStatement.cs" />
-    <Compile Include="Evaluation\Eval.DeclareVariable.cs" />
-    <Compile Include="Evaluation\Eval.DeleteSpecification.cs" />
-    <Compile Include="Evaluation\Eval.DropObectsStatement.cs" />
-    <Compile Include="Evaluation\Eval.ExecuteSpecification.cs" />
-    <Compile Include="Evaluation\Eval.FunctionCall.cs" />
-    <Compile Include="Evaluation\Eval.GroupingSpecification.cs" />
-    <Compile Include="Evaluation\Eval.IfStatement.cs" />
-    <Compile Include="Evaluation\Eval.IIfCall.cs" />
-    <Compile Include="Evaluation\Eval.InsertSpecification.cs" />
-    <Compile Include="Evaluation\Eval.MergeAction.cs" />
-    <Compile Include="Evaluation\Eval.MergeSpecification.cs" />
-    <Compile Include="Evaluation\Eval.Procedure.cs" />
-    <Compile Include="Evaluation\Eval.ProcedureStatementBodyBase.cs" />
-    <Compile Include="Evaluation\Eval.QueryExpression.cs" />
-    <Compile Include="Evaluation\Eval.QuerySpecification.cs" />
-    <Compile Include="Evaluation\Eval.ScalarExpression.cs" />
-    <Compile Include="Evaluation\Eval.SelectInsertSource.cs" />
-    <Compile Include="Evaluation\Eval.SelectStatement.cs" />
-    <Compile Include="Evaluation\Eval.SetClauses.cs" />
-    <Compile Include="Evaluation\Eval.SetVariable.cs" />
-    <Compile Include="Evaluation\Eval.StatementList.cs" />
-    <Compile Include="Evaluation\Eval.StatementWithCtesAndXmlNamespaces.cs" />
-    <Compile Include="Evaluation\Eval.TableReference.cs" />
-    <Compile Include="Evaluation\Eval.TSqlFragment.cs" />
-    <Compile Include="Evaluation\Eval.TSqlStatement.cs" />
-    <Compile Include="Evaluation\Eval.UnaryExpressionType.cs" />
-    <Compile Include="Evaluation\Eval.UpdateSpecification.cs" />
-    <Compile Include="Evaluation\Eval.ValuesInsertSource.cs" />
-    <Compile Include="Evaluation\Eval.WhileStatement.cs" />
-    <Compile Include="Evaluation\Eval.TruncateTableStatement.cs" />
-    <Compile Include="Modeling\Extensions.cs" />
-    <Compile Include="FeatureNotSupportedException.cs" />
-    <Compile Include="Modeling\Column.cs" />
-    <Compile Include="Modeling\Cursor.cs" />
-    <Compile Include="Modeling\Database.cs" />
-    <Compile Include="Modeling\EquatableArray.cs" />
-    <Compile Include="Modeling\EquatableAssociationList.cs" />
-    <Compile Include="Modeling\Function.cs" />
-    <Compile Include="Modeling\IArgument.cs" />
-    <Compile Include="Modeling\INamed.cs" />
-    <Compile Include="Modeling\IOutputSink.cs" />
-    <Compile Include="Modeling\Maybe.cs" />
-    <Compile Include="Modeling\Namespace.cs" />
-    <Compile Include="Modeling\Procedure.cs" />
-    <Compile Include="Modeling\Row.cs" />
-    <Compile Include="Modeling\Schema.cs" />
-    <Compile Include="Modeling\Table.cs" />
-    <Compile Include="Modeling\Types.cs" />
-    <Compile Include="Modeling\View.cs" />
-    <Compile Include="Naming.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Env.cs" />
-    <Compile Include="Scope.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>
