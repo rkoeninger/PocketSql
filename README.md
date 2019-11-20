@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/rkoeninger/PocketSql.svg?branch=master)](https://travis-ci.org/rkoeninger/PocketSql)
+[![Latest Nuget](https://img.shields.io/nuget/v/PocketSql.svg)](https://www.nuget.org/packages/PocketSql)
 
 # PocketSql
 

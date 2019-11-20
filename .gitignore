@@ -1,7 +1,5 @@
 .vs/
 bin/
 obj/
-packages/
-paket-files/
 *.user
 *.suo
