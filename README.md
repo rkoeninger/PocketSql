@@ -1,7 +1,4 @@
-[![Visual Studio Version](https://img.shields.io/badge/vs-2017-68217a.svg)](https://www.visualstudio.com/vs/older-downloads/)
-[![C# Version](https://img.shields.io/badge/C%23-7.2-green.svg)](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-7-2)
 [![Build Status](https://travis-ci.org/rkoeninger/PocketSql.svg?branch=master)](https://travis-ci.org/rkoeninger/PocketSql)
-[![Build status](https://ci.appveyor.com/api/projects/status/hllf7jksjg70iq28/branch/master?svg=true)](https://ci.appveyor.com/project/rkoeninger/pocketsql/branch/master)
 
 # PocketSql
 
