@@ -6,7 +6,6 @@
     <Description>T-SQL interpreter fit for testing</Description>
     <Copyright>Copyright © Robert Koeninger 2018-2020</Copyright>
     <Authors>Robert Koeninger</Authors>
-    <Company />
     <PackageId>PocketSql</PackageId>
     <Product>PocketSql</Product>
   </PropertyGroup>

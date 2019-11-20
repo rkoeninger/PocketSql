@@ -2,12 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-
     <IsPackable>false</IsPackable>
-
     <Authors>Robert Koeninger</Authors>
-
-    <Company />
   </PropertyGroup>
 
   <ItemGroup>
