@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PocketSql.Lib\PocketSql.Lib.csproj" />
+    <ProjectReference Include="..\PocketSql\PocketSql.csproj" />
   </ItemGroup>
 
 </Project>
