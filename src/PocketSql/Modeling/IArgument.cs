@@ -6,11 +6,7 @@ namespace PocketSql.Modeling
 
     public class RowArgument : IArgument
     {
-        public RowArgument(Row value)
-        {
-            Value = value;
-        }
-
+        public RowArgument(Row value) => Value = value;
         public Row Value { get; set; }
     }
 

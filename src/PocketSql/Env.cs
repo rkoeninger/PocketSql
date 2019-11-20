@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Modeling;
 
@@ -85,6 +84,8 @@ namespace PocketSql
 
         public View GetView(SchemaObjectName id) =>
             GetView(GetSchema(id), id.BaseIdentifier);
+
+        // TODO: ids aren't being handled properly here
 
         public Function GetFunction(string[] id) => GetSchema(id).Functions[id[id.Length - 1]];
 

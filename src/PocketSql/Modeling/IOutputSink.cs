@@ -15,10 +15,7 @@ namespace PocketSql.Modeling
     {
         public Table Output { get; }
 
-        public TableOutputSink(IList<Column> columns)
-        {
-            Output = new Table { Columns = columns };
-        }
+        public TableOutputSink(IList<Column> columns) => Output = new Table { Columns = columns };
 
         public void Inserted(Row row)
         {
@@ -131,16 +128,8 @@ namespace PocketSql.Modeling
 
     public class NullOutputSink : IOutputSink
     {
-        public void Inserted(Row row)
-        {
-        }
-
-        public void Updated(Row oldRow, Row newRow)
-        {
-        }
-
-        public void Deleted(Row row)
-        {
-        }
+        public void Inserted(Row row) { }
+        public void Updated(Row oldRow, Row newRow) { }
+        public void Deleted(Row row) { }
     }
 }

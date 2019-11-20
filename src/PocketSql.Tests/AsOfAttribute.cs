@@ -4,8 +4,6 @@ namespace PocketSql.Tests
 {
     public class AsOfAttribute : RangeAttribute
     {
-        public AsOfAttribute(int version) : base(version, 14)
-        {
-        }
+        public AsOfAttribute(int version) : base(version, 14) { }
     }
 }

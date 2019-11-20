@@ -12,10 +12,7 @@ namespace PocketSql
         private int tableIndex;
         private int rowIndex = -1;
 
-        public EngineDataReader(List<EngineResult> data)
-        {
-            this.data = data;
-        }
+        public EngineDataReader(List<EngineResult> data) => this.data = data;
 
         public bool IsClosed { get; private set; }
         public void Close() => IsClosed = true;

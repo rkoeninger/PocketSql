@@ -50,6 +50,7 @@ namespace PocketSql.Modeling
             throw new Exception($"Column \"{name}\" does not exist in table \"{Name}\"");
         }
 
+        // TODO: this is duplicated in Row.cs
         // TODO: expand name with tables in scope
         public int GetColumnOrdinal(string[] name, Scope scope)
         {

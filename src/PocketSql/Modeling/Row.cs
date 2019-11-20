@@ -41,6 +41,7 @@ namespace PocketSql.Modeling
                 .Concat(new[] { name.Last() })
                 .ToArray();
 
+            // TODO: need more general purpose name resolution
             if (resolvedName.Length < 3) resolvedName = new[] { scope.Env.DefaultSchema }.Concat(resolvedName).ToArray();
             if (resolvedName.Length < 4) resolvedName = new[] { scope.Env.DefaultDatabase }.Concat(resolvedName).ToArray();
 

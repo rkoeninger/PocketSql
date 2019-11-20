@@ -14,12 +14,8 @@ namespace PocketSql
 
         // Transactions don't do anything
         public void Dispose() { }
-        public void Commit()
-        {
-        }
-        public void Rollback()
-        {
-        }
+        public void Commit() { }
+        public void Rollback() { }
 
         public IDbConnection Connection => connection;
         public IsolationLevel IsolationLevel { get; }

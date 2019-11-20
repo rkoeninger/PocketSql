@@ -52,7 +52,7 @@ namespace PocketSql
         private bool IsReturn(IDataParameter d) =>
             d.Direction == ParameterDirection.ReturnValue;
 
-        private void OnEval(IDataParameterCollection paramz, Env env)
+        private void OnEval(Env env)
         {
             foreach (var param in Parameters.Cast<IDbDataParameter>().Where(IsOutput))
             {
@@ -76,7 +76,7 @@ namespace PocketSql
                     .Select(p => (p.ParameterName, IsInput(p), IsOutput(p), p.Value))
                     .ToList(),
                 new Scope(env));
-            OnEval(Parameters, env);
+            OnEval(env);
             return new List<EngineResult> { results };
         }
 
@@ -95,7 +95,7 @@ namespace PocketSql
 
             var env = Env.Of(connection, Parameters);
             var results = Eval.Evaluate(fragment, new Scope(env));
-            OnEval(Parameters, env);
+            OnEval(env);
             return results;
         }
 

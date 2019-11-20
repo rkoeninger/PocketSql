@@ -44,8 +44,8 @@ namespace PocketSql
                 .Concat(new[] { name.Last() })
                 .ToArray();
 
-            if (resolvedName.Length < 3) resolvedName = new[] { Env.DefaultSchema }.Concat(resolvedName).ToArray();
-            if (resolvedName.Length < 4) resolvedName = new[] { Env.DefaultDatabase }.Concat(resolvedName).ToArray();
+            if (resolvedName.Length < 3) resolvedName = Prefix(Env.DefaultSchema, resolvedName);
+            if (resolvedName.Length < 4) resolvedName = Prefix(Env.DefaultDatabase, resolvedName);
 
             return resolvedName;
         }
@@ -59,10 +59,13 @@ namespace PocketSql
                         : new[] { x })
                 .ToArray();
 
-            if (resolvedName.Length < 2) resolvedName = new[] { Env.DefaultSchema }.Concat(resolvedName).ToArray();
-            if (resolvedName.Length < 3) resolvedName = new[] { Env.DefaultDatabase }.Concat(resolvedName).ToArray();
+            if (resolvedName.Length < 2) resolvedName = Prefix(Env.DefaultSchema, resolvedName);
+            if (resolvedName.Length < 3) resolvedName = Prefix(Env.DefaultDatabase, resolvedName);
 
             return resolvedName;
         }
+
+        private static T[] Prefix<T>(T item, T[] array) =>
+            new[] { item }.Concat(array).ToArray();
     }
 }
