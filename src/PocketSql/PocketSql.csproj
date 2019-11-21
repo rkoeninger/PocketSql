@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\LICENSE.txt">
+    <None Include="..\..\LICENSE.txt" Visible="false">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
