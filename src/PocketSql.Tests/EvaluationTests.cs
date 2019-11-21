@@ -10,10 +10,8 @@ namespace PocketSql.Tests
     public class EvaluationTests
     {
         [Test]
-        public void UpdatePlusEquals([AsOf(10)]int version)
+        public void UpdatePlusEquals([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table People (Name varchar(32), Age int)");
             Assert.AreEqual(1, connection.Execute("insert into People (Name, Age) values ('Rob', 30)"));
             var people = connection.Query<Person>("select p.Name, p.Age from People as p").ToList();
@@ -28,10 +26,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectOrderBy([AsOf(10)]int version)
+        public void SelectOrderBy([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y varchar(8))");
             Assert.AreEqual(16, connection.Execute(@"
                 insert into Things
@@ -107,10 +103,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectOffsetFetch([AsOf(11)]int version)
+        public void SelectOffsetFetch([AsOf(11)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Numbers (X int)");
             Assert.AreEqual(8, connection.Execute(@"
                 insert into Numbers (X)
@@ -124,10 +118,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectDistinct([AsOf(10)]int version)
+        public void SelectDistinct([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y varchar(8))");
             Assert.AreEqual(16, connection.Execute(@"
                 insert into Things
@@ -153,10 +145,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectInto([AsOf(10)]int version)
+        public void SelectInto([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y varchar(8))");
             Assert.AreEqual(16, connection.Execute(@"
                 insert into Things
@@ -183,10 +173,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectIsNull([AsOf(10)]int version)
+        public void SelectIsNull([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y varchar(8) null)");
             Assert.AreEqual(4, connection.Execute(@"
                 insert into Things
@@ -206,10 +194,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectNullIf([AsOf(10)]int version)
+        public void SelectNullIf([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y varchar(8) null)");
             Assert.AreEqual(4, connection.Execute(@"
                 insert into Things
@@ -229,10 +215,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertSelect([AsOf(10)]int version)
+        public void InsertSelect([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y varchar(8))");
             connection.Execute("create table Others (X int)");
             Assert.AreEqual(16, connection.Execute(@"
@@ -260,10 +244,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CreateAndInsertAndSelectCustomSchema([AsOf(8)]int version)
+        public void CreateAndInsertAndSelectCustomSchema([AsOf(8)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table abc.Things (X int, Y varchar(8))");
             connection.Execute("insert into abc.Things (X, Y) values (1, 'abc')");
             var thing = connection.QueryFirstOrDefault<Thing>("select * from abc.Things");
@@ -271,10 +253,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectExpression([AsOf(10)]int version)
+        public void SelectExpression([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Numbers (X int)");
             Assert.AreEqual(8, connection.Execute(@"
                 insert into Numbers (X)
@@ -285,10 +265,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectGroupBy([AsOf(10)]int version)
+        public void SelectGroupBy([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y varchar(8))");
             Assert.AreEqual(16, connection.Execute(@"
                 insert into Things
@@ -322,10 +300,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectGroupByHaving([AsOf(10)]int version)
+        public void SelectGroupByHaving([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y varchar(8))");
             Assert.AreEqual(16, connection.Execute(@"
                 insert into Things
@@ -358,10 +334,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void MergeTables([AsOf(10)]int version)
+        public void MergeTables([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Source (SourceId int, SourceAmount int)");
             Assert.AreEqual(4, connection.Execute(@"
                 insert into Source
@@ -401,10 +375,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectCte([AsOf(10)]int version)
+        public void SelectCte([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y int)");
             Assert.AreEqual(16, connection.Execute(@"
                 insert into Things
@@ -440,10 +412,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void StoredProc([AsOf(10)]int version)
+        public void StoredProc([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y varchar(8))");
             Assert.AreEqual(16, connection.Execute(@"
                 insert into Things
@@ -490,10 +460,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void BuiltInFunction([AsOf(10)]int version)
+        public void BuiltInFunction([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (Y varchar(8))");
             Assert.AreEqual(16, connection.Execute(@"
                 insert into Things
@@ -521,10 +489,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void UserDefinedFunction([AsOf(9)]int version)
+        public void UserDefinedFunction([AsOf(9)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute(@"
                 create function ScalarMax(@X int, @Y int)
                 returns int
@@ -536,10 +502,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectView([AsOf(10)]int version)
+        public void SelectView([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y varchar(8))");
             Assert.AreEqual(16, connection.Execute(@"
                 insert into Things
@@ -571,10 +535,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void DeclareSetSelect([AsOf(8)]int version)
+        public void DeclareSetSelect([AsOf(8)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             Assert.AreEqual("Rob", connection.ExecuteScalar<string>(@"
                 declare @Name varchar(16)
                 set @Name = 'Rob'
@@ -582,10 +544,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void OutputParameter([AsOf(8)]int version)
+        public void OutputParameter([AsOf(8)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             var p = new DynamicParameters();
             p.Add("@a", 11);
             p.Add("@b", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -609,10 +569,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CursorFetchNext([AsOf(10)]int version)
+        public void CursorFetchNext([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y varchar(8))");
             Assert.AreEqual(8, connection.Execute(@"
                 insert into Things
@@ -646,10 +604,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void SelectRowCountGlobal([AsOf(10)]int version)
+        public void SelectRowCountGlobal([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute("create table Things (X int, Y varchar(8))");
             Assert.AreEqual(8, connection.ExecuteScalar<int>(@"
                 insert into Things
@@ -668,10 +624,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CaseExpression([AsOf(8)]int version)
+        public void CaseExpression([AsOf(8)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             Assert.AreEqual(4, connection.QueryFirst<int>(@"
                 select (case 'a' when 'a' then 4 else 3 end)"));
             Assert.AreEqual(3, connection.QueryFirst<int>(@"
@@ -683,20 +637,16 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void IIfExpression([AsOf(11)]int version)
+        public void IIfExpression([AsOf(11)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             Assert.AreEqual(4, connection.QueryFirst<int>(@"
                 select iif('a' = 'a', 4, 3)"));
             Assert.AreEqual(3, connection.QueryFirst<int>(@"
                 select iif('a' = 'b', 4, 3)"));
         }
 
-        private Engine CreateEngineWithCityColorTaste(int version)
+        private void CreateEngineWithCityColorTaste(IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute(@"
                 create table TableA (X int, City varchar(32))
 
@@ -741,14 +691,12 @@ namespace PocketSql.Tests
                 (24, 'bitter'),
                 (25, 'savory'),
                 (26, 'salty')");
-            return engine;
         }
 
         [Test]
-        public void InnerJoin([AsOf(10)]int version)
+        public void InnerJoin([AsOf(10)]IDbConnection connection)
         {
-            var engine = CreateEngineWithCityColorTaste(version);
-            using var connection = engine.GetConnection();
+            CreateEngineWithCityColorTaste(connection);
             var results = connection.Query<CityColorTaste>(@"
                 select a.City, b.Color, c.Taste
                 from TableA as a
@@ -758,10 +706,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void OuterJoin([AsOf(10)]int version)
+        public void OuterJoin([AsOf(10)]IDbConnection connection)
         {
-            var engine = CreateEngineWithCityColorTaste(version);
-            using var connection = engine.GetConnection();
+            CreateEngineWithCityColorTaste(connection);
             var results = connection.Query<CityColorTaste>(@"
                 select b.Color, c.Taste
                 from TableB as b
@@ -770,10 +717,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CrossJoin([AsOf(10)]int version)
+        public void CrossJoin([AsOf(10)]IDbConnection connection)
         {
-            var engine = CreateEngineWithCityColorTaste(version);
-            using var connection = engine.GetConnection();
+            CreateEngineWithCityColorTaste(connection);
             var results = connection.Query<CityColorTaste>(@"
                 select *
                 from TableA as a
@@ -782,10 +728,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CrossApply([AsOf(10)]int version)
+        public void CrossApply([AsOf(10)]IDbConnection connection)
         {
-            var engine = CreateEngineWithCityColorTaste(version);
-            using var connection = engine.GetConnection();
+            CreateEngineWithCityColorTaste(connection);
             var results = connection.Query<CityColorTaste>(@"
                 select * from TableA as a
                 cross apply
@@ -794,10 +739,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void OuterApply([AsOf(10)]int version)
+        public void OuterApply([AsOf(10)]IDbConnection connection)
         {
-            var engine = CreateEngineWithCityColorTaste(version);
-            using var connection = engine.GetConnection();
+            CreateEngineWithCityColorTaste(connection);
             var results = connection.Query<CityColorTaste>(@"
                 select * from TableA as a
                 outer apply
@@ -819,10 +763,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void DateAdd([AsOf(8)]int version)
+        public void DateAdd([AsOf(8)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             DateTime Run(string datepart, int x) =>
                 connection.ExecuteScalar<DateTime>(
                     $"select dateadd({datepart}, {x}, '2018-01-01')");
@@ -832,10 +774,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertOutput([AsOf(10)] int version)
+        public void InsertOutput([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute(@"
                 create table Things
                 (
@@ -855,10 +795,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void UpdateOutput([AsOf(10)] int version)
+        public void UpdateOutput([AsOf(10)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute(@"
                 create table Things
                 (
@@ -886,10 +824,8 @@ namespace PocketSql.Tests
             }.SequenceEqual(results));
         }
 
-        private Engine SetupBinaryQueryEngine(int version)
+        private void SetupBinaryQueryEngine(IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute(@"
                 create table AAA
                 (
@@ -920,14 +856,12 @@ namespace PocketSql.Tests
                 (3, 'ghi'),
                 (5, 'mno'),
                 (5, 'mno')");
-            return engine;
         }
 
         [Test]
-        public void Union([AsOf(10)]int version)
+        public void Union([AsOf(10)]IDbConnection connection)
         {
-            var engine = SetupBinaryQueryEngine(version);
-            using var connection = engine.GetConnection();
+            SetupBinaryQueryEngine(connection);
             var results = connection.Query<Thing>(@"
                 (select * from AAA)
                 union
@@ -936,10 +870,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void UnionAll([AsOf(10)]int version)
+        public void UnionAll([AsOf(10)]IDbConnection connection)
         {
-            var engine = SetupBinaryQueryEngine(version);
-            using var connection = engine.GetConnection();
+            SetupBinaryQueryEngine(connection);
             var results = connection.Query<Thing>(@"
                 (select * from AAA)
                 union all
@@ -948,10 +881,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void Intersect([AsOf(10)]int version)
+        public void Intersect([AsOf(10)]IDbConnection connection)
         {
-            var engine = SetupBinaryQueryEngine(version);
-            using var connection = engine.GetConnection();
+            SetupBinaryQueryEngine(connection);
             var results = connection.Query<Thing>(@"
                 (select * from AAA)
                 intersect
@@ -960,10 +892,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void IntersectAll([AsOf(10)]int version)
+        public void IntersectAll([AsOf(10)]IDbConnection connection)
         {
-            var engine = SetupBinaryQueryEngine(version);
-            using var connection = engine.GetConnection();
+            SetupBinaryQueryEngine(connection);
             var results = connection.Query<Thing>(@"
                 (select * from AAA)
                 intersect all
@@ -972,10 +903,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void Except([AsOf(10)]int version)
+        public void Except([AsOf(10)]IDbConnection connection)
         {
-            var engine = SetupBinaryQueryEngine(version);
-            using var connection = engine.GetConnection();
+            SetupBinaryQueryEngine(connection);
             var results = connection.Query<Thing>(@"
                 (select * from AAA)
                 except
@@ -984,10 +914,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void ExceptReversed([AsOf(10)]int version)
+        public void ExceptReversed([AsOf(10)]IDbConnection connection)
         {
-            var engine = SetupBinaryQueryEngine(version);
-            using var connection = engine.GetConnection();
+            SetupBinaryQueryEngine(connection);
             var results = connection.Query<Thing>(@"
                 (select * from BBB)
                 except
@@ -996,10 +925,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void ExceptAll([AsOf(10)]int version)
+        public void ExceptAll([AsOf(10)]IDbConnection connection)
         {
-            var engine = SetupBinaryQueryEngine(version);
-            using var connection = engine.GetConnection();
+            SetupBinaryQueryEngine(connection);
             var results = connection.Query<Thing>(@"
                     (select * from AAA)
                     except all
@@ -1008,10 +936,9 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void ExceptAllReversed([AsOf(10)]int version)
+        public void ExceptAllReversed([AsOf(10)]IDbConnection connection)
         {
-            var engine = SetupBinaryQueryEngine(version);
-            using var connection = engine.GetConnection();
+            SetupBinaryQueryEngine(connection);
             var results = connection.Query<Thing>(@"
                     (select * from BBB)
                     except all
@@ -1020,10 +947,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void IdentityColumn([AsOf(8)]int version)
+        public void IdentityColumn([AsOf(8)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute(@"
                 create table Things
                 (
@@ -1044,10 +969,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void IdentitySeedIncrementColumn([AsOf(8)]int version)
+        public void IdentitySeedIncrementColumn([AsOf(8)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute(@"
                 create table Things
                 (
@@ -1068,10 +991,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void DefaultColumn([AsOf(8)]int version)
+        public void DefaultColumn([AsOf(8)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute(@"
                 create table Things
                 (
@@ -1092,10 +1013,8 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertNull([AsOf(8)]int version)
+        public void InsertNull([AsOf(8)]IDbConnection connection)
         {
-            var engine = new Engine(version);
-            using var connection = engine.GetConnection();
             connection.Execute(@"
                 create table Things
                 (

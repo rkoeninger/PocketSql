@@ -9,24 +9,20 @@ namespace PocketSql.Tests
     public class WhereConditionTests
     {
         [Test]
-        public void TestWhereStringGreaterThanString()
+        public void TestWhereStringGreaterThanString([AsOf(8)]IDbConnection connection)
         {
-            var engine = new Engine(140);
-            using var conn = engine.GetConnection();
-            conn.Execute(SampleTable);
-            var ids = conn.Query<IdAndName>("SELECT * FROM [Sample] WHERE [Name] > 'E'");
+            connection.Execute(SampleTable);
+            var ids = connection.Query<IdAndName>("SELECT * FROM [Sample] WHERE [Name] > 'E'");
             Assert.IsNotNull(ids);
             Assert.AreEqual(4, ids.Count());
             Assert.IsFalse(ids.Any(x => x.Name.CompareTo("E") <= 0));
         }
 
         [Test]
-        public void TestWhereStringLessThanString()
+        public void TestWhereStringLessThanString([AsOf(8)]IDbConnection connection)
         {
-            var engine = new Engine(140);
-            using var conn = engine.GetConnection();
-            conn.Execute(SampleTable);
-            var ids = conn.Query<IdAndName>("SELECT * FROM [Sample] WHERE [Name] < 'E'");
+            connection.Execute(SampleTable);
+            var ids = connection.Query<IdAndName>("SELECT * FROM [Sample] WHERE [Name] < 'E'");
             Assert.IsNotNull(ids);
             Assert.AreEqual(4, ids.Count());
             Assert.IsFalse(ids.Any(x => x.Name.CompareTo("E") >= 0));

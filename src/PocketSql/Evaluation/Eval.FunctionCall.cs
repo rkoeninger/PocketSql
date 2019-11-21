@@ -59,6 +59,7 @@ namespace PocketSql.Evaluation
 
             switch (name.ToLower())
             {
+                // TODO: not supported in version 8? see unit test
                 case "isnull" when paramCount == 2:
                     return Evaluate<object>(funCall.Parameters[0], arg, scope)
                         ?? Evaluate<object>(funCall.Parameters[1], arg, scope);

@@ -9,12 +9,10 @@ namespace PocketSql.Tests
     public class SqlFunctionsForNullValueTests
     {
         [Test]
-        public void TestIsNullFunction()
+        public void TestIsNullFunction([AsOf(9)]IDbConnection connection)
         {
-            var engine = new Engine(140);
-            using var conn = engine.GetConnection();
-            conn.Execute(SampleTable);
-            var ids = conn.Query<IdAndName>(@"
+            connection.Execute(SampleTable);
+            var ids = connection.Query<IdAndName>(@"
                 SELECT Id, IsNull(Name, 'NO NAME GIVEN') AS 'Name'
                 FROM [Sample]
                 ORDER BY Name");
@@ -24,12 +22,10 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void TestNullIfFunction()
+        public void TestNullIfFunction([AsOf(9)]IDbConnection connection)
         {
-            var engine = new Engine(140);
-            using var conn = engine.GetConnection();
-            conn.Execute(SampleTable);
-            var ids = conn.Query<IdAndName>(@"
+            connection.Execute(SampleTable);
+            var ids = connection.Query<IdAndName>(@"
                 SELECT Id, NullIf(Name, 'Gwen') AS 'Name'
                 FROM [Sample]
                 ORDER BY Name");
