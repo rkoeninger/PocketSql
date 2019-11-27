@@ -1,39 +1,39 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace PocketSql.Modeling
 {
     public static class Types
     {
-        public static DateTime AsDateTime(this object x)
+        private static readonly Dictionary<(Type, Type), Func<object, object>> casters =
+            new Dictionary<(Type, Type), Func<object, object>>();
+
+        private static void Setup<A, B>(Func<A, B> f) => casters.Add((typeof(A), typeof(B)), x => f((A) x));
+
+        static Types()
         {
-            if (x is DateTime) return (DateTime)x;
-            if (x is string s) return DateTime.Parse(s);
-
-            throw new InvalidCastException($"Type {x?.GetType().Name} cannot be converted to datetime");
-        }
-
-        public static int AsInt(this object x)
-        {
-            if (x is int) return (int)x;
-
-            throw new InvalidCastException($"Type {x?.GetType().Name} cannot be converted to int");
-        }
-
-        public static string AsString(this object x)
-        {
-            if (x is string) return (string)x;
-
-            throw new InvalidCastException($"Type {x?.GetType().Name} cannot be converted to varchar");
+            Setup<DateTime, string>(x => x.ToString());
+            Setup<int, string>(x => x.ToString());
+            Setup<long, string>(x => x.ToString());
+            Setup<short, string>(x => x.ToString());
+            Setup<string, DateTime>(DateTime.Parse);
         }
 
         public static T As<T>(this object x)
         {
-            if (typeof(T) == typeof(object)) return (T)x;
-            if (typeof(T) == typeof(DateTime)) return (T)(object)x.AsDateTime();
-            if (typeof(T) == typeof(int)) return (T)(object)x.AsInt();
-            if (typeof(T) == typeof(string)) return (T)(object)x.AsString();
+            var type = typeof(T);
 
-            throw new InvalidCastException($"Type {x?.GetType().Name} cannot be converted to {typeof(T).Name}");
+            if (x == null)
+            {
+                return type.IsClass
+                    ? default(T)
+                    : throw new InvalidCastException($"Type {type.Name} cannot be null");
+            }
+
+            return
+                type.IsAssignableFrom(x.GetType()) ? (T)x :
+                casters.TryGetValue((x.GetType(), type), out var f) ? (T)f(x) :
+                throw new InvalidCastException($"Type {x?.GetType().Name} cannot be converted to {typeof(T).Name}");
         }
     }
 }
