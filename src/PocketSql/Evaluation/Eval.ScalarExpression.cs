@@ -54,11 +54,8 @@ namespace PocketSql.Evaluation
                     return Evaluate(funCall, arg, scope);
                 case NullLiteral _:
                     return null;
-                // TODO: not supported in version 8? see unit test
                 case NullIfExpression nullIf:
-                    var n1 = Evaluate<object>(nullIf.FirstExpression, arg, scope);
-                    var n2 = Evaluate<object>(nullIf.SecondExpression, arg, scope);
-                    return Equality.Equal(n1, n2) ? null : n1;
+                    return Evaluate(nullIf, arg, scope);
                 default:
                     throw FeatureNotSupportedException.Subtype(expr);
             }
