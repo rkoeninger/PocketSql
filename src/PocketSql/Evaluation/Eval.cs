@@ -69,7 +69,7 @@ namespace PocketSql.Evaluation
             {
                 // TODO: respect table alias in star expression
                 // TODO: function calls like count(*) are SelectStarExpressions
-                case SelectStarExpression star:
+                case SelectStarExpression _:
                     return table.Columns.Select(c => (
                         c.Name.LastOrDefault(),
                         c.Type,
@@ -151,15 +151,14 @@ namespace PocketSql.Evaluation
                 new Table
                 {
                     Columns = accumulatedTables.Columns.Concat(targetTable.Columns).ToList(),
-                    Rows = UnqualifiedJoinRows(accumulatedTables, targetTable, type, scope).ToList()
+                    Rows = UnqualifiedJoinRows(accumulatedTables, targetTable, type).ToList()
                 },
                 scope);
 
         private static IEnumerable<Row> UnqualifiedJoinRows(
             Table accumulatedTables,
             Table targetTable,
-            UnqualifiedJoinType type,
-            Scope scope)
+            UnqualifiedJoinType type)
         {
             switch (type)
             {

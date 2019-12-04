@@ -43,8 +43,6 @@ namespace PocketSql.Modeling
             members[name] = value;
         }
 
-        public void Set<U>(U value) where U : T, INamed => Set(value.Name, value);
-
         public void Declare(string name, T value)
         {
             if (IsDefined(name)) throw new Exception($"{typeof(T).Name} \"{name}\" already exists");
@@ -54,8 +52,6 @@ namespace PocketSql.Modeling
         public void Declare<U>(U value) where U : T, INamed => Declare(value.Name, value);
 
         public void DeclareOrSet(string name, T value) => members[name] = value;
-
-        public void DeclareOrSet<U>(U value) where U : T, INamed => DeclareOrSet(value.Name, value);
 
         public void Drop(string name)
         {

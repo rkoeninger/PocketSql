@@ -5,10 +5,10 @@ namespace PocketSql.Modeling
 {
     public static class Types
     {
-        private static readonly Dictionary<(Type, Type), Func<object, object>> casters =
+        private static readonly Dictionary<(Type, Type), Func<object, object>> Casters =
             new Dictionary<(Type, Type), Func<object, object>>();
 
-        private static void Setup<A, B>(Func<A, B> f) => casters.Add((typeof(A), typeof(B)), x => f((A) x));
+        private static void Setup<A, B>(Func<A, B> f) => Casters.Add((typeof(A), typeof(B)), x => f((A) x));
 
         static Types()
         {
@@ -31,9 +31,9 @@ namespace PocketSql.Modeling
             }
 
             return
-                type.IsAssignableFrom(x.GetType()) ? (T)x :
-                casters.TryGetValue((x.GetType(), type), out var f) ? (T)f(x) :
-                throw new InvalidCastException($"Type {x?.GetType().Name} cannot be converted to {typeof(T).Name}");
+                type.IsInstanceOfType(x) ? (T)x :
+                Casters.TryGetValue((x.GetType(), type), out var f) ? (T)f(x) :
+                throw new InvalidCastException($"Type {x.GetType().Name} cannot be converted to {typeof(T).Name}");
         }
     }
 }

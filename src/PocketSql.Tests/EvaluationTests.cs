@@ -87,15 +87,13 @@ namespace PocketSql.Tests
             public int X { get; set; }
             public string Y { get; set; }
 
-            public override bool Equals(object that) => that is Thing && Equals((Thing) that);
+            public override bool Equals(object that) => that is Thing thing && Equals(thing);
 
             public override int GetHashCode()
             {
                 unchecked
                 {
-                    // ReSharper disable NonReadonlyMemberInGetHashCode
                     return (X * 397) ^ (Y != null ? Y.GetHashCode() : 0);
-                    // ReSharper enable NonReadonlyMemberInGetHashCode
                 }
             }
 
@@ -637,7 +635,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void IIfExpression([AsOf(11)]IDbConnection connection)
+        public void IifExpression([AsOf(11)]IDbConnection connection)
         {
             Assert.AreEqual(4, connection.QueryFirst<int>(@"
                 select iif('a' = 'a', 4, 3)"));
@@ -645,7 +643,7 @@ namespace PocketSql.Tests
                 select iif('a' = 'b', 4, 3)"));
         }
 
-        private void CreateEngineWithCityColorTaste(IDbConnection connection)
+        private static void CreateEngineWithCityColorTaste(IDbConnection connection)
         {
             connection.Execute(@"
                 create table TableA (X int, City varchar(32))

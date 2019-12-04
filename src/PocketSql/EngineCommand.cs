@@ -41,15 +41,15 @@ namespace PocketSql
         // TODO: how to set nullability on parameter?
         public IDbDataParameter CreateParameter() => new EngineParameter(true);
 
-        private bool IsInput(IDataParameter d) =>
+        private static bool IsInput(IDataParameter d) =>
             d.Direction == ParameterDirection.Input
             || d.Direction == ParameterDirection.InputOutput;
 
-        private bool IsOutput(IDataParameter d) =>
+        private static bool IsOutput(IDataParameter d) =>
             d.Direction == ParameterDirection.InputOutput
             || d.Direction == ParameterDirection.Output;
 
-        private bool IsReturn(IDataParameter d) =>
+        private static bool IsReturn(IDataParameter d) =>
             d.Direction == ParameterDirection.ReturnValue;
 
         private void OnEval(Env env)
@@ -83,8 +83,7 @@ namespace PocketSql
         private List<EngineResult> ExecuteText()
         {
             // TODO: you have to create an instance to call the helper?
-            // TODO: specify SqlEngineType: Azure vs SqlServer?
-            var parser = new TSql140Parser(false).Create(sqlVersion, false);
+            var parser = new TSql150Parser(false).Create(sqlVersion, false);
             var input = new StringReader(CommandText);
             var fragment = parser.Parse(input, out var errors);
 

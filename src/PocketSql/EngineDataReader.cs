@@ -39,21 +39,17 @@ namespace PocketSql
 
         public bool GetBoolean(int i) => (bool)GetValue(i);
 
-        public bool AsBoolean(object val) 
-        {
-            if (val is int) return (int)val != 0;
-            if (val is string) return bool.Parse((string)val);
-            return (bool)val;
-        }
+        private static bool AsBoolean(object val) =>
+            val is int i ? i != 0 :
+            val is string s ? bool.Parse(s) :
+            (bool)val;
 
         public byte GetByte(int i) => (byte)GetValue(i);
         public DateTime GetDateTime(int i) => (DateTime)GetValue(i);
 
-        public DateTime AsDate(object val)
-        {
-            if (val is string) return DateTime.Parse(val.ToString());
-            return (DateTime)val;
-        }
+        private static DateTime AsDate(object val) =>
+            val is string s ? DateTime.Parse(s) :
+            (DateTime)val;
 
         public decimal GetDecimal(int i) => (decimal)GetValue(i);
         public double GetDouble(int i) => (double)GetValue(i);
@@ -65,9 +61,10 @@ namespace PocketSql
         public string GetString(int i) => (string)GetValue(i);
         public char GetChar(int i) => (char)GetValue(i);
 
+        // TODO: consolidate all this data type conversion logic
         public object GetValue(int i)
         {
-            switch(data[tableIndex].ResultSet.Columns[i].Type)
+            switch (data[tableIndex].ResultSet.Columns[i].Type)
             {
                 case DbType.Boolean:
                     return AsBoolean(data[tableIndex].ResultSet.Rows[rowIndex].Values[i]);
@@ -80,25 +77,25 @@ namespace PocketSql
             }
         }
 
-        public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferOffset, int length)
-        {
-            var bytes = (byte[])GetValue(i);
-            var amount =
-                Math.Max(0,
-                    Math.Min(length,
-                        Math.Min(buffer.Length - bufferOffset, bytes.Length - fieldOffset)));
-            Array.Copy(bytes, fieldOffset, buffer, bufferOffset, amount);
-            return amount;
-        }
+        public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferOffset, int length) =>
+            GetArray(i, fieldOffset, buffer, bufferOffset, length);
 
-        public long GetChars(int i, long fieldOffset, char[] buffer, int bufferOffset, int length)
+        public long GetChars(int i, long fieldOffset, char[] buffer, int bufferOffset, int length) =>
+            GetArray(i, fieldOffset, buffer, bufferOffset, length);
+
+        private long GetArray<T>(int i, long fieldOffset, T[] buffer, int bufferOffset, int length)
         {
-            var chars = (char[])GetValue(i);
-            var amount =
-                Math.Max(0,
-                    Math.Min(length,
-                        Math.Min(buffer.Length - bufferOffset, chars.Length - fieldOffset)));
-            Array.Copy(chars, fieldOffset, buffer, bufferOffset, amount);
+            var array = (T[])GetValue(i);
+
+            if (buffer == null)
+            {
+                return array.Length;
+            }
+
+            var bufferAmount = buffer.Length - bufferOffset;
+            var charsAmount = array.Length - fieldOffset;
+            var amount = Math.Max(0, Math.Min(length, Math.Min(bufferAmount, charsAmount)));
+            Array.Copy(array, fieldOffset, buffer, bufferOffset, amount);
             return amount;
         }
 
@@ -129,7 +126,7 @@ namespace PocketSql
             return
                 tableIndex >= 0
                 && tableIndex < (data?.Count ?? 0)
-                && rowIndex < (data[tableIndex].ResultSet?.Rows?.Count ?? 0);
+                && rowIndex < (data?[tableIndex]?.ResultSet?.Rows?.Count ?? 0);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace PocketSql.Tests
 
         public AsOfAttribute(int version) => Version = version;
 
-        private readonly static Dictionary<Type, Func<int, object>> builders = new Dictionary<Type, Func<int, object>>
+        private static readonly Dictionary<Type, Func<int, object>> Builders = new Dictionary<Type, Func<int, object>>
         {
             { typeof(int), v => v },
             { typeof(Engine), v => new Engine(v) },
@@ -22,7 +22,7 @@ namespace PocketSql.Tests
         };
 
         public IEnumerable GetData(IParameterInfo parameter) =>
-            builders.TryGetValue(parameter.ParameterType, out var builder)
+            Builders.TryGetValue(parameter.ParameterType, out var builder)
                 ? Enumerable.Range(Version, 15 - Version + 1).Select(builder)
                 : throw new NotImplementedException();
     }

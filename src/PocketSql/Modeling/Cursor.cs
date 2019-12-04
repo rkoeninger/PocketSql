@@ -37,16 +37,20 @@ namespace PocketSql.Modeling
             results = null;
         }
 
-        public Row MoveFirst() => Access(_ => 0, false);
-        public Row MoveLast() => Access(_ => results.Rows.Count - 1);
-        public Row MoveNext() => Access(x => x + 1, false);
-        public Row MovePrior() => Access(x => x - 1);
-        public Row MoveAbsolute(int offset) => Access(_ => offset);
-        public Row MoveRelative(int offset) => Access(x => x + offset);
-        
-        private Row Access(Func<int, int> f, bool requiresScroll = true)
+        public Row MoveFirst() => Access(_ => 0);
+        public Row MoveLast() => AccessRequiresScrool(_ => results.Rows.Count - 1);
+        public Row MoveNext() => Access(x => x + 1);
+        public Row MovePrior() => AccessRequiresScrool(x => x - 1);
+        public Row MoveAbsolute(int offset) => AccessRequiresScrool(_ => offset);
+        public Row MoveRelative(int offset) => AccessRequiresScrool(x => x + offset);
+
+        private Row AccessRequiresScrool(Func<int, int> f) =>
+            scroll
+                ? Access(f)
+                : throw new InvalidOperationException("Cusor must be scroll cursor to fetch last, prior, absolute, relative");
+
+        private Row Access(Func<int, int> f)
         {
-            if (requiresScroll && !scroll) throw new InvalidOperationException("Cusor must be scroll cursor to fetch last, prior, absolute, relative");
             if (!open) throw new InvalidOperationException("Cursor has been closed");
             index = Math.Max(-1, Math.Min(results.Rows.Count, f(index)));
             return index >= 0 && index < results.Rows.Count
