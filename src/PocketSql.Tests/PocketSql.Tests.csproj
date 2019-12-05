@@ -17,4 +17,8 @@
     <ProjectReference Include="..\PocketSql\PocketSql.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="PocketSql.Tests.csproj.DotSettings" Visible="false" />
+  </ItemGroup>
+
 </Project>
