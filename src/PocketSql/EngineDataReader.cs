@@ -27,7 +27,8 @@ namespace PocketSql
                 ? 0
                 : data[tableIndex].ResultSet?.Columns?.Count ?? 0;
 
-        public DataTable GetSchemaTable() => throw new NotImplementedException();
+        public DataTable GetSchemaTable() => throw new FeatureNotSupportedException(
+            $"{nameof(EngineDataReader)} doesn't support {nameof(GetSchemaTable)}");
 
         public string GetName(int i) => data[tableIndex].ResultSet.Columns[i].Name.LastOrDefault();
         public int GetOrdinal(string name) => data[tableIndex].ResultSet.GetColumnOrdinal(name);
@@ -40,9 +41,12 @@ namespace PocketSql
         public bool GetBoolean(int i) => (bool)GetValue(i);
 
         private static bool AsBoolean(object val) =>
-            val is int i ? i != 0 :
-            val is string s ? bool.Parse(s) :
-            (bool)val;
+            val switch
+            {
+                int i => (i != 0),
+                string s => bool.Parse(s),
+                _ => (bool)val
+            };
 
         public byte GetByte(int i) => (byte)GetValue(i);
         public DateTime GetDateTime(int i) => (DateTime)GetValue(i);
@@ -62,20 +66,15 @@ namespace PocketSql
         public char GetChar(int i) => (char)GetValue(i);
 
         // TODO: consolidate all this data type conversion logic
-        public object GetValue(int i)
-        {
-            switch (data[tableIndex].ResultSet.Columns[i].Type)
+        public object GetValue(int i) =>
+            data[tableIndex].ResultSet.Columns[i].Type switch
             {
-                case DbType.Boolean:
-                    return AsBoolean(data[tableIndex].ResultSet.Rows[rowIndex].Values[i]);
-                case DbType.Date:
-                case DbType.DateTime:
-                case DbType.DateTime2:
-                    return AsDate(data[tableIndex].ResultSet.Rows[rowIndex].Values[i]);
-                default:
-                    return data[tableIndex].ResultSet.Rows[rowIndex].Values[i];
-            }
-        }
+                DbType.Boolean => AsBoolean(data[tableIndex].ResultSet.Rows[rowIndex].Values[i]),
+                DbType.Date => AsDate(data[tableIndex].ResultSet.Rows[rowIndex].Values[i]),
+                DbType.DateTime => AsDate(data[tableIndex].ResultSet.Rows[rowIndex].Values[i]),
+                DbType.DateTime2 => AsDate(data[tableIndex].ResultSet.Rows[rowIndex].Values[i]),
+                _ => data[tableIndex].ResultSet.Rows[rowIndex].Values[i]
+            };
 
         public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferOffset, int length) =>
             GetArray(i, fieldOffset, buffer, bufferOffset, length);
@@ -111,7 +110,8 @@ namespace PocketSql
             return i;
         }
 
-        public IDataReader GetData(int i) => throw new NotImplementedException();
+        public IDataReader GetData(int i) => throw new FeatureNotSupportedException(
+            $"{nameof(EngineDataReader)} doesn't support {nameof(GetData)}");
 
         public bool NextResult()
         {

@@ -21,7 +21,7 @@ namespace PocketSql.Modeling
         public IList<(string, object)> Elements { get; } = new List<(string, object)>();
 
         public override bool Equals(object obj) =>
-            obj is EquatableAssociationList && Equals((EquatableAssociationList)obj);
+            obj is EquatableAssociationList list && Equals(list);
 
         public override int GetHashCode() =>
             Elements.Aggregate(1, (hash, obj) => hash + obj.GetHashCode() * 357);

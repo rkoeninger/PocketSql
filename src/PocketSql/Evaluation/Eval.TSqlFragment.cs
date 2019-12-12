@@ -8,24 +8,20 @@ namespace PocketSql.Evaluation
     {
         public static List<EngineResult> Evaluate(TSqlFragment fragment, Scope scope)
         {
-            switch (fragment)
+            return fragment switch
             {
-                case StatementList statements:
-                    return Evaluate(statements, scope);
-                case TSqlStatement statement:
-                    var r = Evaluate(statement, scope);
-                    return r != null ? new List<EngineResult> { r } : new List<EngineResult>();
-                case TSqlScript script:
-                    return (
-                        from b in script.Batches
-                        from s in b.Statements
-                        let x = Evaluate(s, scope)
-                        where x != null
-                        select x
-                    ).ToList();
-                default:
-                    throw FeatureNotSupportedException.Subtype(fragment);
-            }
+                StatementList statements => Evaluate(statements, scope),
+                TSqlStatement statement => new List<EngineResult> {Evaluate(statement, scope)}
+                    .Where(r => r != null)
+                    .ToList(),
+                TSqlScript script => (
+                    from b in script.Batches
+                    from s in b.Statements
+                    let x = Evaluate(s, scope)
+                    where x != null
+                    select x).ToList(),
+                _ => throw FeatureNotSupportedException.Subtype(fragment)
+            };
         }
     }
 }

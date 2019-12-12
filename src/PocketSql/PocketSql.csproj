@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>PocketSql</AssemblyName>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>PocketSql</RootNamespace>
     <Description>T-SQL interpreter fit for testing</Description>
     <Copyright>Copyright © Robert Koeninger 2018-2020</Copyright>

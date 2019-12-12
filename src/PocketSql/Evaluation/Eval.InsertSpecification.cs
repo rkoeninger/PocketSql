@@ -9,15 +9,13 @@ namespace PocketSql.Evaluation
         {
             var table = scope.Env.GetTable((NamedTableReference)insert.Target);
 
-            switch (insert.InsertSource)
+            return insert.InsertSource switch
             {
-                case ValuesInsertSource values:
-                    return Evaluate(table, insert.Columns, values, NullArgument.It, sink, scope);
-                case SelectInsertSource select:
-                    return Evaluate(table, insert.Columns, Evaluate(select.Select, scope).ResultSet, sink, scope);
-                default:
-                    throw FeatureNotSupportedException.Subtype(insert.InsertSource);
-            }
+                ValuesInsertSource values => Evaluate(table, insert.Columns, values, NullArgument.It, sink, scope),
+                SelectInsertSource select => Evaluate(table, insert.Columns, Evaluate(@select.Select, scope).ResultSet,
+                    sink, scope),
+                _ => throw FeatureNotSupportedException.Subtype(insert.InsertSource)
+            };
         }
     }
 }

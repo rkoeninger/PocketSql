@@ -6,6 +6,7 @@ namespace PocketSql.Evaluation
     {
         public static object Evaluate(AssignmentKind kind, object current, object value)
         {
+            // TODO: use switch expression, expression bodied member
             switch (kind)
             {
                 case AssignmentKind.Equals:
@@ -15,8 +16,8 @@ namespace PocketSql.Evaluation
                     // TODO: and how do nulls work?
                     if (current == null || value == null)
                         return current ?? value;
-                    if (current is int && value is int)
-                        return (int)current + (int)value;
+                    if (current is int i && value is int j)
+                        return i + j;
                     return (decimal)current + (decimal)value;
                 case AssignmentKind.SubtractEquals:
                     return (decimal)current - (decimal)value;

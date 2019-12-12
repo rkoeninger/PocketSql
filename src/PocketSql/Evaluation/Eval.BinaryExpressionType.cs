@@ -6,13 +6,15 @@ namespace PocketSql.Evaluation
     {
         public static object Evaluate(BinaryExpressionType op, object left, object right)
         {
+            // TODO: use switch expression, expression bodied member
             switch (op)
             {
                 case BinaryExpressionType.Add:
-                    if (left is string && right is string)
-                        return (string)left + (string)right;
-                    if (left is int && right is int)
-                        return (int) left + (int) right;
+                    // TODO: handle numeric conversions properly
+                    if (left is string s && right is string t)
+                        return s + t;
+                    if (left is int i && right is int j)
+                        return i + j;
                     return (int)left + (int)right;
                 case BinaryExpressionType.Subtract:
                     return (int)left - (int)right;

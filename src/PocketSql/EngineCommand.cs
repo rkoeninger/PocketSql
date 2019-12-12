@@ -98,18 +98,13 @@ namespace PocketSql
             return results;
         }
 
-        private List<EngineResult> Execute()
-        {
-            switch (CommandType)
+        private List<EngineResult> Execute() =>
+            CommandType switch
             {
-                case CommandType.Text:
-                    return ExecuteText();
-                case CommandType.StoredProcedure:
-                    return ExecuteStoredProcedure();
-                default:
-                    throw FeatureNotSupportedException.Value(CommandType);
-            }
-        }
+                CommandType.Text => ExecuteText(),
+                CommandType.StoredProcedure => ExecuteStoredProcedure(),
+                _ => throw FeatureNotSupportedException.Value(CommandType)
+            };
 
         public IDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
         public IDataReader ExecuteReader(CommandBehavior behavior) => new EngineDataReader(Execute());

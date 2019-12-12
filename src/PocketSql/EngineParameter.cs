@@ -4,10 +4,7 @@ namespace PocketSql
 {
     public class EngineParameter : IDbDataParameter
     {
-        public EngineParameter(bool nullable)
-        {
-            IsNullable = nullable;
-        }
+        public EngineParameter(bool nullable) => IsNullable = nullable;
 
         public DbType DbType { get; set; }
         public ParameterDirection Direction { get; set; }

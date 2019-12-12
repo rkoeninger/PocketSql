@@ -8,26 +8,15 @@ namespace PocketSql.Evaluation
     {
         public static EngineResult Evaluate(QueryExpression queryExpr, Scope scope)
         {
-            EngineResult result;
-
-            switch (queryExpr)
+            var result = queryExpr switch
             {
-                case QuerySpecification querySpec:
-                    result = Evaluate(querySpec, scope);
-                    break;
-                case QueryParenthesisExpression paren:
-                    result = Evaluate(paren.QueryExpression, scope);
-                    break;
-                case BinaryQueryExpression binaryExpr:
-                    result = Evaluate(
-                        binaryExpr.BinaryQueryExpressionType,
-                        binaryExpr.All,
-                        Evaluate(binaryExpr.FirstQueryExpression, scope).ResultSet,
-                        Evaluate(binaryExpr.SecondQueryExpression, scope).ResultSet);
-                    break;
-                default:
-                    throw FeatureNotSupportedException.Subtype(queryExpr);
-            }
+                QuerySpecification querySpec => Evaluate(querySpec, scope),
+                QueryParenthesisExpression paren => Evaluate(paren.QueryExpression, scope),
+                BinaryQueryExpression binaryExpr => Evaluate(binaryExpr.BinaryQueryExpressionType, binaryExpr.All,
+                    Evaluate(binaryExpr.FirstQueryExpression, scope).ResultSet,
+                    Evaluate(binaryExpr.SecondQueryExpression, scope).ResultSet),
+                _ => throw FeatureNotSupportedException.Subtype(queryExpr)
+            };
 
             if (result.ResultSet == null)
             {

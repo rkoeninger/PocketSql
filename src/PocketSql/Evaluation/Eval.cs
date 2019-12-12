@@ -93,7 +93,7 @@ namespace PocketSql.Evaluation
             }
         };
 
-        // Need to accumulate table aliases in Scope
+        // TODO: Need to accumulate table aliases in Scope
         private static (Table, Scope) Join(
             Table accumulatedTables,
             Table targetTable,
@@ -112,36 +112,24 @@ namespace PocketSql.Evaluation
             Table targetTable,
             BooleanExpression condition,
             QualifiedJoinType type,
-            Scope scope)
-        {
-            switch (type)
+            Scope scope) =>
+            type switch
             {
-                case QualifiedJoinType.Inner:
-                    return accumulatedTables.Rows.SelectMany(a =>
-                        targetTable.Rows
-                            .Select(b => InnerRow(a, b))
-                            .Where(c => Evaluate(condition, new RowArgument(c), scope)));
-                case QualifiedJoinType.LeftOuter:
-                    return accumulatedTables.Rows.SelectMany(a =>
-                        targetTable.Rows
-                            .Select(x => InnerRow(a, x))
-                            .Where(c => Evaluate(condition, new RowArgument(c), scope))
-                            .DefaultIfEmpty(LeftRow(a, targetTable)));
-                case QualifiedJoinType.RightOuter:
-                    return targetTable.Rows.SelectMany(a =>
-                        accumulatedTables.Rows
-                            .Select(x => InnerRow(a, x))
-                            .Where(c => Evaluate(condition, new RowArgument(c), scope))
-                            .DefaultIfEmpty(RightRow(accumulatedTables, a)));
-                case QualifiedJoinType.FullOuter:
-                    return OuterRows(
-                        accumulatedTables,
-                        targetTable,
-                        c => Evaluate(condition, new RowArgument(c), scope));
-                default:
-                    throw FeatureNotSupportedException.Value(type);
-            }
-        }
+                QualifiedJoinType.Inner => accumulatedTables.Rows.SelectMany(a =>
+                    targetTable.Rows.Select(b => InnerRow(a, b))
+                        .Where(c => Evaluate(condition, new RowArgument(c), scope))),
+                QualifiedJoinType.LeftOuter => accumulatedTables.Rows.SelectMany(a =>
+                    targetTable.Rows.Select(x => InnerRow(a, x))
+                        .Where(c => Evaluate(condition, new RowArgument(c), scope))
+                        .DefaultIfEmpty(LeftRow(a, targetTable))),
+                QualifiedJoinType.RightOuter => targetTable.Rows.SelectMany(a =>
+                    accumulatedTables.Rows.Select(x => InnerRow(a, x))
+                        .Where(c => Evaluate(condition, new RowArgument(c), scope))
+                        .DefaultIfEmpty(RightRow(accumulatedTables, a))),
+                QualifiedJoinType.FullOuter => OuterRows(accumulatedTables, targetTable,
+                    c => Evaluate(condition, new RowArgument(c), scope)),
+                _ => throw FeatureNotSupportedException.Value(type)
+            };
 
         private static (Table, Scope) Join(
             Table accumulatedTables,
@@ -271,42 +259,26 @@ namespace PocketSql.Evaluation
                 }
             }
 
-            foreach (var b in ys.Rows)
-            {
-                if (!matchedRightRows.Contains(b))
-                {
-                    outerRows.Add(RightRow(xs, b));
-                }
-            }
-
+            outerRows.AddRange(ys.Rows.Where(b => !matchedRightRows.Contains(b)).Select(b => RightRow(xs, b)));
             return outerRows;
         }
 
         private static IEnumerable<object> Nulls(int n) => Enumerable.Repeat<object>(null, n);
 
-        private static string InferName(GroupingSpecification groupSpec)
-        {
-            switch (groupSpec)
+        private static string InferName(GroupingSpecification groupSpec) =>
+            groupSpec switch
             {
-                case ExpressionGroupingSpecification expr:
-                    return InferName(expr.Expression);
-            }
+                ExpressionGroupingSpecification expr => InferName(expr.Expression),
+                _ => null
+            };
 
-            return null;
-        }
-
-        private static string InferName(ScalarExpression expr)
-        {
-            switch (expr)
+        private static string InferName(ScalarExpression expr) =>
+            expr switch
             {
-                case ColumnReferenceExpression colRefExpr:
-                    return colRefExpr.MultiPartIdentifier.Identifiers.Last().Value;
-                case VariableReference varRef:
-                    return varRef.Name;
-            }
-
-            return null;
-        }
+                ColumnReferenceExpression colRefExpr => colRefExpr.MultiPartIdentifier.Identifiers.Last().Value,
+                VariableReference varRef => varRef.Name,
+                _ => null
+            };
 
         private static DbType InferType(ScalarExpression expr, Table table, Scope scope)
         {

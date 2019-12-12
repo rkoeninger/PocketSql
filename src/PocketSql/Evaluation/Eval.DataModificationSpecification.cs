@@ -30,25 +30,14 @@ namespace PocketSql.Evaluation
                 sink = new NullOutputSink();
             }
 
-            EngineResult result;
-
-            switch (dml)
+            var result = dml switch
             {
-                case InsertSpecification insert:
-                    result = Evaluate(insert, sink, scope);
-                    break;
-                case MergeSpecification merge:
-                    result = Evaluate(merge, sink, scope);
-                    break;
-                case DeleteSpecification delete:
-                    result = Evaluate(delete, sink, scope);
-                    break;
-                case UpdateSpecification update:
-                    result = Evaluate(update, sink, scope);
-                    break;
-                default:
-                    throw FeatureNotSupportedException.Subtype(dml);
-            }
+                InsertSpecification insert => Evaluate(insert, sink, scope),
+                MergeSpecification merge => Evaluate(merge, sink, scope),
+                DeleteSpecification delete => Evaluate(delete, sink, scope),
+                UpdateSpecification update => Evaluate(update, sink, scope),
+                _ => throw FeatureNotSupportedException.Subtype(dml)
+            };
 
             if (dml.OutputIntoClause != null)
             {

@@ -4,18 +4,13 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static bool Evaluate(BooleanBinaryExpressionType op, bool left, bool right)
-        {
-            // TODO: emulate sql server short-circuit behavior (may be version specific)
-            switch (op)
+        // TODO: emulate sql server short-circuit behavior (may be version specific)
+        public static bool Evaluate(BooleanBinaryExpressionType op, bool left, bool right) =>
+            op switch
             {
-                case BooleanBinaryExpressionType.And:
-                    return left && right;
-                case BooleanBinaryExpressionType.Or:
-                    return left || right;
-                default:
-                    throw FeatureNotSupportedException.Value(op);
-            }
-        }
+                BooleanBinaryExpressionType.And => (left && right),
+                BooleanBinaryExpressionType.Or => (left || right),
+                _ => throw FeatureNotSupportedException.Value(op)
+            };
     }
 }

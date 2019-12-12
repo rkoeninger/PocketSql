@@ -11,21 +11,15 @@ namespace PocketSql.Evaluation
                 scope = Evaluate(statement.WithCtesAndXmlNamespaces.CommonTableExpressions, scope);
             }
 
-            switch (statement)
+            return statement switch
             {
-                case SelectStatement select:
-                    return Evaluate(select, scope);
-                case InsertStatement insert:
-                    return Evaluate(insert.InsertSpecification, scope);
-                case UpdateStatement update:
-                    return Evaluate(update.UpdateSpecification, scope);
-                case DeleteStatement delete:
-                    return Evaluate(delete.DeleteSpecification, scope);
-                case MergeStatement merge:
-                    return Evaluate(merge.MergeSpecification, scope);
-                default:
-                    throw FeatureNotSupportedException.Subtype(statement);
-            }
+                SelectStatement select => Evaluate(select, scope),
+                InsertStatement insert => Evaluate(insert.InsertSpecification, scope),
+                UpdateStatement update => Evaluate(update.UpdateSpecification, scope),
+                DeleteStatement delete => Evaluate(delete.DeleteSpecification, scope),
+                MergeStatement merge => Evaluate(merge.MergeSpecification, scope),
+                _ => throw FeatureNotSupportedException.Subtype(statement)
+            };
         }
     }
 }

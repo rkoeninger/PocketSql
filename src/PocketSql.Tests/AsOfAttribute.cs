@@ -24,6 +24,7 @@ namespace PocketSql.Tests
         public IEnumerable GetData(IParameterInfo parameter) =>
             Builders.TryGetValue(parameter.ParameterType, out var builder)
                 ? Enumerable.Range(Version, 15 - Version + 1).Select(builder)
-                : throw new NotImplementedException();
+                : throw new ArgumentException(
+                    $"{nameof(AsOfAttribute)} can't be used on {parameter.ParameterType} parameter");
     }
 }

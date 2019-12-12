@@ -87,17 +87,17 @@ namespace PocketSql
 
         // TODO: ids aren't being handled properly here
 
-        public Function GetFunction(string[] id) => GetSchema(id).Functions[id[id.Length - 1]];
+        public Function GetFunction(string[] id) => GetSchema(id).Functions[id[^1]];
 
-        public Procedure GetProcedure(string[] id) => GetSchema(id).Procedures[id[id.Length - 1]];
+        public Procedure GetProcedure(string[] id) => GetSchema(id).Procedures[id[^1]];
 
-        public Table GetTable(string[] id) => GetSchema(id).Tables[id[id.Length - 1]];
+        public Table GetTable(string[] id) => GetSchema(id).Tables[id[^1]];
 
-        public View GetView(string[] id) => GetSchema(id).Views[id[id.Length - 1]];
+        public View GetView(string[] id) => GetSchema(id).Views[id[^1]];
 
         public Schema GetSchema(string[] id) => Engine
-            .Databases[id.Length >= 3 ? id[id.Length - 3] : DefaultDatabase]
-            .Schemas[id.Length >= 2 ? id[id.Length - 2] : DefaultSchema];
+            .Databases[id.Length >= 3 ? id[^3] : DefaultDatabase]
+            .Schemas[id.Length >= 2 ? id[^2] : DefaultSchema];
 
         public object GetGlobal(string name)
         {

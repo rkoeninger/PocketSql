@@ -822,7 +822,7 @@ namespace PocketSql.Tests
             }.SequenceEqual(results));
         }
 
-        private void SetupBinaryQueryEngine(IDbConnection connection)
+        private static void SetupBinaryQueryEngine(IDbConnection connection)
         {
             connection.Execute(@"
                 create table AAA

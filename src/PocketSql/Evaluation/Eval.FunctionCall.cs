@@ -87,6 +87,7 @@ namespace PocketSql.Evaluation
                     {
                         case ColumnReferenceExpression colExpr:
                             var dateUnit = colExpr.MultiPartIdentifier.Identifiers.LastOrDefault()?.Value?.ToLower();
+                            // TODO: break this out into another function
                             switch (dateUnit)
                             {
                                 case "year":
