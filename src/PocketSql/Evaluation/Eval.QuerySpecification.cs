@@ -50,7 +50,7 @@ namespace PocketSql.Evaluation
 
             if (table == null)
             {
-                var resultRow = projection.NewRow();
+                var resultRow = projection.NewRow(scope.Env);
 
                 for (var i = 0; i < selections.Count; ++i)
                 {
@@ -69,7 +69,7 @@ namespace PocketSql.Evaluation
                 if (querySpec.WhereClause == null
                     || Evaluate(querySpec.WhereClause.SearchCondition, new RowArgument(row), scope))
                 {
-                    CopyOnto(row, tableCopy);
+                    CopyOnto(row, tableCopy, scope.Env);
                 }
             }
 
@@ -118,7 +118,7 @@ namespace PocketSql.Evaluation
             if (querySpec.UniqueRowFilter == UniqueRowFilter.Distinct)
             {
                 var temp = projection.CopyLayout();
-                CopyOnto(projection, temp);
+                CopyOnto(projection, temp, scope.Env);
                 projection.Rows.Clear();
 
                 foreach (var item in temp.Rows
@@ -126,7 +126,7 @@ namespace PocketSql.Evaluation
                         .Select(c => (c.Name.LastOrDefault(), r.GetValue(c.Name.LastOrDefault())))))
                     .Distinct())
                 {
-                    var row = projection.NewRow();
+                    var row = projection.NewRow(scope.Env);
 
                     foreach (var i in Enumerable.Range(0, item.Elements.Count))
                     {
@@ -147,7 +147,7 @@ namespace PocketSql.Evaluation
         {
             foreach (var row in source)
             {
-                var resultRow = target.NewRow();
+                var resultRow = target.NewRow(scope.Env);
 
                 for (var i = 0; i < selections.Count; ++i)
                 {

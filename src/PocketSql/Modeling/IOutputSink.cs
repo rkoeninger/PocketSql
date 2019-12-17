@@ -6,9 +6,9 @@ namespace PocketSql.Modeling
 {
     public interface IOutputSink
     {
-        void Inserted(Row row);
-        void Updated(Row oldRow, Row newRow);
-        void Deleted(Row row);
+        void Inserted(Row row, Env env);
+        void Updated(Row oldRow, Row newRow, Env env);
+        void Deleted(Row row, Env env);
     }
 
     public class TableOutputSink : IOutputSink
@@ -17,9 +17,9 @@ namespace PocketSql.Modeling
 
         public TableOutputSink(IList<Column> columns) => Output = new Table { Columns = columns };
 
-        public void Inserted(Row row)
+        public void Inserted(Row row, Env env)
         {
-            var outputRow = Output.NewRow();
+            var outputRow = Output.NewRow(env);
 
             foreach (var i in Enumerable.Range(0, Output.Columns.Count))
             {
@@ -53,9 +53,9 @@ namespace PocketSql.Modeling
             }
         }
 
-        public void Updated(Row oldRow, Row newRow)
+        public void Updated(Row oldRow, Row newRow, Env env)
         {
-            var outputRow = Output.NewRow();
+            var outputRow = Output.NewRow(env);
 
             foreach (var i in Enumerable.Range(0, Output.Columns.Count))
             {
@@ -89,9 +89,9 @@ namespace PocketSql.Modeling
             }
         }
 
-        public void Deleted(Row row)
+        public void Deleted(Row row, Env env)
         {
-            var outputRow = Output.NewRow();
+            var outputRow = Output.NewRow(env);
 
             foreach (var i in Enumerable.Range(0, Output.Columns.Count))
             {
@@ -128,8 +128,8 @@ namespace PocketSql.Modeling
 
     public class NullOutputSink : IOutputSink
     {
-        public void Inserted(Row row) { }
-        public void Updated(Row oldRow, Row newRow) { }
-        public void Deleted(Row row) { }
+        public void Inserted(Row row, Env env) { }
+        public void Updated(Row oldRow, Row newRow, Env env) { }
+        public void Deleted(Row row, Env env) { }
     }
 }

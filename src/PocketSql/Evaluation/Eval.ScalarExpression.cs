@@ -9,54 +9,35 @@ namespace PocketSql.Evaluation
         public static T Evaluate<T>(ScalarExpression expr, IArgument arg, Scope scope) =>
             Evaluate(expr, arg, scope).As<T>();
 
-        public static object Evaluate(ScalarExpression expr, IArgument arg, Scope scope)
-        {
-            switch (expr)
+        public static object Evaluate(ScalarExpression expr, IArgument arg, Scope scope) =>
+            expr switch
             {
-                case ParenthesisExpression paren:
-                    return Evaluate(paren.Expression, arg, scope);
-                case IntegerLiteral intLiteral:
-                    return int.Parse(intLiteral.Value);
-                case NumericLiteral numericExpr:
-                    return decimal.Parse(numericExpr.Value);
-                case StringLiteral stringExpr:
-                    return stringExpr.Value;
-                case UnaryExpression unaryExpr:
-                    return Evaluate(
-                        unaryExpr.UnaryExpressionType,
-                        Evaluate(unaryExpr.Expression, arg, scope));
-                case BinaryExpression binaryExpr:
-                    return Evaluate(
-                        binaryExpr.BinaryExpressionType,
-                        Evaluate(binaryExpr.FirstExpression, arg, scope),
-                        Evaluate(binaryExpr.SecondExpression, arg, scope));
-                case ColumnReferenceExpression colExpr:
-                    return arg switch
-                    {
-                        RowArgument row => row.Value.GetValue(
-                            colExpr.MultiPartIdentifier.Identifiers.Select(x => x.Value).ToArray(), scope),
-                        GroupArgument group => group.Key.Elements.First(x =>
-                                x.Item1.Similar(colExpr.MultiPartIdentifier.Identifiers.Last().Value))
-                            .Item2,
-                        _ => throw FeatureNotSupportedException.Subtype(arg)
-                    };
-                case VariableReference varRef:
-                    return scope.Env.Vars[varRef.Name];
-                case GlobalVariableExpression globRef:
-                    return scope.Env.GetGlobal(globRef.Name);
-                case CaseExpression caseExpr:
-                    return Evaluate(caseExpr, arg, scope);
-                case IIfCall iif:
-                    return Evaluate(iif, arg, scope);
-                case FunctionCall funCall:
-                    return Evaluate(funCall, arg, scope);
-                case NullLiteral _:
-                    return null;
-                case NullIfExpression nullIf:
-                    return Evaluate(nullIf, arg, scope);
-                default:
-                    throw FeatureNotSupportedException.Subtype(expr);
-            }
-        }
+                ParenthesisExpression paren => Evaluate(paren.Expression, arg, scope),
+                IntegerLiteral intLiteral => int.Parse(intLiteral.Value),
+                NumericLiteral numericExpr => decimal.Parse(numericExpr.Value),
+                StringLiteral stringExpr => stringExpr.Value,
+                UnaryExpression unaryExpr => Evaluate(unaryExpr.UnaryExpressionType,
+                    Evaluate(unaryExpr.Expression, arg, scope)),
+                BinaryExpression binaryExpr => Evaluate(binaryExpr.BinaryExpressionType,
+                    Evaluate(binaryExpr.FirstExpression, arg, scope),
+                    Evaluate(binaryExpr.SecondExpression, arg, scope)),
+                ColumnReferenceExpression colExpr => arg switch
+                {
+                    RowArgument row => row.Value.GetValue(
+                        colExpr.MultiPartIdentifier.Identifiers.Select(x => x.Value).ToArray(), scope),
+                    GroupArgument group => group.Key.Elements.First(x =>
+                            x.Item1.Similar(colExpr.MultiPartIdentifier.Identifiers.Last().Value))
+                        .Item2,
+                    _ => throw FeatureNotSupportedException.Subtype(arg)
+                },
+                VariableReference varRef => scope.Env.Vars[varRef.Name],
+                GlobalVariableExpression globRef => scope.Env.GetGlobal(globRef.Name),
+                CaseExpression caseExpr => Evaluate(caseExpr, arg, scope),
+                IIfCall iif => Evaluate(iif, arg, scope),
+                FunctionCall funCall => Evaluate(funCall, arg, scope),
+                NullLiteral _ => null,
+                NullIfExpression nullIf => Evaluate(nullIf, arg, scope),
+                _ => throw FeatureNotSupportedException.Subtype(expr)
+            };
     }
 }

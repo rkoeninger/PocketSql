@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Modeling;
+using static PocketSql.Modeling.Extensions;
 
 namespace PocketSql.Evaluation
 {
@@ -8,54 +9,30 @@ namespace PocketSql.Evaluation
     {
         // TODO: change result types of various Evaluate to only return what
         //       they will be able to return: rowCount, resultSet, void, etc.
-
-        public static EngineResult Evaluate(TSqlStatement statement, Scope scope)
-        {
-            switch (statement)
+        public static EngineResult Evaluate(TSqlStatement statement, Scope scope) =>
+            statement switch
             {
-                case StatementWithCtesAndXmlNamespaces ctes:
-                    return Evaluate(ctes, scope);
-                case TruncateTableStatement truncate:
-                    return Evaluate(truncate, scope);
-                case CreateTableStatement createTable:
-                    return Evaluate(createTable, scope);
-                case CreateViewStatement createView:
-                    return Evaluate(createView, scope);
-                case ProcedureStatementBodyBase exec:
-                    Evaluate(exec, scope);
-                    return null;
-                case DropObjectsStatement drop:
-                    Evaluate(drop, scope);
-                    return null;
-                case SetVariableStatement set:
-                    return Evaluate(set, scope);
-                case DeclareVariableStatement declare:
-                    return Evaluate(declare, scope);
-                case IfStatement conditional:
-                    return Evaluate(conditional, scope);
-                case WhileStatement loop:
-                    return Evaluate(loop, scope);
-                case BeginEndBlockStatement block:
-                    // TODO: maybe everything should return a list of results?
-                    //       or at least all Evaluate(____Statement) methods
-                    return Evaluate(block.StatementList, scope).LastOrDefault();
-                case UseStatement use:
-                    scope.Env.DefaultDatabase = use.DatabaseName.Value;
-                    return null;
-                case ExecuteStatement exec:
-                    return Evaluate(exec.ExecuteSpecification, scope);
-                case ReturnStatement ret:
-                    scope.Env.ReturnValue = Evaluate(ret.Expression, NullArgument.It, scope);
-                    return null;
-                case DeclareCursorStatement declare:
-                    Evaluate(declare, scope);
-                    return null;
-                case CursorStatement cur:
-                    Evaluate(cur, scope);
-                    return null;
-                default:
-                    throw FeatureNotSupportedException.Subtype(statement);
-            }
-        }
+                StatementWithCtesAndXmlNamespaces ctes => Evaluate(ctes, scope),
+                TruncateTableStatement truncate => Evaluate(truncate, scope),
+                CreateTableStatement createTable => Evaluate(createTable, scope),
+                CreateViewStatement createView => Evaluate(createView, scope),
+                ProcedureStatementBodyBase exec => VoidNull<EngineResult>(() => Evaluate(exec, scope)),
+                DropObjectsStatement drop => VoidNull<EngineResult>(() => Evaluate(drop, scope)),
+                SetVariableStatement set => Evaluate(set, scope),
+                DeclareVariableStatement declare => Evaluate(declare, scope),
+                IfStatement conditional => Evaluate(conditional, scope),
+                WhileStatement loop => Evaluate(loop, scope),
+                // TODO: maybe everything should return a list of results? (e.g. BeginEndBlockStatement)
+                //       or at least all Evaluate(____Statement) methods
+                // TODO: set @@error after each statement
+                BeginEndBlockStatement block => Evaluate(block.StatementList, scope).LastOrDefault(),
+                UseStatement use => VoidNull<EngineResult>(() => scope.Env.DefaultDatabase = use.DatabaseName.Value),
+                ExecuteStatement exec => Evaluate(exec.ExecuteSpecification, scope),
+                ReturnStatement ret => VoidNull<EngineResult>(() =>
+                    scope.Env.ReturnValue = Evaluate(ret.Expression, NullArgument.It, scope)),
+                DeclareCursorStatement declare => VoidNull<EngineResult>(() => Evaluate(declare, scope)),
+                CursorStatement cur => VoidNull<EngineResult>(() => Evaluate(cur, scope)),
+                _ => throw FeatureNotSupportedException.Subtype(statement)
+            };
     }
 }

@@ -7,7 +7,7 @@ namespace PocketSql.Evaluation
 {
     public static partial class Eval
     {
-        public static EngineResult Evaluate(BinaryQueryExpressionType type, bool all, Table left, Table right)
+        public static EngineResult Evaluate(BinaryQueryExpressionType type, bool all, Table left, Table right, Env env)
         {
             // TODO: does offset/fetch/top happen before or after?
 
@@ -45,21 +45,21 @@ namespace PocketSql.Evaluation
                 case BinaryQueryExpressionType.Except:
                     foreach (var x in left.Rows)
                     {
-                        if (!Contains(right, x) && (all || !Contains(result, x))) result.AddCopy(x);
+                        if (!Contains(right, x) && (all || !Contains(result, x))) result.AddCopy(x, env);
                     }
 
                     break;
                 case BinaryQueryExpressionType.Intersect:
                     foreach (var x in left.Rows)
                     {
-                        if (Contains(right, x) && (all || !Contains(result, x))) result.AddCopy(x);
+                        if (Contains(right, x) && (all || !Contains(result, x))) result.AddCopy(x, env);
                     }
 
                     if (all)
                     {
                         foreach (var x in right.Rows)
                         {
-                            if (Contains(left, x)) result.AddCopy(x);
+                            if (Contains(left, x)) result.AddCopy(x, env);
                         }
                     }
 
@@ -67,12 +67,12 @@ namespace PocketSql.Evaluation
                 case BinaryQueryExpressionType.Union:
                     foreach (var x in left.Rows)
                     {
-                        if (all || !Contains(result, x)) result.AddCopy(x);
+                        if (all || !Contains(result, x)) result.AddCopy(x, env);
                     }
 
                     foreach (var x in right.Rows)
                     {
-                        if (all || !Contains(result, x)) result.AddCopy(x);
+                        if (all || !Contains(result, x)) result.AddCopy(x, env);
                     }
 
                     break;

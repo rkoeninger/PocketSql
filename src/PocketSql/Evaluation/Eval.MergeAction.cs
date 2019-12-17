@@ -19,7 +19,7 @@ namespace PocketSql.Evaluation
                     return;
                 case DeleteMergeAction _:
                     var r = GetTargetRow();
-                    sink.Deleted(r);
+                    sink.Deleted(r, scope.Env);
                     targetTable.Rows.Remove(r);
                     return;
                 default:
