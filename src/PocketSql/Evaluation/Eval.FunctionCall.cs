@@ -157,6 +157,8 @@ namespace PocketSql.Evaluation
                     var x1 = Evaluate<int>(funCall.Parameters[1], arg, scope);
                     var d1 = Evaluate<DateTime>(funCall.Parameters[2], arg, scope);
                     return dateAdd(d1, x1);
+                case "newid":
+                    return Guid.NewGuid();
                 default:
                     var env2 = scope.Env.Fork();
                     var f = scope.Env.Functions[name];

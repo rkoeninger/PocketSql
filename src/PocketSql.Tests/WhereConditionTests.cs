@@ -9,7 +9,7 @@ namespace PocketSql.Tests
     public class WhereConditionTests
     {
         [Test]
-        public void TestWhereStringGreaterThanString([AsOf(8)]IDbConnection connection)
+        public void TestWhereStringGreaterThanString([All]IDbConnection connection)
         {
             connection.Execute(SampleTable);
             var ids = connection.Query<IdAndName>("SELECT * FROM [Sample] WHERE [Name] > 'E'")?.ToList();
@@ -19,7 +19,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void TestWhereStringLessThanString([AsOf(8)]IDbConnection connection)
+        public void TestWhereStringLessThanString([All]IDbConnection connection)
         {
             connection.Execute(SampleTable);
             var ids = connection.Query<IdAndName>("SELECT * FROM [Sample] WHERE [Name] < 'E'")?.ToList();

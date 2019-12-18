@@ -27,4 +27,9 @@ namespace PocketSql.Tests
                 : throw new ArgumentException(
                     $"{nameof(AsOfAttribute)} can't be used on {parameter.ParameterType} parameter");
     }
+
+    public class AllAttribute : AsOfAttribute
+    {
+        public AllAttribute() : base(8) { }
+    }
 }

@@ -322,7 +322,10 @@ namespace PocketSql.Evaluation
                             return DbType.String;
                         case "dateadd":
                             return DbType.DateTime;
-                        default: return scope.Env.Functions[fun.FunctionName.Value].ReturnType;
+                        case "newid":
+                            return DbType.Guid;
+                        default:
+                            return scope.Env.Functions[fun.FunctionName.Value].ReturnType;
                     }
                 case CaseExpression c:
                     return InferType(c.ElseExpression, table, scope);

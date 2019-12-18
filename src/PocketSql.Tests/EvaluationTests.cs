@@ -242,7 +242,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CreateAndInsertAndSelectCustomSchema([AsOf(8)]IDbConnection connection)
+        public void CreateAndInsertAndSelectCustomSchema([All]IDbConnection connection)
         {
             connection.Execute("create table abc.Things (X int, Y varchar(8))");
             connection.Execute("insert into abc.Things (X, Y) values (1, 'abc')");
@@ -533,7 +533,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void DeclareSetSelect([AsOf(8)]IDbConnection connection)
+        public void DeclareSetSelect([All]IDbConnection connection)
         {
             Assert.AreEqual("Rob", connection.ExecuteScalar<string>(@"
                 declare @Name varchar(16)
@@ -542,7 +542,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void OutputParameter([AsOf(8)]IDbConnection connection)
+        public void OutputParameter([All]IDbConnection connection)
         {
             var p = new DynamicParameters();
             p.Add("@a", 11);
@@ -622,7 +622,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void CaseExpression([AsOf(8)]IDbConnection connection)
+        public void CaseExpression([All]IDbConnection connection)
         {
             Assert.AreEqual(4, connection.QueryFirst<int>(@"
                 select (case 'a' when 'a' then 4 else 3 end)"));
@@ -761,7 +761,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void DateAdd([AsOf(8)]IDbConnection connection)
+        public void DateAdd([All]IDbConnection connection)
         {
             DateTime Run(string datepart, int x) =>
                 connection.ExecuteScalar<DateTime>(
@@ -772,7 +772,13 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void IsNumeric([AsOf(8)]IDbConnection connection)
+        public void NewId([All] IDbConnection connection)
+        {
+            Assert.IsInstanceOf<Guid>(connection.ExecuteScalar("select newid()"));
+        }
+
+        [Test]
+        public void IsNumeric([All]IDbConnection connection)
         {
             Assert.AreEqual(1, connection.ExecuteScalar<int>("select isnumeric(1)"));
             Assert.AreEqual(1, connection.ExecuteScalar<int>("select isnumeric(1.0)"));
@@ -953,7 +959,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void IdentityColumn([AsOf(8)]IDbConnection connection)
+        public void IdentityColumn([All]IDbConnection connection)
         {
             connection.Execute(@"
                 create table Things
@@ -977,7 +983,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void IdentitySeedIncrementColumn([AsOf(8)]IDbConnection connection)
+        public void IdentitySeedIncrementColumn([All]IDbConnection connection)
         {
             connection.Execute(@"
                 create table Things
@@ -1001,7 +1007,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void DefaultColumn([AsOf(8)]IDbConnection connection)
+        public void DefaultColumn([All]IDbConnection connection)
         {
             connection.Execute(@"
                 create table Things
@@ -1023,7 +1029,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void InsertNull([AsOf(8)]IDbConnection connection)
+        public void InsertNull([All]IDbConnection connection)
         {
             connection.Execute(@"
                 create table Things
