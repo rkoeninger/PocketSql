@@ -643,6 +643,18 @@ namespace PocketSql.Tests
                 select iif('a' = 'b', 4, 3)"));
         }
 
+        [Test]
+        public void IfStatement([All]IDbConnection connection)
+        {
+            Assert.AreEqual(1, connection.ExecuteScalar<int>("if 1 = 1 select 1"));
+        }
+
+        [Test]
+        public void IfElseStatement([All]IDbConnection connection)
+        {
+            Assert.AreEqual(2, connection.ExecuteScalar<int>("if 1 = 2 select 1 else select 2"));
+        }
+
         private static void CreateEngineWithCityColorTaste(IDbConnection connection)
         {
             connection.Execute(@"
