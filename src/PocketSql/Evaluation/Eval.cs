@@ -311,6 +311,7 @@ namespace PocketSql.Evaluation
                         case "isnull":
                         case "sum":
                             return InferType(fun.Parameters[0], table, scope);
+                        case "isnumeric":
                         case "count":
                             return DbType.Int32;
                         case "trim":

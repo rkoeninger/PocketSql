@@ -52,6 +52,11 @@ namespace PocketSql.Evaluation
             }
         }
 
+        private static readonly Type[] NumericTypes =
+        {
+            typeof(int), typeof(short), typeof(long), typeof(byte), typeof(float), typeof(double), typeof(decimal)
+        };
+
         private static object UngroupedFunctionCall(FunctionCall funCall, IArgument arg, Scope scope)
         {
             var name = funCall.FunctionName.Value;
@@ -59,6 +64,9 @@ namespace PocketSql.Evaluation
 
             switch (name.ToLower())
             {
+                case "isnumeric" when paramCount == 1:
+                    var value = Evaluate(funCall.Parameters[0], arg, scope);
+                    return value != null && NumericTypes.Contains(value.GetType()) ? 1 : 0;
                 // TODO: not supported in version 8? see unit test
                 case "isnull" when paramCount == 2:
                     return Evaluate<object>(funCall.Parameters[0], arg, scope)

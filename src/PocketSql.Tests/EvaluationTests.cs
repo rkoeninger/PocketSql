@@ -772,6 +772,14 @@ namespace PocketSql.Tests
         }
 
         [Test]
+        public void IsNumeric([AsOf(8)]IDbConnection connection)
+        {
+            Assert.AreEqual(1, connection.ExecuteScalar<int>("select isnumeric(1)"));
+            Assert.AreEqual(1, connection.ExecuteScalar<int>("select isnumeric(1.0)"));
+            Assert.AreEqual(0, connection.ExecuteScalar<int>("select isnumeric('1')"));
+        }
+
+        [Test]
         public void InsertOutput([AsOf(10)]IDbConnection connection)
         {
             connection.Execute(@"
