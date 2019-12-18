@@ -106,8 +106,10 @@ namespace PocketSql
                 _ => throw FeatureNotSupportedException.Value(CommandType)
             };
 
+        private List<EngineResult> ExecuteQuery() => Execute().Where(x => x.ResultSet != null).ToList();
+
         public IDataReader ExecuteReader() => ExecuteReader(CommandBehavior.Default);
-        public IDataReader ExecuteReader(CommandBehavior behavior) => new EngineDataReader(Execute());
+        public IDataReader ExecuteReader(CommandBehavior behavior) => new EngineDataReader(ExecuteQuery());
         public object ExecuteScalar() => Execute().Last().ResultSet.Rows[0].Values[0];
 
         public int ExecuteNonQuery()
