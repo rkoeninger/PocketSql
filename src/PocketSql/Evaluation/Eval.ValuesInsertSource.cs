@@ -16,15 +16,16 @@ namespace PocketSql.Evaluation
         {
             foreach (var valuesExpr in values.RowValues)
             {
-                var row = table.NewRow();
+                var row = table.NewRow(scope.Env);
 
                 for (var i = 0; i < cols.Count; ++i)
                 {
+                    // TODO: take the last instead of the first? need more robust handling of multi-part names here
                     var name = cols[i].MultiPartIdentifier.Identifiers[0].Value;
                     row.SetValue(name, Evaluate(valuesExpr.ColumnValues[i], arg, scope));
                 }
 
-                sink.Inserted(row);
+                sink.Inserted(row, scope.Env);
             }
 
             scope.Env.RowCount = values.RowValues.Count;

@@ -14,7 +14,7 @@ namespace PocketSql.Modeling
         public int IdentityValue { get; set; } = 1;
         public int IdentityIncrement { get; set; } = 1;
 
-        public Row NewRow()
+        public Row NewRow(Env env)
         {
             var row = new Row
             {
@@ -25,6 +25,7 @@ namespace PocketSql.Modeling
 
             if (IdentityColumnName != null)
             {
+                env.Identity = IdentityValue;
                 row.SetValue(IdentityColumnName, IdentityValue);
                 IdentityValue += IdentityIncrement;
             }
@@ -85,9 +86,9 @@ namespace PocketSql.Modeling
                 Columns = Columns.ToList()
             };
 
-        public Row AddCopy(Row r)
+        public Row AddCopy(Row r, Env env)
         {
-            var s = NewRow();
+            var s = NewRow(env);
 
             // TODO: match names instead?
 

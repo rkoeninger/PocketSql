@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace PocketSql.Modeling
 {
@@ -8,5 +10,13 @@ namespace PocketSql.Modeling
             dict.TryGetValue(key, out var val)
                 ? Maybe.Some(val)
                 : Maybe.None<B>();
+
+        public static IEnumerable<T> ListOf<T>(T value) => new List<T> { value };
+
+        public static T VoidNull<T>(Action f) where T : class
+        {
+            f();
+            return null;
+        }
     }
 }

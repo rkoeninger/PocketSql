@@ -953,11 +953,13 @@ namespace PocketSql.Tests
                     X int identity,
                     Y varchar(8)
                 )");
-            connection.Execute(@"
-                insert into Things (Y) values ('abc')
-                insert into Things (Y) values ('def')
-                insert into Things (Y) values ('ghi')");
-            var things = connection.Query<Thing>(@"select * from Things");
+            var id1 = connection.QuerySingle<int>("insert into Things (Y) values ('abc'); select @@identity");
+            var id2 = connection.QuerySingle<int>("insert into Things (Y) values ('def'); select @@identity");
+            var id3 = connection.QuerySingle<int>("insert into Things (Y) values ('ghi'); select @@identity");
+            var things = connection.Query<Thing>("select * from Things");
+            Assert.AreEqual(1, id1);
+            Assert.AreEqual(2, id2);
+            Assert.AreEqual(3, id3);
             Assert.IsTrue(new[]
             {
                 new Thing(1, "abc"),
@@ -975,11 +977,13 @@ namespace PocketSql.Tests
                     X int identity(100, 10),
                     Y varchar(8)
                 )");
-            connection.Execute(@"
-                insert into Things (Y) values ('abc')
-                insert into Things (Y) values ('def')
-                insert into Things (Y) values ('ghi')");
-            var things = connection.Query<Thing>(@"select * from Things");
+            var id1 = connection.QuerySingle<int>("insert into Things (Y) values ('abc'); select @@identity");
+            var id2 = connection.QuerySingle<int>("insert into Things (Y) values ('def'); select @@identity");
+            var id3 = connection.QuerySingle<int>("insert into Things (Y) values ('ghi'); select @@identity");
+            var things = connection.Query<Thing>("select * from Things");
+            Assert.AreEqual(100, id1);
+            Assert.AreEqual(110, id2);
+            Assert.AreEqual(120, id3);
             Assert.IsTrue(new[]
             {
                 new Thing(100, "abc"),

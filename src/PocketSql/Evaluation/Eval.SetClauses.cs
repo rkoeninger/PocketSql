@@ -27,7 +27,7 @@ namespace PocketSql.Evaluation
                 }
             }
 
-            sink.Updated(originalTargetRow, targetRow);
+            sink.Updated(originalTargetRow, targetRow, scope.Env);
         }
     }
 }

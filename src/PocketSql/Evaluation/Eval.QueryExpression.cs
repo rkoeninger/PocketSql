@@ -12,9 +12,12 @@ namespace PocketSql.Evaluation
             {
                 QuerySpecification querySpec => Evaluate(querySpec, scope),
                 QueryParenthesisExpression paren => Evaluate(paren.QueryExpression, scope),
-                BinaryQueryExpression binaryExpr => Evaluate(binaryExpr.BinaryQueryExpressionType, binaryExpr.All,
+                BinaryQueryExpression binaryExpr => Evaluate(
+                    binaryExpr.BinaryQueryExpressionType,
+                    binaryExpr.All,
                     Evaluate(binaryExpr.FirstQueryExpression, scope).ResultSet,
-                    Evaluate(binaryExpr.SecondQueryExpression, scope).ResultSet),
+                    Evaluate(binaryExpr.SecondQueryExpression, scope).ResultSet,
+                    scope.Env),
                 _ => throw FeatureNotSupportedException.Subtype(queryExpr)
             };
 
@@ -38,11 +41,11 @@ namespace PocketSql.Evaluation
                     Order(projection.Rows, firstElement, scope),
                     (orderedRows, element) => Order(orderedRows, element, scope)))
                 {
-                    CopyOnto(row, temp);
+                    CopyOnto(row, temp, scope.Env);
                 }
 
                 projection.Rows.Clear();
-                CopyOnto(temp, projection);
+                CopyOnto(temp, projection, scope.Env);
             }
 
             // OFFSET

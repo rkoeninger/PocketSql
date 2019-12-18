@@ -15,7 +15,7 @@ namespace PocketSql.Evaluation
         {
             foreach (var valuesExpr in selectedRows.Rows)
             {
-                var row = table.NewRow();
+                var row = table.NewRow(scope.Env);
 
                 foreach (var col in cols)
                 {
@@ -23,7 +23,7 @@ namespace PocketSql.Evaluation
                     row.SetValue(columnName, valuesExpr.GetValue(columnName));
                 }
 
-                sink.Inserted(row);
+                sink.Inserted(row, scope.Env);
             }
 
             scope.Env.RowCount = selectedRows.Rows.Count;

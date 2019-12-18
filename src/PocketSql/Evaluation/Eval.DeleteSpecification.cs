@@ -20,7 +20,7 @@ namespace PocketSql.Evaluation
                     rowCount++;
                 }
 
-                sink.Deleted(row);
+                sink.Deleted(row, scope.Env);
             }
 
             scope.Env.RowCount = rowCount;

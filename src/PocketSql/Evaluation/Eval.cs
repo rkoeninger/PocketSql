@@ -26,17 +26,17 @@ namespace PocketSql.Evaluation
             };
         }
 
-        private static void CopyOnto(Table source, Table target)
+        private static void CopyOnto(Table source, Table target, Env env)
         {
             foreach (var row in source.Rows)
             {
-                CopyOnto(row, target);
+                CopyOnto(row, target, env);
             }
         }
 
-        private static void CopyOnto(Row row, Table target)
+        private static void CopyOnto(Row row, Table target, Env env)
         {
-            var copy = target.NewRow();
+            var copy = target.NewRow(env);
 
             foreach (var i in Enumerable.Range(0, target.Columns.Count))
             {
@@ -441,7 +441,9 @@ namespace PocketSql.Evaluation
                     return typeof(decimal);
                 case DbType.Boolean:
                     return typeof(bool);
-                 default:
+                case DbType.Object:
+                    return typeof(object);
+                default:
                     throw FeatureNotSupportedException.Value(type);
             }
         }
