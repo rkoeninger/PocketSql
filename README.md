@@ -40,6 +40,8 @@ An in-process implementation of T-SQL, packaged as a library, suitable for testi
 
 ### Currently Unplanned/Excluded Features
 
+  * `waitfor`
+  * `break`, `continue`, `goto`, labels
   * Working Transactions with `rollback`/`commit`
   * Nested table results
   * Customizable collations (everything is case insensitive by default)

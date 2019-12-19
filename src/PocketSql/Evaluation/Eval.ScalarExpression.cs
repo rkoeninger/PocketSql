@@ -37,6 +37,7 @@ namespace PocketSql.Evaluation
                 FunctionCall funCall => Evaluate(funCall, arg, scope),
                 NullLiteral _ => null,
                 NullIfExpression nullIf => Evaluate(nullIf, arg, scope),
+                CoalesceExpression c => c.Expressions.Select(x => Evaluate(x, arg, scope)).FirstOrDefault(x => x != null),
                 _ => throw FeatureNotSupportedException.Subtype(expr)
             };
     }

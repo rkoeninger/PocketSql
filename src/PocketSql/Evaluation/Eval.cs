@@ -333,6 +333,8 @@ namespace PocketSql.Evaluation
                     return InferType(c.ElseExpression, table, scope);
                 case NullIfExpression nullIf:
                     return InferType(nullIf.FirstExpression, table, scope);
+                case CoalesceExpression c:
+                    return c.Expressions.Count > 0 ? InferType(c.Expressions[0], table, scope) : DbType.Object;
                 case NullLiteral _:
                     return DbType.String; // TODO: should there be a Null type?
                 default:

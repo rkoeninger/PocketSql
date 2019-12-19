@@ -784,7 +784,7 @@ namespace PocketSql.Tests
         }
 
         [Test]
-        public void NewId([All] IDbConnection connection)
+        public void NewId([All]IDbConnection connection)
         {
             Assert.IsInstanceOf<Guid>(connection.ExecuteScalar("select newid()"));
         }
@@ -795,6 +795,13 @@ namespace PocketSql.Tests
             Assert.AreEqual(1, connection.ExecuteScalar<int>("select isnumeric(1)"));
             Assert.AreEqual(1, connection.ExecuteScalar<int>("select isnumeric(1.0)"));
             Assert.AreEqual(0, connection.ExecuteScalar<int>("select isnumeric('1')"));
+        }
+
+        [Test]
+        public void Coalesce([All]IDbConnection connection)
+        {
+            Assert.AreEqual(2, connection.ExecuteScalar<int>("select coalesce(null, 2)"));
+            Assert.AreEqual(3, connection.ExecuteScalar<int>("select coalesce(null, null, 3)"));
         }
 
         [Test]
