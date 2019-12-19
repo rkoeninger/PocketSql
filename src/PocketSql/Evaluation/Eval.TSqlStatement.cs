@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using PocketSql.Modeling;
+using static PocketSql.Exceptions;
 using static PocketSql.Modeling.Extensions;
 
 namespace PocketSql.Evaluation
@@ -26,6 +27,12 @@ namespace PocketSql.Evaluation
                 //       or at least all Evaluate(____Statement) methods
                 // TODO: set @@error after each statement
                 BeginEndBlockStatement block => Evaluate(block.StatementList, scope).LastOrDefault(),
+                ThrowStatement t => throw NewSqlException(
+                    Evaluate<int>(t.ErrorNumber, NullArgument.It, scope),
+                    Evaluate<int>(t.State, NullArgument.It, scope),
+                    Evaluate<string>(t.Message, NullArgument.It, scope),
+                    scope.Env.Engine.Version),
+                TryCatchStatement t => Evaluate(t, scope),
                 UseStatement use => VoidNull<EngineResult>(() => scope.Env.DefaultDatabase = use.DatabaseName.Value),
                 ExecuteStatement exec => Evaluate(exec.ExecuteSpecification, scope),
                 ReturnStatement ret => VoidNull<EngineResult>(() =>

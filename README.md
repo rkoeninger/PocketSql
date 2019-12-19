@@ -24,12 +24,14 @@ An in-process implementation of T-SQL, packaged as a library, suitable for testi
   * CTEs (Common Table Expressions)
   * `if`, `while` statments
   * `case`, `between` expressions
+  * `try`, `catch`, `throw`, `error_*` functions
   * All binary operators
   * `sum`, `count`, `rownumber` aggregate functions
   * Calling user-defined functions
   * Input, output and return parameters
   * `declare`, `set`, access local variables
-  * `@@rowcount`, `@@fetch_status`, etc. meta-variables
+  * Global variables
+    * `@@rowcount`, `@@fetch_status`, `@@identity`, `@@error`
   * Cursors
   * Uniqueness constraints imposed by indexes
   * `identity` auto-incrementing columns

@@ -57,6 +57,7 @@ namespace PocketSql.Evaluation
             typeof(int), typeof(short), typeof(long), typeof(byte), typeof(float), typeof(double), typeof(decimal)
         };
 
+        // TODO: refactor how built-in functions are implemented
         private static object UngroupedFunctionCall(FunctionCall funCall, IArgument arg, Scope scope)
         {
             var name = funCall.FunctionName.Value;
@@ -64,6 +65,18 @@ namespace PocketSql.Evaluation
 
             switch (name.ToLower())
             {
+                case "error_number" when paramCount == 0:
+                    return scope.Env.ErrorNumber;
+                case "error_state" when paramCount == 0:
+                    return scope.Env.ErrorState;
+                case "error_message" when paramCount == 0:
+                    return scope.Env.ErrorMessage;
+                case "error_severity" when paramCount == 0:
+                    return null; // not properly implemented
+                case "error_line" when paramCount == 0:
+                    return null; // not properly implemented
+                case "error_procedure" when paramCount == 0:
+                    return null; // not properly implemented
                 case "isnumeric" when paramCount == 1:
                     var value = Evaluate(funCall.Parameters[0], arg, scope);
                     return value != null && NumericTypes.Contains(value.GetType()) ? 1 : 0;

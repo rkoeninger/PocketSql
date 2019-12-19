@@ -306,14 +306,21 @@ namespace PocketSql.Evaluation
                     // TODO: so, so brittle
                     return InferType(binExpr.FirstExpression, table, scope);
                 case FunctionCall fun:
+                    // TODO: refactor how built-in functions are implemented
                     switch (fun.FunctionName.Value.ToLower())
                     {
                         case "isnull":
                         case "sum":
                             return InferType(fun.Parameters[0], table, scope);
+                        case "error_number":
+                        case "error_state":
+                        case "error_severity":
+                        case "error_line":
                         case "isnumeric":
                         case "count":
                             return DbType.Int32;
+                        case "error_message":
+                        case "error_procedure":
                         case "trim":
                         case "ltrim":
                         case "rtrim":

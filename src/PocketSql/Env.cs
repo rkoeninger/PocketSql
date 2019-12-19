@@ -23,7 +23,8 @@ namespace PocketSql
             {
                 { "@@fetch_status", x => x.FetchStatus },
                 { "@@rowcount", x => x.RowCount },
-                { "@@identity", x => x.Identity }
+                { "@@identity", x => x.Identity },
+                { "@@error", x => x.ErrorNumber }
             };
 
         public Namespace<object> Vars { get; private set; } = new Namespace<object>();
@@ -31,6 +32,9 @@ namespace PocketSql
         public int FetchStatus { get; set; } = -1;
         public int RowCount { get; set; } = -1;
         public int Identity { get; set; } = -1;
+        public int? ErrorNumber { get; set; }
+        public int? ErrorState { get; set; }
+        public string ErrorMessage { get; set; }
         public Engine Engine { get; private set; }
         public string DefaultDatabase { get; set; } = "master";
         public string DefaultSchema { get; set; } = "dbo";
