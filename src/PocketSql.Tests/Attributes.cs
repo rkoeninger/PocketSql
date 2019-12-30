@@ -18,6 +18,7 @@ namespace PocketSql.Tests
         {
             { typeof(int), v => v },
             { typeof(Engine), v => new Engine(v) },
+            { typeof(EngineConnection), v => new Engine(v).GetConnection() },
             { typeof(IDbConnection), v => new Engine(v).GetConnection() }
         };
 
