@@ -89,7 +89,8 @@ namespace PocketSql
 
             if (errors != null && errors.Count > 0)
             {
-                throw new Exception(string.Join("\r\n", errors.Select(e => e.Message)));
+                throw new Exception(string.Join("\r\n", errors.Select(e =>
+                    e.Message + " at line " + e.Line + ", column " + e.Column)));
             }
 
             var env = Env.Of(connection, Parameters);

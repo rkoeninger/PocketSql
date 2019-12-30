@@ -5,8 +5,7 @@ using NUnit.Framework;
 
 namespace PocketSql.Tests
 {
-    [TestFixture]
-    public class WhereConditionTests
+    public class Comparisons
     {
         [Test]
         public void TestWhereStringGreaterThanString([All]IDbConnection connection)
@@ -14,8 +13,8 @@ namespace PocketSql.Tests
             connection.Execute(SampleTable);
             var ids = connection.Query<IdAndName>("SELECT * FROM [Sample] WHERE [Name] > 'E'")?.ToList();
             Assert.IsNotNull(ids);
-            Assert.AreEqual(4, ids.Count);
-            Assert.IsFalse(ids.Any(x => x.Name.CompareTo("E") <= 0));
+            Assert.AreEqual(4, ids?.Count);
+            Assert.IsFalse(ids?.Any(x => x.Name.CompareTo("E") <= 0));
         }
 
         [Test]
@@ -24,14 +23,8 @@ namespace PocketSql.Tests
             connection.Execute(SampleTable);
             var ids = connection.Query<IdAndName>("SELECT * FROM [Sample] WHERE [Name] < 'E'")?.ToList();
             Assert.IsNotNull(ids);
-            Assert.AreEqual(4, ids.Count);
-            Assert.IsFalse(ids.Any(x => x.Name.CompareTo("E") >= 0));
-        }
-
-        internal class IdAndName
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
+            Assert.AreEqual(4, ids?.Count);
+            Assert.IsFalse(ids?.Any(x => x.Name.CompareTo("E") >= 0));
         }
 
         private const string SampleTable = @"

@@ -63,6 +63,7 @@ namespace PocketSql.Evaluation
             var name = funCall.FunctionName.Value;
             var paramCount = funCall.Parameters.Count;
 
+            // TODO: how to handle `select count(*)` ?
             switch (name.ToLower())
             {
                 case "error_number" when paramCount == 0:

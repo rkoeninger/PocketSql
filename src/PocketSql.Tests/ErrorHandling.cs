@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace PocketSql.Tests
 {
-    public class ErrorHandlingTests
+    public class ErrorHandling
     {
         [Test]
         public void CatchAndSelectThrownError([AsOf(11)]IDbConnection connection)
